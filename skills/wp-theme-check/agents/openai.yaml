@@ -1,0 +1,5 @@
+interface:
+  display_name: "WordPress Theme Check"
+  short_description: "Run offline WordPress theme checks and fix findings"
+policy:
+  allow_implicit_invocation: true

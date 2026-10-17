@@ -1,0 +1,16 @@
+{
+  "name": "wp-theme-kit",
+  "interface": {
+    "displayName": "WordPress Theme Kit"
+  },
+  "plugins": [
+    {
+      "name": "wp-theme-kit",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "category": "Development"
+    }
+  ]
+}

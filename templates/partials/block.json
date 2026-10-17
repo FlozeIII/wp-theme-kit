@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "{{slug}}/{{blockSlug}}",
+  "version": "0.1.0",
+  "title": "{{blockTitle}}",
+  "category": "theme",
+  "icon": "block-default",
+  "description": "{{blockTitle}} block.",
+  "textdomain": "{{textDomain}}",
+  "supports": {
+    "html": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css"
+}

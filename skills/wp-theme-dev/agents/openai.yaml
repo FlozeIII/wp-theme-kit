@@ -1,0 +1,5 @@
+interface:
+  display_name: "WordPress Theme Development"
+  short_description: "Route WordPress theme tasks to the right workflow"
+policy:
+  allow_implicit_invocation: true

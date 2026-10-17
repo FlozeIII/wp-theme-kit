@@ -1,0 +1,15 @@
+node_modules/
+vendor/
+dist/
+coverage/
+*.zip
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.scratch/
+.wp-theme-kit-install.json
+.claude/
+.codex/
+.agents/skills/

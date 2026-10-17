@@ -1,0 +1,5 @@
+interface:
+  display_name: "WordPress Theme i18n"
+  short_description: "Generate and check POT files for a theme"
+policy:
+  allow_implicit_invocation: true

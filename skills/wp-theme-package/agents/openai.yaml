@@ -1,0 +1,5 @@
+interface:
+  display_name: "WordPress Theme Package"
+  short_description: "Package, verify, and prepare a theme release"
+policy:
+  allow_implicit_invocation: true

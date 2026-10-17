@@ -1,0 +1,50 @@
+{
+  "name": "wp-theme-kit",
+  "version": "0.1.0",
+  "description": "Cross-harness toolkit for developing WordPress themes: checks, scaffolding, previews, packaging, and i18n.",
+  "type": "module",
+  "bin": {
+    "wptk": "bin/wp-theme-kit.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "install.mjs",
+    "templates/",
+    "skills/",
+    "commands/",
+    "AGENTS.md",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    ".claude-plugin/",
+    ".codex-plugin/",
+    ".agents/"
+  ],
+  "engines": {
+    "node": ">=22.2.0"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:unit": "node --test \"tests/unit/*.test.mjs\"",
+    "test:integration": "node --test \"tests/integration/*.test.mjs\"",
+    "check:self": "node bin/wp-theme-kit.mjs check ."
+  },
+  "keywords": [
+    "wordpress",
+    "theme",
+    "wordpress-theme",
+    "claude-code",
+    "codex",
+    "deepseek",
+    "agent-skills"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FlozeIII/wp-theme-kit.git"
+  },
+  "author": {
+    "name": "FlozeIII"
+  }
+}

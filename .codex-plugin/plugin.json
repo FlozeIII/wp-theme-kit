@@ -1,0 +1,20 @@
+{
+  "name": "wp-theme-kit",
+  "version": "0.1.0",
+  "description": "Offline checks, scaffolding, browser screenshots, packaging, and POT generation for classic, block, and hybrid WordPress themes.",
+  "author": {
+    "name": "FlozeIII"
+  },
+  "homepage": "https://github.com/FlozeIII/wp-theme-kit",
+  "repository": "https://github.com/FlozeIII/wp-theme-kit",
+  "license": "MIT",
+  "keywords": [
+    "wordpress",
+    "theme",
+    "wordpress-theme",
+    "codex",
+    "deepseek",
+    "agent-skills"
+  ],
+  "skills": "./skills/"
+}

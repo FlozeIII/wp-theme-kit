@@ -1,0 +1,17 @@
+# Packaging exclusion list for wp-theme-kit.
+# Root-relative literal paths only. Directories may end with "/".
+tests/
+docs/
+.scratch/
+.git/
+.gitignore
+.distignore
+.wp-theme-kit.json
+.wp-theme-kit-baseline.json
+.wp-theme-kit-install.json
+AGENTS.md
+CLAUDE.md
+.agents/
+.claude/
+.codex-plugin/
+.editorconfig

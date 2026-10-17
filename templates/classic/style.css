@@ -1,0 +1,122 @@
+/*
+Theme Name: {{name}}
+Author: {{author}}
+Description: {{description}}
+Version: {{version}}
+Requires at least: {{requiresAtLeast}}
+Tested up to: {{testedUpTo}}
+Requires PHP: {{requiresPHP}}
+License: {{license}}
+License URI: {{licenseUri}}
+Text Domain: {{textDomain}}
+Tags: blog
+*/
+
+:root {
+  --theme-background: #fdfbf7;
+  --theme-foreground: #2d2d35;
+  --theme-muted: #7c7c8a;
+  --theme-border: #e8e5df;
+  --theme-accent: #6366f1;
+  --theme-radius: 0.5rem;
+  --theme-width: 72rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--theme-background);
+  color: var(--theme-foreground);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.7;
+}
+
+a {
+  color: var(--theme-accent);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.site-header,
+.site-footer,
+.site-main {
+  width: min(var(--theme-width), calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.site-title {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-main {
+  padding: 2rem 0;
+}
+
+.post-list {
+  display: grid;
+  gap: 2rem;
+}
+
+.site-footer {
+  padding: 2rem 0;
+  border-top: 1px solid var(--theme-border);
+  color: var(--theme-muted);
+}
+
+.screen-reader-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link:focus {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  background: var(--theme-foreground);
+  color: var(--theme-background);
+  clip: auto;
+}
+
+@media (min-width: 48rem) {
+  .with-sidebar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18rem;
+    gap: 3rem;
+  }
+}

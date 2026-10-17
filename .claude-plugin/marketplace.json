@@ -1,0 +1,22 @@
+{
+  "name": "wp-theme-kit",
+  "owner": {
+    "name": "FlozeIII"
+  },
+  "description": "WordPress theme development skills and a zero-dependency CLI.",
+  "plugins": [
+    {
+      "name": "wp-theme-kit",
+      "source": "./",
+      "description": "Checks, scaffolding, screenshots, packaging, and i18n for classic, block, and hybrid WordPress themes.",
+      "category": "development",
+      "keywords": [
+        "wordpress",
+        "theme",
+        "claude-code",
+        "codex",
+        "deepseek"
+      ]
+    }
+  ]
+}

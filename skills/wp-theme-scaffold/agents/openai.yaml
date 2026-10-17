@@ -1,0 +1,5 @@
+interface:
+  display_name: "WordPress Theme Scaffold"
+  short_description: "Create themes, templates, parts, modules, and blocks"
+policy:
+  allow_implicit_invocation: true

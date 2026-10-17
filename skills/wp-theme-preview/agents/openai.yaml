@@ -1,0 +1,5 @@
+interface:
+  display_name: "WordPress Theme Preview"
+  short_description: "Screenshot and audit themes in a real browser"
+policy:
+  allow_implicit_invocation: true
