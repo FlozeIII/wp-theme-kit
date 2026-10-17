@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `check --diff <ref>` limits reports and mechanical fixes to changed files,
+  including staged, unstaged, and non-ignored new sources. Supports nested theme
+  directories and Windows case-only renames; JSON reports expose the scope.
+  Unattributed theme-wide findings are omitted and partial baseline updates
+  are rejected. Git stays offline even in partial clones; missing comparison
+  objects fail before fixes. Structure findings respect ignored files and use
+  the source file's actual spelling on Windows.
 - `check --fix` for missing `wp_body_open()` in classic/hybrid headers,
   missing third text-domain arguments in eligible two-argument gettext calls,
   and numeric normalization of `Tested up to` header values.
@@ -30,7 +37,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 97 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 111 passing, 1 skipped on Windows (file-symlink privileges).
+- `check --diff` acceptance: 14 CLI integration tests cover real Git changes,
+  clean scopes, Unicode paths, nested themes, renames/deletions, fixes and
+  baselines, invalid refs, missing Git, partial-clone offline failures, ignored
+  structure files, actual Windows path spelling, and output formats.
 - Each regression was reproduced with a failing CLI test before its fix;
   coverage includes dry runs, applied edits, both PHP line-comment forms,
   JS/auto/PHP analysis, suppression on multiline body markup, and version-header

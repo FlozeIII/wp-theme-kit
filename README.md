@@ -28,7 +28,7 @@ text domain, or environment variable enters the core.
 ## Requirements
 
 - Node.js 22.2 or newer.
-- Git, for packaging.
+- Git, for packaging and `check --diff`.
 - Optional: PHP 7.4 or newer for the deeper `token_get_all` analyzer.
 - Optional: a Chromium-family browser (Edge or Chrome) for screenshots.
 - Optional: a running local WordPress site for preview and audit.
@@ -104,6 +104,7 @@ wptk doctor
 # Check the current theme
 wptk check
 wptk check --format json --fail-on warning
+wptk check --diff HEAD
 wptk check --fix --dry-run
 wptk check --fix
 
@@ -134,7 +135,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk doctor` | Report Node, Git, PHP, WordPress, WP-CLI, browser, and theme metadata. |
 | `wptk init <slug>` | Create a classic, block, or hybrid theme. |
 | `wptk adopt [dir]` | Add config and agent instructions to an existing theme. |
-| `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`, `--fix [--dry-run]`. |
+| `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`, `--diff <ref>`, `--fix [--dry-run]`. |
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
 | `wptk pot [--out file]` | Generate a POT file; `--check` compares msgids. |
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
@@ -221,6 +222,30 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
   PHPCS-WordPress. Run those against the extracted artifact before release.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
+
+## Changed-file checks
+
+`wptk check --diff <ref>` reports findings only in files changed between one
+committed Git ref and the current worktree. This includes staged and unstaged
+edits plus non-ignored untracked files. Commit hashes, tags, and refs such as
+`HEAD~1` work; invalid refs or missing Git exit 2 without writing files.
+Git never automatically fetches missing objects in a partial clone; if the
+comparison needs unavailable objects, the command exits 2 without applying fixes.
+
+Themes may live inside a larger repository. Paths are relative to the theme,
+with rename destinations included and deleted files excluded. Existing check
+ignores, inline suppression, baselines, output formats, and failure thresholds
+apply to the scoped findings. Windows path matching handles case-only renames.
+
+The checker still scans the complete theme for cross-file context. JSON adds
+`diff.ref` and `diff.files` (changed source files within the check scope);
+`summary.files` remains the total number of scanned source files. Findings with
+no concrete file, shown as `(theme)`, are omitted, including theme-wide header
+and classic-markup findings. Use an ordinary `check` for complete theme validation.
+
+With `--fix [--dry-run]`, only scoped findings can generate edits, and the
+post-fix report keeps the same diff scope. `--diff --update-baseline` is rejected
+so a partial report cannot replace the full baseline.
 
 ## Mechanical fixes
 

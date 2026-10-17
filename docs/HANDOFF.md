@@ -7,8 +7,8 @@ It does not assume access to any previous chat, plan file, or local session.
 
 - Version: `0.1.0`
 - Status: usable; all four capability areas are implemented, with the first
-  v0.2 roadmap item (`check --fix`) completed.
-- Tests: `npm test` -> 97 passing, 1 skipped on Windows because file-symlink
+  two v0.2 roadmap items (`check --fix` and `check --diff`) completed.
+- Tests: `npm test` -> 111 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -62,6 +62,13 @@ bin/wp-theme-kit.mjs
 - A rule calls `ctx.add({ line, severity, message, hint, file })`.
 - Rule IDs are stable API. Changing an ID changes baseline fingerprints.
 - Inline ignores: `wptk-ignore`, `wptk-ignore-next-line`, `phpcs:ignore`.
+- `src/check/diff.mjs` reads changed paths with offline Git commands.
+  `--diff` filters concrete-file findings before baseline suppression and fix
+  planning, while keeping full-theme scan context. Partial baseline updates
+  are rejected. Partial clones never fetch missing objects; unavailable
+  comparison objects exit 2 before edits. Concrete findings use the actual
+  scanned paths, including ignores and Windows casing.
+  Acceptance: `tests/integration/check-diff.test.mjs` (14 tests).
 - `src/check/fix.mjs` plans whitelisted edits from visible findings and applies
   them atomically per file. Dry runs emit plans only; applied fixes reload theme
   metadata and run the checker again. See the README's Mechanical fixes section

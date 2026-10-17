@@ -77,6 +77,18 @@ Severity is only a default. Override a rule in `.wp-theme-kit.json`:
 | `js.hardcoded-host` | warning | no local hosts in shipped JavaScript |
 | `css.local-url` | warning | no local hosts in CSS URLs |
 
+## Changed-file checks
+
+Use `wptk check --diff <ref>` to report only findings in changed source files.
+The comparison includes staged, unstaged, and non-ignored untracked paths and
+works when the theme is a repository subdirectory. The full theme is still
+scanned for context; findings without a concrete file (`(theme)`) are omitted.
+Run an ordinary `check` for the complete theme-wide gate.
+
+The scope also limits `--fix` and survives its recheck. Existing baselines can
+be read, but `--update-baseline` must run separately without `--diff`.
+See the README's Changed-file checks section for JSON fields and path behavior.
+
 ## Mechanical fixes
 
 Run `wptk check --fix --dry-run` to preview edits, then `wptk check --fix` to

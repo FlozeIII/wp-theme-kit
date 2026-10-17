@@ -13,9 +13,11 @@ Each item is small enough for one agent session and has an acceptance command.
   Acceptance: every fix has a positive fixture and a `--dry-run` test.
   Verified: `node --test tests/integration/check-fix.test.mjs` (22 pass, 1
   file-symlink privilege skip on Windows); `npm test` (97 pass, 1 skip).
-- [ ] `check --diff <ref>`: only report findings in changed files.
+- [x] `check --diff <ref>`: only report findings in changed files.
   Acceptance: a test creates a Git repo, changes one file, and asserts the
   unchanged file's findings are absent.
+  Verified: `node --test tests/integration/check-diff.test.mjs` (14 pass on
+  Windows); `npm test` (111 pass, 1 file-symlink privilege skip).
 - [ ] `check --explain <rule-id>`: print the rule's rationale and examples.
   Acceptance: `wptk check --explain php.unescaped-output` exits 0 and prints the
   rule catalogue entry.

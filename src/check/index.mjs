@@ -5,6 +5,7 @@ import { VERSION } from '../version.mjs';
 import { EnvError } from '../errors.mjs';
 import { loadTheme } from '../theme.mjs';
 import { applyFixes, planFixes } from './fix.mjs';
+import { changedFiles } from './diff.mjs';
 import { analyzePhpFiles, lexFile } from './analyze.mjs';
 import { applyBaseline, defaultBaseline, loadBaseline, writeBaseline } from './baseline.mjs';
 import { buildIgnoreMap, isIgnored } from './ignore.mjs';
@@ -14,6 +15,10 @@ import { rules as assetRules } from './rules/assets.mjs';
 
 const SEVERITY_RANK = { info: 0, warning: 1, error: 2 };
 const ALL_RULES = [...structureRules, ...phpRules, ...assetRules];
+
+function sourcePathKey(file) {
+  return process.platform === 'win32' ? file.toLowerCase() : file;
+}
 
 function languageOf(file) {
   const extension = path.extname(file).toLowerCase();
@@ -98,6 +103,7 @@ function runRule(rule, context, sink, config) {
  * @param {string} [options.format]
  * @param {string} [options.failOn]
  * @param {string} [options.analyzer]
+ * @param {string} [options.diffRef]
  * @param {string} [options.baselineFile]
  * @param {boolean} [options.noBaseline]
  * @param {boolean} [options.updateBaseline]
@@ -110,6 +116,7 @@ export async function runCheck({
   format = 'pretty',
   failOn,
   analyzer,
+  diffRef,
   baselineFile,
   noBaseline = false,
   updateBaseline = false,
@@ -127,11 +134,16 @@ export async function runCheck({
     );
   }
 
+  const changed = diffRef === undefined ? null : new Set([...changedFiles(root, diffRef)].map(sourcePathKey));
   const ignore = normalizeIgnore([...DEFAULT_IGNORE, ...(config.checks.ignore ?? [])]);
   const files = walkThemeSource(root, ignore).filter((file) => {
     const base = path.basename(file);
     return !base.endsWith('.min.js') && !base.endsWith('.min.css');
   });
+  const diffFiles = changed ? new Map(files
+    .map((file) => relativePosix(root, file))
+    .filter((file) => changed.has(sourcePathKey(file)))
+    .map((file) => [sourcePathKey(file), file])) : null;
   const phpFiles = files.filter((file) => languageOf(file) === 'php');
 
   const wpRoot = findWordPressRoot({ explicit: config.wordpress.path, startDir: root });
@@ -216,6 +228,12 @@ export async function runCheck({
   // De-duplicate identical findings (a rule may see the same call twice).
   const seen = new Set();
   const unique = findings.filter((finding) => {
+    if (diffFiles) {
+      if (finding.file === '(theme)') return false;
+      const actualFile = diffFiles.get(sourcePathKey(finding.file));
+      if (!actualFile) return false;
+      finding.file = actualFile;
+    }
     const key = `${finding.rule}|${finding.file}|${finding.line}|${finding.message}`;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -259,7 +277,7 @@ export async function runCheck({
       applyFixes(plans);
       return runCheck({
         context: { ...context, theme: loadTheme(root, config) },
-        format, failOn, analyzer, baselineFile, noBaseline, out, fixes,
+        format, failOn, analyzer, diffRef, baselineFile, noBaseline, out, fixes,
       });
     }
   }
@@ -284,6 +302,7 @@ export async function runCheck({
       files: files.length,
     },
     findings: kept,
+    ...(diffFiles ? { diff: { ref: diffRef, files: [...diffFiles.values()] } } : {}),
     ...(fixes ? { fixes } : {}),
   };
 
