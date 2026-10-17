@@ -14,6 +14,14 @@ Severity is only a default. Override a rule in `.wp-theme-kit.json`:
 }
 ```
 
+JSON findings include `documentationUrl`, an absolute `file:` URL to this
+installed catalogue with an explicit rule anchor (for example,
+`#php-unescaped-output`). The URL is encoded and refers to the kit installation,
+not the checked theme. It works offline in Markdown viewers supporting HTML
+anchors, while `wptk check --explain <rule-id>` reads the entry in the terminal.
+Diff/fix reports use the same links. Baseline identities and files exclude
+this presentation metadata; pretty and GitHub output remain unchanged.
+
 ## Theme structure
 
 | Rule | Default | What it checks |
@@ -143,6 +151,9 @@ surface a known problem intentionally.
 Use `wptk check --explain <rule-id>` to read an entry without scanning a theme.
 Each entry below uses a level-three heading containing its exact rule ID;
 the CLI reads that entry directly from this shipped catalogue.
+Keep its explicit `<a id="rule-id-with-hyphens"></a>` anchor stable so existing
+JSON documentation links keep locating the rule. Internal diagnostics are
+documented separately from the 38 registered checks.
 The output is Markdown by default; `--json` or `--format json` returns
 `{ "rule": "<id>", "documentation": "<Markdown entry>" }`. This mode needs
 no theme or toolchain, does not load configuration, and rejects scan options
@@ -150,6 +161,8 @@ such as `--fix`, `--diff`, baseline flags, `--analyzer`, and `--fail-on`.
 IDs are exact and case-sensitive; invalid IDs or combinations exit 2.
 
 ### `php.unescaped-output`
+
+<a id="php-unescaped-output"></a>
 
 Default: warning. Applies to PHP output through `echo`, `print`, and `<?=`.
 
@@ -172,6 +185,8 @@ echo esc_html( $title );
 
 ### `theme.style-css`
 
+<a id="theme-style-css"></a>
+
 Default: error. Applies to the theme root.
 
 Rationale: WordPress reads the theme's identity from the `style.css` header.
@@ -190,6 +205,8 @@ After:
 ```
 
 ### `theme.style-header`
+
+<a id="theme-style-header"></a>
 
 Default: error. Missing secondary header fields are warnings.
 
@@ -223,6 +240,8 @@ Tags: blog
 
 ### `theme.tested-up-to`
 
+<a id="theme-tested-up-to"></a>
+
 Default: warning. Applies to the `style.css` header.
 
 Rationale: Compatibility tools expect a numeric WordPress version in
@@ -241,6 +260,8 @@ After:
 ```
 
 ### `theme.text-domain`
+
+<a id="theme-text-domain"></a>
 
 Default: warning. Applies to the `style.css` header.
 
@@ -262,6 +283,8 @@ Text Domain: demo-theme
 ```
 
 ### `theme.version-mismatch`
+
+<a id="theme-version-mismatch"></a>
 
 Default: warning. Applies when `package.json` declares a version.
 
@@ -285,6 +308,8 @@ package.json version: 1.0.0
 
 ### `theme.screenshot`
 
+<a id="theme-screenshot"></a>
+
 Default: info. Invalid PNGs and dimensions above 1200x900 are warnings.
 
 Rationale: The WordPress Themes screen needs a recognizable preview. Ship a
@@ -303,6 +328,8 @@ screenshot.png: valid PNG, 1200x900
 ```
 
 ### `theme.distignore`
+
+<a id="theme-distignore"></a>
 
 Default: info. Applies to the theme root.
 
@@ -326,6 +353,8 @@ docs/
 
 ### `theme.unknown-type`
 
+<a id="theme-unknown-type"></a>
+
 Default: error. Applies to theme structure detection.
 
 Rationale: Checks need a recognizable classic or block layout to select the
@@ -345,6 +374,8 @@ Block: style.css + theme.json + templates/index.html
 ```
 
 ### `classic.index-missing`
+
+<a id="classic-index-missing"></a>
 
 Default: error. Applies to classic and hybrid themes.
 
@@ -367,6 +398,8 @@ get_footer();
 ```
 
 ### `classic.markup`
+
+<a id="classic-markup"></a>
 
 Default: warning. A missing skip link is info.
 
@@ -394,6 +427,8 @@ After:
 
 ### `classic.title-tag`
 
+<a id="classic-title-tag"></a>
+
 Default: info. Applies to classic and hybrid themes.
 
 Rationale: Every page needs a document title. Declare `title-tag` support so
@@ -414,6 +449,8 @@ add_action( 'after_setup_theme', 'demo_theme_setup' );
 
 ### `php.unescaped-printf`
 
+<a id="php-unescaped-printf"></a>
+
 Default: warning. Applies to PHP `printf()` calls.
 
 Rationale: Formatting a string does not escape its dynamic arguments. Escape
@@ -432,6 +469,8 @@ printf( '<span>%s</span>', esc_html( $title ) );
 ```
 
 ### `php.text-domain`
+
+<a id="php-text-domain"></a>
 
 Default: warning. A different literal domain is an error; dynamic domains are warnings.
 
@@ -453,6 +492,8 @@ __( 'Read more', 'demo-theme' );
 
 ### `php.translator-comment`
 
+<a id="php-translator-comment"></a>
+
 Default: info. Applies to gettext strings containing placeholders.
 
 Rationale: Translators need to know what substituted values mean, especially
@@ -472,6 +513,8 @@ __( 'Written by %s', 'demo-theme' );
 ```
 
 ### `php.forbidden-function`
+
+<a id="php-forbidden-function"></a>
 
 Default: error. Some discouraged functions are warnings.
 
@@ -495,6 +538,8 @@ wp_reset_postdata();
 
 ### `php.superglobal-direct`
 
+<a id="php-superglobal-direct"></a>
+
 Default: info. Applies to request superglobal reads.
 
 Rationale: Request input is untrusted. Unslash and sanitize it for the intended
@@ -515,6 +560,8 @@ $search = isset( $_GET['search'] ) ? sanitize_text_field( wp_unslash( $_GET['sea
 
 ### `php.sql-interpolation`
 
+<a id="php-sql-interpolation"></a>
+
 Default: error. Queries passed as plain variables are info for manual review.
 
 Rationale: Interpolating request-derived values into SQL can permit SQL
@@ -534,6 +581,8 @@ $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->posts} WHERE post_tit
 ```
 
 ### `php.nonce-check`
+
+<a id="php-nonce-check"></a>
 
 Default: info. Applies to files reading `$_POST` or `$_REQUEST`.
 
@@ -556,6 +605,8 @@ $label = sanitize_text_field( wp_unslash( $_POST['label'] ?? '' ) );
 
 ### `php.capability-check`
 
+<a id="php-capability-check"></a>
+
 Default: info. Applies to request-driven state-changing WordPress calls.
 
 Rationale: A valid request still needs authorization for the specific action.
@@ -577,6 +628,8 @@ update_option( 'demo_theme_label', sanitize_text_field( wp_unslash( $_POST['labe
 ```
 
 ### `php.abspath-guard`
+
+<a id="php-abspath-guard"></a>
 
 Default: info. Applies to PHP libraries under `inc/`, `includes/`, `src/`,
 `lib/`, and `classes/`, rather than ordinary template files.
@@ -601,6 +654,8 @@ function demo_theme_helper() { return 'value'; }
 
 ### `php.global-prefix`
 
+<a id="php-global-prefix"></a>
+
 Default: info. Applies to named global PHP functions, excluding class methods.
 
 Rationale: Themes and plugins share PHP's global function namespace. Use the
@@ -621,6 +676,8 @@ function demo_theme_render_card() { return 'card'; }
 
 ### `php.hardcoded-local-path`
 
+<a id="php-hardcoded-local-path"></a>
+
 Default: warning. Applies to PHP string literals.
 
 Rationale: Development hostnames and machine-specific paths fail after
@@ -639,6 +696,8 @@ $image = get_theme_file_uri( 'assets/hero.png' );
 ```
 
 ### `php.template-part-missing`
+
+<a id="php-template-part-missing"></a>
 
 Default: warning. Applies to literal template references in classic/hybrid themes.
 
@@ -662,6 +721,8 @@ template-parts/card.php exists.
 
 ### `php.require-glob`
 
+<a id="php-require-glob"></a>
+
 Default: info. Applies to files with dynamic discovery and PHP includes.
 
 Rationale: Directory scans hide load order and make included behavior difficult
@@ -683,6 +744,8 @@ require_once __DIR__ . '/inc/assets.php';
 
 ### `php.asset-version`
 
+<a id="php-asset-version"></a>
+
 Default: info. Applies to script/style enqueue and registration calls.
 
 Rationale: An explicit asset version gives deployments a cache invalidation
@@ -702,6 +765,8 @@ wp_enqueue_style( 'demo-theme', get_stylesheet_uri(), array(), wp_get_theme()->g
 ```
 
 ### `block.index-missing`
+
+<a id="block-index-missing"></a>
 
 Default: error. Applies to block themes.
 
@@ -723,6 +788,8 @@ After:
 
 ### `block.theme-json`
 
+<a id="block-theme-json"></a>
+
 Default: error. Unsupported/missing version is warning; missing `$schema` is info.
 
 Rationale: WordPress must parse valid JSON before using theme settings and
@@ -742,6 +809,8 @@ After:
 ```
 
 ### `block.template-parts`
+
+<a id="block-template-parts"></a>
 
 Default: warning. Applies to template references in block/hybrid themes.
 
@@ -765,6 +834,8 @@ parts/header.html exists.
 
 ### `block.block-json`
 
+<a id="block-block-json"></a>
+
 Default: error. Missing name/title/category fields are warnings.
 
 Rationale: A block manifest needs valid JSON, identifying metadata, and existing
@@ -786,6 +857,8 @@ After:
 Create `render.php` beside this manifest before using the After example.
 
 ### `block.pattern-header`
+
+<a id="block-pattern-header"></a>
 
 Default: warning. Applies to PHP files under `patterns/`.
 
@@ -811,6 +884,8 @@ After:
 
 ### `html.img-alt`
 
+<a id="html-img-alt"></a>
+
 Default: info. Applies to literal image markup in HTML and PHP inline HTML.
 
 Rationale: Alternative text makes image meaning available to assistive
@@ -830,6 +905,8 @@ After:
 ```
 
 ### `html.inline-handler`
+
+<a id="html-inline-handler"></a>
 
 Default: info. Applies to recognized inline event attributes in HTML/PHP markup.
 
@@ -853,6 +930,8 @@ Attach `openMenu` with `addEventListener` in the enqueued script.
 
 ### `html.target-blank`
 
+<a id="html-target-blank"></a>
+
 Default: info. Applies to literal links with `target="_blank"`.
 
 Rationale: Explicit `rel="noopener"` prevents an opened page from controlling
@@ -872,6 +951,8 @@ After:
 ```
 
 ### `js.text-domain`
+
+<a id="js-text-domain"></a>
 
 Default: warning. Wrong literal domains are errors; dynamic domains are info.
 
@@ -893,6 +974,8 @@ wp.i18n.__( 'Read more', 'demo-theme' );
 
 ### `js.console`
 
+<a id="js-console"></a>
+
 Default: info. Applies to `console.log`, `console.debug`, and `console.info`.
 
 Rationale: Debug logging in shipped JavaScript adds noise and may expose
@@ -912,6 +995,8 @@ render( state );
 ```
 
 ### `js.hardcoded-host`
+
+<a id="js-hardcoded-host"></a>
 
 Default: warning. Applies to localhost and 127.0.0.1 in shipped JavaScript.
 
@@ -933,6 +1018,8 @@ const endpoint = demoThemeConfig.cardsUrl;
 
 ### `css.local-url`
 
+<a id="css-local-url"></a>
+
 Default: warning. Applies to localhost and 127.0.0.1 inside CSS `url()`.
 
 Rationale: A stylesheet referencing a developer's server loses its assets on
@@ -948,4 +1035,29 @@ After:
 
 ```css
 .hero { background-image: url('../images/hero.png'); }
+```
+
+### `meta.rule-error`
+
+<a id="meta-rule-error"></a>
+
+Default: info. This is an internal diagnostic, not one of the 38 registered checks.
+
+Rationale: When a rule throws, the checker reports the exception and continues
+with other rules. This diagnostic means that one rule did not finish; it does
+not certify that the input is valid. Use the named rule and exception message
+to reproduce the failure, and enable `WPTK_DEBUG=1` for its stack trace when
+reporting a toolkit bug. Baselines and failure thresholds still apply.
+
+Before:
+
+```text
+Rule block.theme-json failed: Cannot read properties of null ...
+```
+
+After:
+
+```text
+Reproduce with WPTK_DEBUG=1, then report the rule, stack trace, and minimal input.
+After the toolkit bug is repaired, rerun the complete theme check.
 ```

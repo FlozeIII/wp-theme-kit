@@ -6,10 +6,9 @@ It does not assume access to any previous chat, plan file, or local session.
 ## Current state
 
 - Version: `0.1.0`
-- Status: usable; all four capability areas are implemented, with the first
-  three v0.2 roadmap items (`check --fix`, `check --diff`, and `check --explain`)
-  completed.
-- Tests: `npm test` -> 117 passing, 1 skipped on Windows because file-symlink
+- Status: usable; all four capability areas and the initial v0.2 rule depth
+  and fix loop roadmap group are implemented.
+- Tests: `npm test` -> 123 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -62,6 +61,14 @@ bin/wp-theme-kit.mjs
   inline ignores, and baselines, then renders the report.
 - A rule calls `ctx.add({ line, severity, message, hint, file })`.
 - Rule IDs are stable API. Changing an ID changes baseline fingerprints.
+- `src/check/documentation.mjs` resolves per-rule URLs into the installed
+  catalogue. JSON report findings add `documentationUrl` after suppression and
+  fix planning, so baseline identities/schema and non-JSON output stay intact.
+  Explicit HTML anchors use rule IDs with dots replaced by hyphens. They cover
+  all 38 registered checks plus the synthetic `meta.rule-error` diagnostic.
+  URLs are installation-specific and require no network calls; use a Markdown
+  viewer supporting explicit anchors, or read the entry through `--explain`.
+  Acceptance: `tests/integration/check-documentation.test.mjs` (6 CLI tests).
 - `src/check/explain.mjs` reads the rule entry directly from the shipped
   `skills/wp-theme-dev/references/checks.md` catalogue. All 38 current rules
   have rationale and before/after examples under exact level-three ID headings.
@@ -157,6 +164,8 @@ bin/wp-theme-kit.mjs
 4. Document it in `skills/wp-theme-dev/references/checks.md`.
    Include its default severity, rationale, and before/after examples under a
    level-three heading containing the exact backticked ID for `--explain`.
+   Add an explicit HTML anchor with dots in the ID replaced by hyphens for
+   JSON `documentationUrl`; preserve existing anchors when editing wording.
 5. Run `node --test` and `wptk check` against a real theme.
 
 ## How to add a command

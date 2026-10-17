@@ -224,6 +224,26 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
 
+## JSON finding documentation
+
+Every entry in a check report's `findings` array includes `documentationUrl`,
+an absolute `file:` URL to its explanation in the installed rule catalogue.
+For example, `php.unescaped-output` links to
+`skills/wp-theme-dev/references/checks.md#php-unescaped-output` inside the kit.
+Explicit anchors use the rule ID with dots replaced by hyphens; the internal
+`meta.rule-error` diagnostic also has an entry.
+
+These links work offline and refer to the installation that produced the
+report, independently of the theme or working directory. Paths are URL-encoded,
+including spaces and Unicode. A Markdown viewer must support explicit HTML
+anchors to navigate the fragment; `wptk check --explain <rule-id>` can also read
+the entry directly.
+
+The field is additive in `--json` and `--format json`, including `--diff`,
+fix previews, and post-fix reports. Counts, exit codes, baseline fingerprints,
+and baseline file contents retain their existing behavior. Pretty output and
+GitHub annotations do not include link metadata.
+
 ## Rule explanations
 
 Run `wptk check --explain php.unescaped-output` for a rule's rationale and

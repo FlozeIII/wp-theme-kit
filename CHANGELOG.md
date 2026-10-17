@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- JSON findings include `documentationUrl`, an encoded absolute file URL to
+  the matching explanation in the installed catalogue. Stable explicit anchors
+  cover all 38 checks and `meta.rule-error`; diff, dry-run, and post-fix reports
+  use the same links without changing baseline identities or non-JSON output.
 - `check --explain <rule-id>` prints a rule's rationale and before/after examples
   from the shipped catalogue, with entries for all 38 current rules. It works
   offline without a theme or toolchain, supports Markdown and JSON output, and
@@ -41,7 +45,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 117 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 123 passing, 1 skipped on Windows (file-symlink privileges).
+- JSON documentation acceptance: 6 CLI integration tests cover both JSON
+  formats, exact rule targets, internal diagnostics, unique anchors, diff/fix
+  reports, existing baseline fingerprints, non-JSON output, and a relocated kit
+  with Unicode, spaces, `#`, and `%` in its path.
 - `check --explain` acceptance: 6 CLI integration tests cover all 38 catalogue
   entries, execution outside a theme without tools, broken configuration,
   read-only behavior, text/JSON formats, help, and invalid/conflicting options.

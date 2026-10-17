@@ -6,6 +6,7 @@ import { EnvError } from '../errors.mjs';
 import { loadTheme } from '../theme.mjs';
 import { applyFixes, planFixes } from './fix.mjs';
 import { changedFiles } from './diff.mjs';
+import { ruleDocumentationUrl } from './documentation.mjs';
 import { analyzePhpFiles, lexFile } from './analyze.mjs';
 import { applyBaseline, defaultBaseline, loadBaseline, writeBaseline } from './baseline.mjs';
 import { buildIgnoreMap, isIgnored } from './ignore.mjs';
@@ -301,7 +302,7 @@ export async function runCheck({
       suppressed: applied.suppressed,
       files: files.length,
     },
-    findings: kept,
+    findings: kept.map((finding) => ({ ...finding, documentationUrl: ruleDocumentationUrl(finding.rule) })),
     ...(diffFiles ? { diff: { ref: diffRef, files: [...diffFiles.values()] } } : {}),
     ...(fixes ? { fixes } : {}),
   };

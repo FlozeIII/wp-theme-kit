@@ -24,7 +24,11 @@ Each item is small enough for one agent session and has an acceptance command.
   Verified: `node --test tests/integration/check-explain.test.mjs` (6 pass,
   covering all 38 current rules); `npm test` (117 pass, 1 Windows file-symlink
   privilege skip). Direct acceptance command exits 0.
-- [ ] Add a per-rule documentation link to JSON findings.
+- [x] Add a per-rule documentation link to JSON findings.
+  Acceptance: `node --test tests/integration/check-documentation.test.mjs`
+  verifies installed file URLs and stable anchors, diff/fix reports, existing
+  baselines, internal diagnostics, and relocated paths.
+  Verified: 6 pass; `npm test` (123 pass, 1 Windows file-symlink privilege skip).
 
 ## v0.2: block and PHP analysis
 
