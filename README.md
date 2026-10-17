@@ -105,6 +105,7 @@ wptk doctor
 wptk check
 wptk check --format json --fail-on warning
 wptk check --diff HEAD
+wptk check --explain php.unescaped-output
 wptk check --fix --dry-run
 wptk check --fix
 
@@ -135,7 +136,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk doctor` | Report Node, Git, PHP, WordPress, WP-CLI, browser, and theme metadata. |
 | `wptk init <slug>` | Create a classic, block, or hybrid theme. |
 | `wptk adopt [dir]` | Add config and agent instructions to an existing theme. |
-| `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`, `--diff <ref>`, `--fix [--dry-run]`. |
+| `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`, `--diff <ref>`, `--fix [--dry-run]`; `--explain <rule-id>` reads rule documentation. |
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
 | `wptk pot [--out file]` | Generate a POT file; `--check` compares msgids. |
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
@@ -222,6 +223,23 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
   PHPCS-WordPress. Run those against the extracted artifact before release.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
+
+## Rule explanations
+
+Run `wptk check --explain php.unescaped-output` for a rule's rationale and
+before/after examples. All 38 current rules have entries in the shipped
+[rule catalogue](skills/wp-theme-dev/references/checks.md#rule-explanations),
+which is also the CLI's explanation source. Rule IDs are exact and case-sensitive.
+
+Explanation works offline outside a theme, without loading configuration or
+discovering Git/PHP. An optional theme directory does not change the static
+entry. Default/`--format pretty` output is Markdown; `--json` or `--format json`
+returns `{ "rule": "<id>", "documentation": "<Markdown entry>" }`.
+
+Unknown, empty, repeated, or missing IDs exit 2. Scan options (`--fix`,
+`--dry-run`, `--diff`, baseline flags, `--analyzer`, and `--fail-on`) cannot be
+combined with explanation. Unsupported formats, including `github`, also exit 2.
+Run a separate ordinary `check` to inspect the theme.
 
 ## Changed-file checks
 

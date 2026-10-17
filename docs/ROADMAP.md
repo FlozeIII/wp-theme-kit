@@ -18,9 +18,12 @@ Each item is small enough for one agent session and has an acceptance command.
   unchanged file's findings are absent.
   Verified: `node --test tests/integration/check-diff.test.mjs` (14 pass on
   Windows); `npm test` (111 pass, 1 file-symlink privilege skip).
-- [ ] `check --explain <rule-id>`: print the rule's rationale and examples.
+- [x] `check --explain <rule-id>`: print the rule's rationale and examples.
   Acceptance: `wptk check --explain php.unescaped-output` exits 0 and prints the
   rule catalogue entry.
+  Verified: `node --test tests/integration/check-explain.test.mjs` (6 pass,
+  covering all 38 current rules); `npm test` (117 pass, 1 Windows file-symlink
+  privilege skip). Direct acceptance command exits 0.
 - [ ] Add a per-rule documentation link to JSON findings.
 
 ## v0.2: block and PHP analysis

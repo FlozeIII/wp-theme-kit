@@ -2,6 +2,7 @@ import path from 'node:path';
 import { parseArgs } from '../args.mjs';
 import { loadContext } from '../config.mjs';
 import { runCheck } from '../check/index.mjs';
+import { explainRule } from '../check/explain.mjs';
 import { UsageError } from '../errors.mjs';
 
 const USAGE = `Usage: wptk check [theme-dir] [options]
@@ -12,6 +13,7 @@ Options:
   --format <pretty|json|github>  Output format (default: pretty).
   --fail-on <error|warning|info> Lowest severity that fails the command.
   --analyzer <auto|js|php>       PHP tokenizer (default: config or auto).
+  --explain <rule-id>            Print a rule's rationale and examples without scanning.
   --diff <ref>                   Report only findings in files changed since ref.
   --baseline <file>              Read known findings from a baseline file.
   --update-baseline              Write current findings to the baseline file.
@@ -25,13 +27,15 @@ Examples:
   wptk check
   wptk check ../my-theme --fail-on warning
   wptk check --diff HEAD
+  wptk check --explain php.unescaped-output
   wptk check --fix --dry-run
   wptk check --format json > report.json
   wptk check --update-baseline`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {
-    strings: ['format', 'fail-on', 'analyzer', 'baseline', 'diff'],
+    strings: ['format', 'fail-on', 'analyzer', 'baseline', 'diff', 'explain'],
+    multiple: ['explain'],
     booleans: ['update-baseline', 'no-baseline', 'fix', 'dry-run', 'help'],
     aliases: { h: 'help' },
   });
@@ -42,6 +46,15 @@ export async function run({ argv, globals, out }) {
 
   if (parsed.positionals.length > 1) {
     throw new UsageError('check accepts at most one theme directory.');
+  }
+  if (parsed.values.explain !== undefined) {
+    if (parsed.values.explain.length !== 1) throw new UsageError('--explain may be specified only once.');
+    const scanOption = Object.keys(parsed.values).find((name) => !['explain', 'format'].includes(name));
+    if (scanOption) throw new UsageError(`--explain cannot be combined with --${scanOption}. Run the check separately.`);
+    if (parsed.values.format !== undefined && !['pretty', 'json'].includes(parsed.values.format)) {
+      throw new UsageError('--explain supports only pretty or json output.');
+    }
+    return explainRule(parsed.values.explain[0], { format: globals.json ? 'json' : parsed.values.format, out });
   }
   if (parsed.values['dry-run'] && !parsed.values.fix) {
     throw new UsageError('--dry-run requires --fix.');

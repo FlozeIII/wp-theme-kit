@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `check --explain <rule-id>` prints a rule's rationale and before/after examples
+  from the shipped catalogue, with entries for all 38 current rules. It works
+  offline without a theme or toolchain, supports Markdown and JSON output, and
+  rejects invalid IDs, unsupported formats, and conflicting scan options.
 - `check --diff <ref>` limits reports and mechanical fixes to changed files,
   including staged, unstaged, and non-ignored new sources. Supports nested theme
   directories and Windows case-only renames; JSON reports expose the scope.
@@ -37,7 +41,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 111 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 117 passing, 1 skipped on Windows (file-symlink privileges).
+- `check --explain` acceptance: 6 CLI integration tests cover all 38 catalogue
+  entries, execution outside a theme without tools, broken configuration,
+  read-only behavior, text/JSON formats, help, and invalid/conflicting options.
 - `check --diff` acceptance: 14 CLI integration tests cover real Git changes,
   clean scopes, Unicode paths, nested themes, renames/deletions, fixes and
   baselines, invalid refs, missing Git, partial-clone offline failures, ignored

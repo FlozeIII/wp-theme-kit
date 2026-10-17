@@ -7,8 +7,9 @@ It does not assume access to any previous chat, plan file, or local session.
 
 - Version: `0.1.0`
 - Status: usable; all four capability areas are implemented, with the first
-  two v0.2 roadmap items (`check --fix` and `check --diff`) completed.
-- Tests: `npm test` -> 111 passing, 1 skipped on Windows because file-symlink
+  three v0.2 roadmap items (`check --fix`, `check --diff`, and `check --explain`)
+  completed.
+- Tests: `npm test` -> 117 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -61,6 +62,14 @@ bin/wp-theme-kit.mjs
   inline ignores, and baselines, then renders the report.
 - A rule calls `ctx.add({ line, severity, message, hint, file })`.
 - Rule IDs are stable API. Changing an ID changes baseline fingerprints.
+- `src/check/explain.mjs` reads the rule entry directly from the shipped
+  `skills/wp-theme-dev/references/checks.md` catalogue. All 38 current rules
+  have rationale and before/after examples under exact level-three ID headings.
+  Code fences protect example headings from section splitting. Explanation
+  bypasses theme/configuration/tool discovery; scan flags and unsupported
+  formats are rejected. Text is Markdown; JSON contains `rule` and
+  `documentation`. Acceptance: `tests/integration/check-explain.test.mjs`
+  (6 CLI tests).
 - Inline ignores: `wptk-ignore`, `wptk-ignore-next-line`, `phpcs:ignore`.
 - `src/check/diff.mjs` reads changed paths with offline Git commands.
   `--diff` filters concrete-file findings before baseline suppression and fix
@@ -146,6 +155,8 @@ bin/wp-theme-kit.mjs
 3. Add positive and negative fixtures under `tests/integration/check.test.mjs`
    or a new test file.
 4. Document it in `skills/wp-theme-dev/references/checks.md`.
+   Include its default severity, rationale, and before/after examples under a
+   level-three heading containing the exact backticked ID for `--explain`.
 5. Run `node --test` and `wptk check` against a real theme.
 
 ## How to add a command
