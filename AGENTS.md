@@ -51,3 +51,20 @@ When using this kit on a theme:
 - Prefix global PHP symbols with the slug using underscores.
 - Prefer new files plus explicit `require_once` over editing shared files.
 - Escape at output; sanitize on input; verify nonces and capabilities.
+
+## Agent skills
+
+### Issue tracker
+
+Track issues as local Markdown files under `.scratch/<feature-slug>/`.
+See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five default triage roles.
+See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Use a single-context layout: root `CONTEXT.md` and `docs/adr/`.
+See `docs/agents/domain.md`.

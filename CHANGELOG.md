@@ -15,6 +15,8 @@ All notable changes to this project are documented here. The format follows
   include edit locations and replacements; applied fixes recheck the theme and
   use the remaining findings for the exit code. Suppressions and baselines are
   respected, while ambiguous syntax and symlinked files stay unchanged.
+- Repository configuration for Matt Pocock engineering skills: local
+  Markdown issue tracking, default triage labels, and domain-doc reading rules.
 
 ### Verified
 
