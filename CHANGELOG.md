@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `check --fix` for missing `wp_body_open()` in classic/hybrid headers,
+  missing third text-domain arguments in eligible two-argument gettext calls,
+  and numeric normalization of `Tested up to` header values.
+- `check --fix --dry-run` previews edits without writing files. JSON reports
+  include edit locations and replacements; applied fixes recheck the theme and
+  use the remaining findings for the exit code. Suppressions and baselines are
+  respected, while ambiguous syntax and symlinked files stay unchanged.
+
+### Verified
+
+- `npm test`: 93 passing, 1 skipped on Windows (file-symlink privileges).
+- Combined fix fixture passes PHP syntax validation; Yuki dry run proposes no
+  edits and reports 0 errors, 0 warnings, 8 info findings.
+
 ## [0.1.0] - 2026-10-17
 
 ### Added

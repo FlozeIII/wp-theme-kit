@@ -3,6 +3,8 @@ import { DEFAULT_IGNORE, isFile, normalizeIgnore, readText, readTextIfExists, re
 import { findPhp, findWordPressRoot } from '../env.mjs';
 import { VERSION } from '../version.mjs';
 import { EnvError } from '../errors.mjs';
+import { loadTheme } from '../theme.mjs';
+import { applyFixes, planFixes } from './fix.mjs';
 import { analyzePhpFiles, lexFile } from './analyze.mjs';
 import { applyBaseline, defaultBaseline, loadBaseline, writeBaseline } from './baseline.mjs';
 import { buildIgnoreMap, isIgnored } from './ignore.mjs';
@@ -99,6 +101,8 @@ function runRule(rule, context, sink, config) {
  * @param {string} [options.baselineFile]
  * @param {boolean} [options.noBaseline]
  * @param {boolean} [options.updateBaseline]
+ * @param {boolean} [options.fix]
+ * @param {boolean} [options.dryRun]
  * @param {object} options.out
  */
 export async function runCheck({
@@ -109,6 +113,9 @@ export async function runCheck({
   baselineFile,
   noBaseline = false,
   updateBaseline = false,
+  fix = false,
+  dryRun = false,
+  fixes,
   out,
 }) {
   const { root, config, theme } = context;
@@ -245,6 +252,17 @@ export async function runCheck({
 
   const applied = applyBaseline(unique, baseline);
   const kept = applied.kept;
+  if (fix) {
+    const plans = planFixes({ root, theme, files, findings: kept });
+    fixes = { dryRun, applied: !dryRun, edits: plans.flatMap((plan) => plan.edits) };
+    if (!dryRun && plans.length > 0) {
+      applyFixes(plans);
+      return runCheck({
+        context: { ...context, theme: loadTheme(root, config) },
+        format, failOn, analyzer, baselineFile, noBaseline, out, fixes,
+      });
+    }
+  }
   const counts = { error: 0, warning: 0, info: 0 };
   for (const finding of kept) counts[finding.severity] = (counts[finding.severity] ?? 0) + 1;
 
@@ -266,8 +284,13 @@ export async function runCheck({
       files: files.length,
     },
     findings: kept,
+    ...(fixes ? { fixes } : {}),
   };
 
+  if (fixes && format !== 'json') {
+    out.line(`${fixes.dryRun ? 'Would apply' : 'Applied'} ${fixes.edits.length} mechanical fix(es).`);
+    for (const edit of fixes.edits) out.line(`  ${edit.file}:${edit.line}  ${edit.rule}  ${JSON.stringify(edit.replacement)}`);
+  }
   if (format === 'github') {
     for (const finding of kept) {
       const level = finding.severity === 'error' ? 'error' : finding.severity === 'warning' ? 'warning' : 'notice';

@@ -15,19 +15,22 @@ Options:
   --baseline <file>              Read known findings from a baseline file.
   --update-baseline              Write current findings to the baseline file.
   --no-baseline                  Ignore any baseline file.
+  --fix                          Apply whitelisted mechanical fixes, then recheck.
+  --dry-run                      With --fix, report edits without writing files.
   --json                         Same as --format json.
   -h, --help                     Show this help.
 
 Examples:
   wptk check
   wptk check ../my-theme --fail-on warning
+  wptk check --fix --dry-run
   wptk check --format json > report.json
   wptk check --update-baseline`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {
     strings: ['format', 'fail-on', 'analyzer', 'baseline'],
-    booleans: ['update-baseline', 'no-baseline', 'help'],
+    booleans: ['update-baseline', 'no-baseline', 'fix', 'dry-run', 'help'],
     aliases: { h: 'help' },
   });
   if (parsed.values.help) {
@@ -37,6 +40,12 @@ export async function run({ argv, globals, out }) {
 
   if (parsed.positionals.length > 1) {
     throw new UsageError('check accepts at most one theme directory.');
+  }
+  if (parsed.values['dry-run'] && !parsed.values.fix) {
+    throw new UsageError('--dry-run requires --fix.');
+  }
+  if (parsed.values.fix && parsed.values['update-baseline']) {
+    throw new UsageError('--fix cannot be combined with --update-baseline. Update the baseline in a separate run.');
   }
 
   const cwd = parsed.positionals[0] ? path.resolve(globals.cwd, parsed.positionals[0]) : globals.cwd;
@@ -54,6 +63,8 @@ export async function run({ argv, globals, out }) {
     baselineFile: parsed.values.baseline ? path.resolve(globals.cwd, parsed.values.baseline) : undefined,
     noBaseline: parsed.values['no-baseline'] === true,
     updateBaseline: parsed.values['update-baseline'] === true,
+    fix: parsed.values.fix === true,
+    dryRun: parsed.values['dry-run'] === true,
     out,
   });
 }

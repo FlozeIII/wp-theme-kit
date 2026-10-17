@@ -6,8 +6,10 @@ It does not assume access to any previous chat, plan file, or local session.
 ## Current state
 
 - Version: `0.1.0`
-- Status: usable; all four capability areas are implemented.
-- Tests: `node --test` -> 75 passing.
+- Status: usable; all four capability areas are implemented, with the first
+  v0.2 roadmap item (`check --fix`) completed.
+- Tests: `npm test` -> 93 passing, 1 skipped on Windows because file-symlink
+  creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
   - `wptk package --rev HEAD`: same entry list as the theme's existing packager.
@@ -15,8 +17,9 @@ It does not assume access to any previous chat, plan file, or local session.
   - `wptk shot`: 1200x900 PNG.
 - Claude `plugin validate . --strict` passes.
 - Claude and Codex plugin installs were smoke-tested in temporary config roots.
-- The repository has no committed baseline yet when this document was written.
-  Commit it before starting a multi-step task.
+- The initial baseline and `check --fix` implementation are recorded in Git.
+  Inspect `git status` before starting the next roadmap item; commit only when
+  asked.
 
 ## First commands
 
@@ -59,6 +62,11 @@ bin/wp-theme-kit.mjs
 - A rule calls `ctx.add({ line, severity, message, hint, file })`.
 - Rule IDs are stable API. Changing an ID changes baseline fingerprints.
 - Inline ignores: `wptk-ignore`, `wptk-ignore-next-line`, `phpcs:ignore`.
+- `src/check/fix.mjs` plans whitelisted edits from visible findings and applies
+  them atomically per file. Dry runs emit plans only; applied fixes reload theme
+  metadata and run the checker again. See the README's Mechanical fixes section
+  for the whitelist and CLI behavior. Acceptance fixtures live in
+  `tests/integration/check-fix.test.mjs`.
 
 ### Packaging pipeline
 
@@ -187,8 +195,9 @@ repository root.
 - The POT extractor handles literal calls; dynamic strings are skipped.
 - Block template validation is structural, not a block registry.
 - Packaging requires the theme root to be the Git root.
-- `check --fix`, the mu-plugin E2E harness installer, and npm publishing are
-  deferred.
+- Mechanical fixes cover only the documented whitelist. Ambiguous syntax,
+  namespaced/imported gettext calls, and symlinked source files require manual
+  edits. The mu-plugin E2E harness installer and npm publishing remain deferred.
 
 ## 中文摘要
 

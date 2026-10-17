@@ -104,6 +104,8 @@ wptk doctor
 # Check the current theme
 wptk check
 wptk check --format json --fail-on warning
+wptk check --fix --dry-run
+wptk check --fix
 
 # Create a new theme
 wptk init my-theme --type block --name "My Theme"
@@ -132,7 +134,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk doctor` | Report Node, Git, PHP, WordPress, WP-CLI, browser, and theme metadata. |
 | `wptk init <slug>` | Create a classic, block, or hybrid theme. |
 | `wptk adopt [dir]` | Add config and agent instructions to an existing theme. |
-| `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`. |
+| `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`, `--fix [--dry-run]`. |
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
 | `wptk pot [--out file]` | Generate a POT file; `--check` compares msgids. |
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
@@ -219,6 +221,27 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
   PHPCS-WordPress. Run those against the extracted artifact before release.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
+
+## Mechanical fixes
+
+Preview changes with `wptk check --fix --dry-run`, then apply them with
+`wptk check --fix`. The whitelist covers:
+
+- A missing `wp_body_open()` after one unambiguous opening `<body>` in
+  `header.php` for classic and hybrid themes.
+- A missing third text-domain argument in gettext calls with exactly two
+  arguments and a literal first argument, such as `_x('Label', 'context')` or
+  `_n_noop('One', 'Many')`. Existing domains and other signatures stay unchanged.
+- A `Tested up to` header containing one numeric version with a `WP`,
+  `WordPress`, or `v` prefix, such as `WordPress v7.1` -> `7.1`.
+
+Fixes respect disabled rules, ignored paths, inline suppression, and baselines.
+Ambiguous syntax and symlinked files are skipped. Files retain their BOM and line
+endings. Applied fixes trigger another check; its remaining findings determine the
+exit code. Dry runs report the original findings and exit code without writing.
+`--dry-run` requires `--fix`; update baselines in a separate invocation.
+With `--json`, `fixes.edits` lists the rule, file, line, replacement, and
+zero-based UTF-16 `start`/`end` offsets in the original file (end exclusive).
 
 ## Development
 

@@ -77,6 +77,22 @@ Severity is only a default. Override a rule in `.wp-theme-kit.json`:
 | `js.hardcoded-host` | warning | no local hosts in shipped JavaScript |
 | `css.local-url` | warning | no local hosts in CSS URLs |
 
+## Mechanical fixes
+
+Run `wptk check --fix --dry-run` to preview edits, then `wptk check --fix` to
+apply and recheck. See the README's Mechanical fixes section for CLI reporting.
+
+| Rule | Whitelisted edit |
+|---|---|
+| `classic.markup` | Insert `wp_body_open()` after one unambiguous `<body>` in classic/hybrid `header.php` |
+| `php.text-domain` | Append the configured domain to a two-argument gettext call whose first argument is a literal and whose signature places the domain third (`_x`, `_ex`, `esc_html_x`, `esc_attr_x`, `translate_with_gettext_context`, `_n_noop`) |
+| `theme.tested-up-to` | Remove a `WP`, `WordPress`, or `v` wrapper around one numeric version in the `style.css` header |
+
+Only visible findings are eligible: rule overrides, path ignores, inline ignores,
+and baselines still apply. Named arguments, unpacking, namespaced/imported calls,
+dynamic first arguments, existing domains, ambiguous headers, and symlinked files
+are left for manual review. `--update-baseline` must run separately from `--fix`.
+
 ## Extending the escaping allowlist
 
 If the theme has project-specific helpers that return escaped HTML, list them so

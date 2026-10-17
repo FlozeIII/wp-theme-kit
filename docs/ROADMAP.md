@@ -5,12 +5,14 @@ Each item is small enough for one agent session and has an acceptance command.
 
 ## v0.2: rule depth and fix loops
 
-- [ ] `check --fix` for a whitelist of mechanical issues:
+- [x] `check --fix` for a whitelist of mechanical issues:
   - add a missing `wp_body_open()` after `<body>`;
   - add a missing text domain when the call has exactly two arguments and the
     first is a literal;
   - normalize `Tested up to` to a numeric version.
   Acceptance: every fix has a positive fixture and a `--dry-run` test.
+  Verified: `node --test tests/integration/check-fix.test.mjs` (18 pass, 1
+  file-symlink privilege skip on Windows); `npm test` (93 pass, 1 skip).
 - [ ] `check --diff <ref>`: only report findings in changed files.
   Acceptance: a test creates a Git repo, changes one file, and asserts the
   unchanged file's findings are absent.
