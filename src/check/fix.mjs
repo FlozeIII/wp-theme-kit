@@ -4,6 +4,7 @@ import { writeAtomic, relativePosix } from '../fs.mjs';
 import { EnvError } from '../errors.mjs';
 import { GETTEXT_SIGNATURES } from '../i18n/functions.mjs';
 import { calls, decodePhpString, isTrivia, lexPhp, prevMeaningful } from './lexer-php.mjs';
+import { buildIgnoreMap, isIgnored } from './ignore.mjs';
 
 const meaningful = (tokens) => tokens.filter((token) => !isTrivia(token));
 const blank = (text) => text.replace(/[^\r\n]/g, ' ');
@@ -28,6 +29,8 @@ function bodyEdit(source, tokens) {
   const tags = [...html.matchAll(/<[a-z][\w:-]*\b(?:[^<>"']|"[^"]*"|'[^']*')*>/gi)];
   const bodies = tags.filter((match) => /^<body(?:\s|>)/i.test(match[0]));
   if (bodies.length !== 1) return null;
+  const bodyLine = source.slice(0, bodies[0].index).split('\n').length;
+  if (isIgnored(buildIgnoreMap(tokens, source, 'php'), 'classic.markup', bodyLine)) return null;
   const start = bodies[0].index + bodies[0][0].length;
   const newline = source.includes('\r\n') ? '\r\n' : '\n';
   return { start, end: start, replacement: `${newline}<?php wp_body_open(); ?>`, rule: 'classic.markup' };
@@ -67,6 +70,8 @@ function versionEdit(source) {
   const version = /^(?:(?:WordPress|WP)\s*:?\s*)?v?\s*(\d+(?:\.\d+)*)\s*$/i.exec(match[2].trim());
   if (!version || match[2].trim() === version[1]) return null;
   const start = match.index + match[1].length;
+  const line = source.slice(0, start).split('\n').length;
+  if (isIgnored(buildIgnoreMap([], source, 'css'), 'theme.tested-up-to', line)) return null;
   const trailing = /[ \t]*$/.exec(match[2])[0];
   return { start, end: start + match[2].length, replacement: version[1] + trailing, rule: 'theme.tested-up-to' };
 }

@@ -120,7 +120,8 @@ export function lexPhp(source) {
 
     if ((char === '/' && next === '/') || char === '#') {
       let end = index;
-      while (end < length && source[end] !== '\n') end++;
+      // PHP's closing tag ends a line comment as well as the PHP block.
+      while (end < length && source[end] !== '\n' && !source.startsWith('?>', end)) end++;
       push('comment', source.slice(index, end), line);
       index = end;
       continue;

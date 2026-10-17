@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas are implemented, with the first
   v0.2 roadmap item (`check --fix`) completed.
-- Tests: `npm test` -> 93 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 97 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -67,6 +67,10 @@ bin/wp-theme-kit.mjs
   metadata and run the checker again. See the README's Mechanical fixes section
   for the whitelist and CLI behavior. Acceptance fixtures live in
   `tests/integration/check-fix.test.mjs`.
+- Fix regression coverage includes PHP closing tags inside line comments and
+  source-line suppression for body-hook and version-header edits. Check the
+  opening tag's line for multiline `<body>` markup. CSS directives use their
+  actual lines within the comment, including normal multiline theme headers.
 
 ### Packaging pipeline
 

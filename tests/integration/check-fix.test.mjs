@@ -66,6 +66,28 @@ test('gettext fixes preserve comments, trailing commas, multiple edits, BOM, and
     .replace("'More' //", "'More', 'demo-theme' //"));
 });
 
+test('gettext fixes preserve JavaScript after a PHP line comment closes its block', () => {
+  const modes = ['js', 'auto'];
+  if (findPhp({ wpRoot: findWordPressRoot({ startDir: process.cwd() }) })) modes.push('php');
+  for (const mode of modes) {
+    for (const comment of ['//', '#']) {
+      const root = fixture();
+      const source = `<?php ${comment} comment ?>\n<script>_x('In script', 'context');</script><?php _x('Real', 'context');`;
+      const expected = `<?php ${comment} comment ?>\n<script>_x('In script', 'context');</script><?php _x('Real', 'context', 'demo-theme');`;
+      write(root, 'index.php', source);
+
+      const preview = check(root, '--fix', '--dry-run', '--analyzer', mode);
+      assert.equal(preview.report.fixes.edits.length, 1, `${mode}, ${comment}: only the PHP call is eligible`);
+      assert.equal(read(root, 'index.php'), source);
+
+      const applied = check(root, '--fix', '--analyzer', mode);
+      assert.equal(applied.result.status, 0, applied.result.stderr || applied.result.stdout);
+      assert.equal(read(root, 'index.php'), expected, `${mode}, ${comment}: preserve script text exactly`);
+      assert.equal(applied.report.fixes.edits.length, 1);
+    }
+  }
+});
+
 test('unsafe or out-of-whitelist gettext calls stay unchanged', () => {
   const root = fixture();
   const source = `<?php
@@ -148,6 +170,68 @@ test('fixes respect disabled rules, ignored paths, inline ignores, and baselines
   assert.equal(check(root, '--fix').report.fixes.edits.length, 0);
   assert.equal(read(root, 'index.php'), source);
   assert.equal(check(root, '--fix', '--no-baseline').report.fixes.edits.length, 1);
+});
+
+test('body-hook fixes respect inline suppression on the opening body tag', () => {
+  const headers = [
+    '<?php /* wptk-ignore classic.markup */ ?><body <?php body_class(); ?>>',
+    '<?php // wptk-ignore-next-line classic.markup\n?><body <?php body_class(); ?>>',
+    '<?php /* phpcs:ignore */ ?><body <?php body_class(); ?>>',
+    '<?php // wptk-ignore-next-line classic.markup\n?><body\n  <?php body_class(); ?>\n>',
+  ];
+  for (const source of headers) {
+    const root = fixture();
+    write(root, 'header.php', source);
+    const preview = check(root, '--fix', '--dry-run');
+    assert.equal(preview.report.fixes.edits.length, 0, source);
+    assert.equal(read(root, 'header.php'), source);
+
+    const applied = check(root, '--fix');
+    assert.equal(applied.report.fixes.edits.length, 0, source);
+    assert.equal(read(root, 'header.php'), source);
+  }
+});
+
+test('Tested up to fixes respect inline suppression on the version header line', () => {
+  const root = fixture();
+  const source = read(root, 'style.css')
+    .replace('/*\n', '/* wptk-ignore-next-line theme.tested-up-to\nTested up to: WP 7.1\n')
+    .replace('Tested up to: 7.1\n', '');
+  write(root, 'style.css', source);
+
+  const preview = check(root, '--fix', '--dry-run');
+  assert.equal(preview.report.fixes.edits.length, 0);
+  assert.equal(read(root, 'style.css'), source);
+
+  const applied = check(root, '--fix');
+  assert.equal(applied.report.fixes.edits.length, 0);
+  assert.equal(read(root, 'style.css'), source);
+
+  write(root, 'style.css', source.replace('wptk-ignore-next-line theme.tested-up-to', ''));
+  assert.equal(check(root, '--fix').report.fixes.edits.length, 1);
+  assert.match(read(root, 'style.css'), /^Tested up to: 7\.1$/m);
+});
+
+test('Tested up to suppression works inside a normally laid out multiline theme header', () => {
+  for (const newline of ['\n', '\r\n']) {
+    const root = fixture();
+    const source = read(root, 'style.css')
+      .replace('Tested up to: 7.1', 'wptk-ignore-next-line theme.tested-up-to\nTested up to: WP 7.1')
+      .replaceAll('\n', newline);
+    write(root, 'style.css', source);
+
+    const preview = check(root, '--fix', '--dry-run');
+    assert.equal(preview.report.fixes.edits.length, 0);
+    assert.equal(read(root, 'style.css'), source);
+
+    const applied = check(root, '--fix');
+    assert.equal(applied.report.fixes.edits.length, 0);
+    assert.equal(read(root, 'style.css'), source);
+
+    write(root, 'style.css', source.replace('wptk-ignore-next-line theme.tested-up-to', ''));
+    assert.equal(check(root, '--fix').report.fixes.edits.length, 1);
+    assert.match(read(root, 'style.css'), /^Tested up to: 7\.1\r?$/m);
+  }
 });
 
 test('dry-run misuse and baseline update conflict fail before writing', () => {

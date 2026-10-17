@@ -84,10 +84,13 @@ export function buildIgnoreMap(tokens, source, language) {
     comments.push({ text: match[0], line });
   }
   for (const comment of comments) {
-    const directive = parseDirective(stripComment(comment.text));
-    if (!directive) continue;
-    if (directive.kind === 'wptk-ignore-next-line') add(byNextLine, comment.line + 1, directive);
-    else add(byLine, comment.line, directive);
+    for (const [offset, text] of stripComment(comment.text).split('\n').entries()) {
+      const directive = parseDirective(text);
+      if (!directive) continue;
+      const line = comment.line + offset;
+      if (directive.kind === 'wptk-ignore-next-line') add(byNextLine, line + 1, directive);
+      else add(byLine, line, directive);
+    }
   }
   return { byLine, byNextLine };
 }

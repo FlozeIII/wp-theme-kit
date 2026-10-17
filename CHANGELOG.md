@@ -18,9 +18,23 @@ All notable changes to this project are documented here. The format follows
 - Repository configuration for Matt Pocock engineering skills: local
   Markdown issue tracking, default triage labels, and domain-doc reading rules.
 
+### Fixed
+
+- Recognize `?>` as the end of a PHP line comment so gettext fixes leave
+  adjacent HTML and JavaScript unchanged, including when a real PHP call
+  appears on the same line.
+- Respect inline suppression on the opening `<body>` tag and `Tested up to`
+  header line before planning or applying their mechanical fixes.
+- Resolve suppression directives at their actual lines inside multiline CSS
+  comments, including ordinary theme headers with LF or CRLF line endings.
+
 ### Verified
 
-- `npm test`: 93 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 97 passing, 1 skipped on Windows (file-symlink privileges).
+- Each regression was reproduced with a failing CLI test before its fix;
+  coverage includes dry runs, applied edits, both PHP line-comment forms,
+  JS/auto/PHP analysis, suppression on multiline body markup, and version-header
+  suppression without rearranging the theme metadata.
 - Combined fix fixture passes PHP syntax validation; Yuki dry run proposes no
   edits and reports 0 errors, 0 warnings, 8 info findings.
 
