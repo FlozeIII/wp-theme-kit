@@ -29,6 +29,8 @@ It does not assume access to any previous chat, plan file, or local session.
   five browser suites only when `findBrowser({})` finds a browser. Hosted
   Windows runners intermittently hang headless Edge, so Windows runs the
   non-browser suite and browser acceptance stays on Linux and macOS.
+  Green matrix (run 39142468657): test on Ubuntu and Windows with Node 22 and
+  24, browser on Ubuntu and macOS.
   Runs: https://github.com/FlozeIII/wp-theme-kit/actions.
 - The initial baseline and `check --fix` implementation are recorded in Git.
   Inspect `git status` before starting the next roadmap item; commit only when

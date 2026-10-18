@@ -194,8 +194,9 @@ Each item is small enough for one agent session and has an acceptance command.
   macOS.
   Verified: the exact command runs 30/30 locally in Edge; the workflow YAML
   parses; the first real GitHub runs exposed Windows-only fixture and cleanup
-  defects that are now fixed. Evidence:
-  https://github.com/FlozeIII/wp-theme-kit/actions.
+  defects that are now fixed. Green matrix (run 39142468657): test on Ubuntu and
+  Windows with Node 22 and 24, browser on Ubuntu and macOS.
+  Evidence: https://github.com/FlozeIII/wp-theme-kit/actions.
 - [x] Publish to npm and add a Claude/Codex marketplace entry.
   Published 2026-10-18 as `wp-theme-kit@0.2.0` from the public repository
   `FlozeIII/wp-theme-kit`, with the user's explicit decision recorded in this
