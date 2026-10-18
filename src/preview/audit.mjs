@@ -1,5 +1,8 @@
 import { captureRoutes, guardFailures } from './capture.mjs';
 import { applyAuditBaseline, writeAuditBaseline } from './baseline.mjs';
+import {
+  accessibilityFailures, analyzeAccessibility, collectAccessibility,
+} from './accessibility.mjs';
 
 /**
  * Inspect routes without taking screenshots. Returns route facts and a pass/fail flag.
@@ -12,6 +15,7 @@ export async function auditRoutes({ context, routes, out, noGuards = false,
     output: null,
     strict: false,
     noGuards,
+    collect: collectAccessibility,
     out: { ...out, warn() {} },
   });
 
@@ -20,6 +24,7 @@ export async function auditRoutes({ context, routes, out, noGuards = false,
 
   const failures = [];
   for (const result of results) {
+    result.accessibility = analyzeAccessibility(result.extra);
     if (baseline) {
       const applied = applyAuditBaseline(result.facts, result.route, baseline,
         noGuards ? { noConsoleErrors: false, noHorizontalOverflow: false } : guards);
@@ -35,6 +40,11 @@ export async function auditRoutes({ context, routes, out, noGuards = false,
     }
     for (const request of result.facts.failedRequests) {
       failures.push(`${result.route.url}: asset ${request.error} ${request.url}`);
+    }
+    if (!noGuards && guards.accessibility !== false) {
+      for (const failure of accessibilityFailures(result.accessibility)) {
+        failures.push(`${result.route.url}: ${failure}`);
+      }
     }
   }
 
@@ -62,6 +72,9 @@ export function auditReport(result) {
       httpErrors: item.facts.httpErrors,
       bodyBackground: item.facts.bodyBackground,
       bodyColor: item.facts.bodyColor,
+      duplicateIds: item.accessibility.duplicateIds,
+      emptyLinks: item.accessibility.emptyLinks,
+      unlabeledControls: item.accessibility.unlabeledControls,
       ...(item.suppressed ? { suppressed: item.suppressed } : {}),
     })),
     failures: result.failures,

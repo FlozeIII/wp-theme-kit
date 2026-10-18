@@ -8,13 +8,17 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 248 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 262 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
   - `wptk package --rev HEAD`: same entry list as the theme's existing packager.
   - `wptk pot`: 112 msgids, identical to `languages/yuki.pot`.
   - `wptk shot`: 1200x900 PNG.
+  - Accessibility assertions were accepted with a local HTTP fixture in Edge
+    (`tests/integration/accessibility.test.mjs`). Yuki has no `.wp-theme-kit.json`
+    or site URL in this checkout, so `wptk audit` could not run against live
+    WordPress pages; `wptk doctor` reports preview unavailable.
 - Claude `plugin validate . --strict` passes.
 - Claude and Codex plugin installs were smoke-tested in temporary config roots.
 - The initial baseline and `check --fix` implementation are recorded in Git.
@@ -246,7 +250,30 @@ bin/wp-theme-kit.mjs
   `--screenshot --window-size`; it renders at a wider layout and crops.
 - `src/preview/capture.mjs` applies guards and writes images atomically.
 - `src/preview/audit.mjs` reports console errors, failed assets, overflow,
-  unloaded images, and missing selectors.
+  unloaded images, missing selectors, and (since v0.2) accessibility assertions.
+- `src/preview/accessibility.mjs` owns the DOM snapshot (`ACCESSIBILITY_EXPRESSION`)
+  and pure analysis for duplicate ids, links with no accessible name and
+  unlabeled form controls. Names prefer `aria-labelledby`, then `aria-label`,
+  then visible text / associated label, then image `alt`/SVG `title`/`title`
+  (links) or `title` (controls); `placeholder`/`name`/`value` never count.
+  Entries under `aria-hidden` or `hidden` are skipped; hidden/submit/button/
+  reset/image inputs are not labelable. Failure lines are capped at five
+  identifiers but JSON keeps complete lists.
+- `capture.mjs` accepts an optional `collect` hook so `audit` can snapshot
+  accessibility data in the same browser visit; `shot` passes nothing, gets no
+  `extra` result field, and is unchanged. The guard is
+  `preview.guards.accessibility` (default true, so `--no-guard` and the config
+  key both disable it); findings are not baselineable. Unlike the layout/console
+  guards it is evaluated in `audit.mjs`, not `capture.guardFailures`, because
+  shot must never collect the snapshot. JSON adds `duplicateIds`, `emptyLinks`
+  and `unlabeledControls` per route; pretty output adds the counts.
+- Acceptance: `tests/unit/accessibility.test.mjs` (7 name-resolution/analysis
+  tests) and `tests/integration/accessibility.test.mjs` (7 CLI tests in real
+  Chromium over a local HTTP server: defect facts, pretty counts, clean page,
+  guard opt-out, `--no-guard`, baseline non-suppression, untouched `shot`).
+  Hidden/`aria-hidden` text, image `alt` and SVG `title` are excluded. Ids are
+  compared verbatim (empty ids only). The fixture serves a decodable 1x1 PNG
+  because `minimalPng()` only satisfies header parsers and browsers reject it.
 - `src/preview/baseline.mjs` implements opt-in `audit --baseline <file>` and
   atomic `--update-baseline`. Profiles match exact URL, actual viewport and
   color scheme; console entries match text/count, overflow exact scrollWidth.

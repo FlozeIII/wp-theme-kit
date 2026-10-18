@@ -140,6 +140,7 @@ export function guardFailures(facts, guards) {
  * @param {boolean} [options.fullPage]
  * @param {boolean} [options.strict]
  * @param {boolean} [options.noGuards]
+ * @param {Function|null} [options.collect] async (page, route) => extra facts
  * @param {object} options.out
  */
 export async function captureRoutes({
@@ -150,6 +151,7 @@ export async function captureRoutes({
   fullPage = false,
   strict = true,
   noGuards = false,
+  collect = null,
   out,
 }) {
   const browserPath = context.config.preview.browser;
@@ -183,6 +185,10 @@ export async function captureRoutes({
           );
         }
 
+        const extra = collect ? await collect(page, route) : null;
+        const shared = { route, facts, failures };
+        if (extra !== null) shared.extra = extra;
+
         let file = null;
         if (output) {
           file = all || output.endsWith('/') || output.endsWith('\\') || !output.toLowerCase().endsWith('.png')
@@ -191,9 +197,9 @@ export async function captureRoutes({
           const buffer = await page.screenshot({ fullPage });
           writeBufferAtomic(file, buffer);
           const size = pngSize(buffer);
-          results.push({ route, file, size, facts, failures });
+          results.push({ ...shared, file, size });
         } else {
-          results.push({ route, file: null, facts, failures });
+          results.push({ ...shared, file: null });
         }
 
         for (const failure of failures) out.warn(`${route.url}: ${failure}`);

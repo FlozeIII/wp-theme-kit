@@ -140,7 +140,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
 | `wptk pot [--out file]` | Generate a POT file; `--merge` retains header metadata; `--check` compares msgids. |
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
-| `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors; `--baseline <file>` and `--update-baseline` accept known console/overflow findings. |
+| `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors, duplicate ids, empty links, unlabeled controls; `--baseline <file>` and `--update-baseline` accept known console/overflow findings. |
 | `wptk preview [route]` | Open the route in the system browser. |
 | `wptk version [bump patch|minor|major]` | Print or bump `style.css` and `package.json`. |
 | `wptk package [out.zip] [--rev ref]` | Build from a committed revision. |
@@ -187,7 +187,7 @@ error.
     "routes": [
       { "name": "home", "path": "/", "width": 1200, "height": 900, "waitFor": ".site-header", "expect": ["main"] }
     ],
-    "guards": { "noHorizontalOverflow": true, "noConsoleErrors": true, "imagesLoaded": true }
+    "guards": { "noHorizontalOverflow": true, "noConsoleErrors": true, "imagesLoaded": true, "accessibility": true }
   }
 }
 ```
@@ -267,6 +267,33 @@ identities are rejected. Audit JSON stdout stays parseable on failure.
 
 `audit --baseline` 只接受精确匹配的已知控制台错误和溢出，原始观测仍保留。
 通过 `--update-baseline` 显式更新全部路由；资源、图片和选择器失败仍须修复。
+
+## Accessibility assertions
+
+`wptk audit` also runs three DOM assertions that need no judgement call:
+
+- **Duplicate ids.** Every `[id]` in document order; one finding per id with its
+  use count. Empty ids are ignored.
+- **Empty links.** `a[href]` and `area[href]` with no accessible name from
+  `aria-labelledby`, `aria-label`, visible text, a descendant image `alt`, a
+  descendant SVG `title`, or the `title` attribute. Text and images inside a
+  `hidden` or `aria-hidden` descendant do not count.
+- **Unlabeled controls.** `input`, `select` and `textarea` with no name from
+  `aria-labelledby`, `aria-label`, an associated label, or `title`.
+  `placeholder`, `name` and `value` never count. Hidden, submit, button, reset
+  and image inputs are skipped.
+
+Links and controls under `aria-hidden` or `hidden` are skipped as a whole. The
+assertions ship with the same defaults as the other guards: a finding fails the
+run and the CLI prints each finding with the route URL. They are not
+baselineable, because a duplicate id or an unnamed link is always fixable.
+
+Set `preview.guards.accessibility` to `false` to keep reporting the observations
+without failing, or pass `--no-guard` to disable every audit gate for one run.
+JSON adds `duplicateIds`, `emptyLinks` and `unlabeledControls` per route; pretty
+output adds their counts. These are static DOM heuristics, not a WCAG audit:
+they never replace keyboard, zoom and screen-reader review. `shot` does not run
+them, so screenshot behavior is unchanged.
 
 ## POT header metadata
 

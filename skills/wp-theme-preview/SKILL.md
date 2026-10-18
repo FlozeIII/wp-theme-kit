@@ -1,6 +1,6 @@
 ---
 name: wp-theme-preview
-description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, dark mode, or before declaring a visual change done.
+description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, duplicate ids, empty links, unlabeled form controls, dark mode, or before declaring a visual change done.
 license: MIT
 metadata:
   author: FlozeIII
@@ -33,7 +33,8 @@ wptk audit --baseline .wp-theme-kit-audit-baseline.json --json
 - `shot` defaults to `screenshot.png` in the theme root at 1200x900.
 - `--all` captures every route in `config.preview.routes`.
 - `audit` reports status, title, console errors, failed assets, horizontal
-  overflow, unloaded images, and missing `expect` selectors.
+  overflow, unloaded images, missing `expect` selectors, duplicate ids, links
+  without an accessible name, and unlabeled form controls.
 
 ## Route configuration
 
@@ -45,10 +46,24 @@ wptk audit --baseline .wp-theme-kit-audit-baseline.json --json
       { "name": "home", "path": "/", "width": 1200, "height": 900, "waitFor": ".site-header", "expect": ["main"] },
       { "name": "single", "path": "/?p=1", "width": 375, "height": 812 }
     ],
-    "guards": { "noHorizontalOverflow": true, "noConsoleErrors": true, "imagesLoaded": true }
+    "guards": { "noHorizontalOverflow": true, "noConsoleErrors": true, "imagesLoaded": true, "accessibility": true }
   }
 }
 ```
+
+## Accessibility assertions
+
+`audit` also fails on duplicate `id` attributes, `a[href]`/`area[href]` without
+an accessible name, and `input`/`select`/`textarea` without a label. Names come
+from `aria-labelledby`, `aria-label`, visible text or associated label, a
+descendant image `alt` or SVG `title`, and the `title` attribute.
+`placeholder`, `name` and `value` never count; entries under `aria-hidden` or
+`hidden` and hidden/submit/button/reset/image inputs are skipped.
+
+These are DOM heuristics, not a WCAG audit. Fix the markup instead of accepting
+a baseline: the findings are not baselineable. Set
+`preview.guards.accessibility` to `false` to observe without failing, or use
+`--no-guard` for diagnostics. `shot` does not run them.
 
 ## Known audit findings
 
@@ -91,7 +106,8 @@ Common causes:
 
 截图必须在 `goto` 之前设好真实视口。`wptk shot` 默认产出 1200×900 的
 `screenshot.png`，`--all` 按配置路由批量截图。`wptk audit` 检查状态码、控制台
-错误、失败资源、横向溢出、未加载图片与缺失选择器。守护条件失败时不要覆盖旧图；
-先用 `--no-guard` 只做诊断，修好后再正常跑。
+错误、失败资源、横向溢出、未加载图片、缺失选择器，以及重复 id、无可访问名称的
+链接、缺少标签的表单控件。守护条件失败时不要覆盖旧图；先用 `--no-guard` 只做
+诊断，修好后再正常跑。无障碍问题不可加入 baseline，必须修标记。
 `audit --baseline` 显式抑制已知错误；`--update-baseline` 更新全部路由并保留原始
 观测。新增问题与资源、图片、选择器失败仍会报错，截图守护不受影响。

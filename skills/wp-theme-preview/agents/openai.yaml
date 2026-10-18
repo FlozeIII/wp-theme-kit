@@ -1,5 +1,5 @@
 interface:
   display_name: "WordPress Theme Preview"
-  short_description: "Screenshot themes and audit known browser findings"
+  short_description: "Screenshot themes and audit browser and accessibility findings"
 policy:
   allow_implicit_invocation: true

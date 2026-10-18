@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `audit` now asserts duplicate `id` attributes, links with no accessible name
+  and form controls with no label, failing the run and listing each finding with
+  its route. Names come from `aria-labelledby`, `aria-label`, visible text, image
+  `alt`/SVG `title`, associated labels and `title`; `placeholder`, `name` and
+  `value` never count, and hidden/`aria-hidden` content is skipped. JSON adds
+  `duplicateIds`, `emptyLinks` and `unlabeledControls` per route. Disable with
+  `preview.guards.accessibility: false` or `--no-guard`; findings are not
+  baselineable. `shot` and its screenshot protection are unchanged.
 - `audit --baseline <file>` accepts known console errors and exact horizontal
   overflow by URL, viewport and color scheme, preserving raw JSON observations
   and reporting suppression counts. Message/count/width changes still fail.

@@ -103,7 +103,19 @@ Each item is small enough for one agent session and has an acceptance command.
   independent guards, schema/errors, file preservation and screenshot safety.
   Verified: `npm test` (248 pass, 1 Windows file-symlink privilege skip).
   Real Yuki baseline update/read passed at 1200x900 without changing its source.
-- [ ] Accessibility assertions: duplicate IDs, empty links, form labels.
+- [x] Accessibility assertions: duplicate IDs, empty links, form labels.
+  Acceptance: `tests/integration/accessibility.test.mjs` (7 CLI tests in real
+  Chromium over a local HTTP server) covers exact JSON observations, pretty
+  counts and stderr details, a clean page, `preview.guards.accessibility: false`,
+  `--no-guard`, non-baselineable findings surviving `--update-baseline`, and
+  unchanged `shot` behavior. `tests/unit/accessibility.test.mjs` (7 tests) pins
+  name precedence, label rules, hidden/aria-hidden skips, malformed snapshots
+  and capped failure text.
+  Verified: `npm test` (262 pass, 1 Windows file-symlink privilege skip);
+  `node bin/wp-theme-kit.mjs audit --help`; defect and clean fixture pages
+  exercised through the real CLI in Edge.
+  Yuki has no site URL configured, so live WordPress acceptance remains pending
+  for the next browser session with a running site.
 - [ ] Screenshot comparison with a tolerance and a diff image.
 - [ ] Editor screenshots (`/wp-admin/post-new.php`) with a cookie fixture.
 - [ ] A `wptk harness install` command for the mu-plugin observation helpers

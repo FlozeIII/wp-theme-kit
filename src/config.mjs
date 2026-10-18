@@ -42,6 +42,7 @@ const DEFAULTS = {
       noHorizontalOverflow: true,
       noConsoleErrors: true,
       imagesLoaded: true,
+      accessibility: true,
     },
   },
   scaffold: {

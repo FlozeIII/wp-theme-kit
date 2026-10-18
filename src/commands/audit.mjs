@@ -10,17 +10,20 @@ import { exists } from '../fs.mjs';
 const USAGE = `Usage: wptk audit [route] [options]
 
 Load routes in a real browser and report console errors, failed assets,
-horizontal overflow, unloaded images, and missing selectors.
+horizontal overflow, unloaded images, duplicate ids, links without an
+accessible name, unlabeled form controls, and missing selectors.
 
 Options:
   --url <url>     Site base URL.
   --baseline <file> Read known console errors and overflow from this file.
   --update-baseline Write all routes to the baseline (default: ${AUDIT_BASELINE_NAME}).
-  --no-guard      Report layout problems without applying guards.
+  --no-guard      Report problems without applying guards.
   --json          Machine-readable report.
   -h, --help      Show this help.
 
-Without a route, every route in config.preview.routes is audited.`;
+Without a route, every route in config.preview.routes is audited.
+Accessibility assertions run by default; set preview.guards.accessibility to
+false to report them without failing.`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {
@@ -77,6 +80,9 @@ export async function run({ argv, globals, out }) {
       out.line(`  failed assets:       ${route.httpErrors.length}`);
       out.line(`  unloaded images:     ${route.missingImages.length}`);
       out.line(`  missing selectors:   ${route.missingSelectors.length}`);
+      out.line(`  duplicate ids:       ${route.duplicateIds.length}`);
+      out.line(`  empty links:         ${route.emptyLinks.length}`);
+      out.line(`  unlabeled controls:  ${route.unlabeledControls.length}`);
       if (route.suppressed) {
         out.line(`  suppressed errors:   ${route.suppressed.consoleErrors}`);
         out.line(`  suppressed overflow: ${route.suppressed.horizontalOverflow ? 'yes' : 'no'}`);
