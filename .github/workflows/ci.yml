@@ -23,3 +23,33 @@ jobs:
         shell: bash
         run: |
           node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')); JSON.parse(require('fs').readFileSync('.codex-plugin/plugin.json','utf8')); JSON.parse(require('fs').readFileSync('.agents/plugins/marketplace.json','utf8')); console.log('manifests ok')"
+
+  browser:
+    name: browser (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Detect a Chromium-family browser
+        id: detect
+        shell: bash
+        run: |
+          if node --input-type=module -e "import { findBrowser } from './src/env.mjs'; process.exit(findBrowser({}) ? 0 : 1)"; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Browser tests
+        if: steps.detect.outputs.available == 'true'
+        shell: bash
+        run: node --test tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs
+      - name: No browser found
+        if: steps.detect.outputs.available != 'true'
+        run: echo "No Chromium-family browser on this runner; browser tests skipped."

@@ -21,6 +21,10 @@ It does not assume access to any previous chat, plan file, or local session.
     WordPress pages; `wptk doctor` reports preview unavailable.
 - Claude `plugin validate . --strict` passes.
 - Claude and Codex plugin installs were smoke-tested in temporary config roots.
+- CI: `.github/workflows/ci.yml` runs `node --test` on Ubuntu/Windows (Node
+  22 and 24) and a separate browser job on Ubuntu/Windows/macOS (Node 24) that
+  runs the five browser suites only when `findBrowser({})` finds a browser.
+  GitHub execution is unverified: this checkout has no `git remote`.
 - The initial baseline and `check --fix` implementation are recorded in Git.
   Inspect `git status` before starting the next roadmap item; commit only when
   asked.
