@@ -126,10 +126,15 @@ test('pretty and GitHub output stay free of JSON link metadata', () => {
 });
 
 test('a relocated CLI encodes its own installation path, independently of cwd and theme', () => {
-  const installed = fs.realpathSync.native(tempDir('wptk 工具 #100% '));
+  // Node 22 on Windows fails to start a module below a directory whose name
+  // contains '#' or '%' (the copy exists), so keep those characters out of the
+  // Windows path while still covering spaces and non-ASCII names.
+  const prefix = process.platform === 'win32' ? 'wptk 工具 ' : 'wptk 工具 #100% ';
+  const installed = fs.realpathSync.native(tempDir(prefix));
   for (const directory of ['bin', 'src']) {
     fs.cpSync(path.join(KIT_ROOT, directory), path.join(installed, directory), { recursive: true });
   }
+  assert.ok(fs.existsSync(path.join(installed, 'bin/wp-theme-kit.mjs')), 'the relocated CLI was copied');
   const relative = 'skills/wp-theme-dev/references/checks.md';
   const installedCatalogue = write(installed, relative, fs.readFileSync(catalogue, 'utf8'));
   const root = classicTheme(tempDir('wptk-docs-relocated-theme-'));
@@ -146,8 +151,8 @@ test('a relocated CLI encodes its own installation path, independently of cwd an
   const finding = report.findings.find((item) => item.rule === 'php.unescaped-output');
   assert.ok(finding);
   assert.equal(finding.documentationUrl, `${pathToFileURL(installedCatalogue).href}#php-unescaped-output`);
-  assert.match(finding.documentationUrl, /%23/);
-  assert.match(finding.documentationUrl, /100%25/);
+  if (prefix.includes('#')) assert.match(finding.documentationUrl, /%23/);
+  if (prefix.includes('%')) assert.match(finding.documentationUrl, /100%25/);
   const url = new URL(finding.documentationUrl);
   assert.equal(fileURLToPath(url), installedCatalogue);
   assert.ok(fs.readFileSync(url, 'utf8').includes('<a id="php-unescaped-output"></a>'));

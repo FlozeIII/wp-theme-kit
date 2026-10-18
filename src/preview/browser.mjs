@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { findBrowser } from '../env.mjs';
 import { EnvError } from '../errors.mjs';
 
@@ -18,6 +18,23 @@ function removeProfile(profile) {
   } catch {
     // Best effort: a killed browser can hold the directory briefly.
   }
+}
+
+/**
+ * Stop a browser process group. Chromium-family browsers spawn renderer
+ * children that keep file handles and sockets open, so a plain kill can leave
+ * the profile locked and the caller's HTTP connection hanging on Windows.
+ */
+function stopBrowser(child) {
+  if (process.platform === 'win32') {
+    try {
+      spawnSync('taskkill', ['/pid', String(child.pid), '/t', '/f'], { stdio: 'ignore', windowsHide: true });
+      return;
+    } catch {
+      // Fall back to the plain kill below.
+    }
+  }
+  child.kill();
 }
 
 /**
@@ -59,7 +76,7 @@ export async function launch({ browserPath, headless = true, timeoutMs = 15000 }
   }
 
   if (!port) {
-    child.kill();
+    stopBrowser(child);
     removeProfile(profile);
     throw new EnvError(
       startError ? `Cannot start browser: ${startError.message}` : `The browser did not start within ${timeoutMs}ms.`,
@@ -71,7 +88,7 @@ export async function launch({ browserPath, headless = true, timeoutMs = 15000 }
     executable,
     port,
     async close() {
-      child.kill();
+      stopBrowser(child);
       await sleep(200);
       removeProfile(profile);
     },
@@ -330,6 +347,8 @@ export async function newPage(browser, { colorScheme = 'light', reducedMotion = 
 
     async close() {
       closed = true;
+      for (const { reject } of pending.values()) reject(new Error('The browser page is closed.'));
+      pending.clear();
       ws.close();
     },
   };
