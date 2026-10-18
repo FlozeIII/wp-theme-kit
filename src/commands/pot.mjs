@@ -1,10 +1,12 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from '../args.mjs';
 import { loadContext } from '../config.mjs';
 import { DEFAULT_IGNORE, normalizeIgnore, readTextIfExists, walkThemeSource, writeAtomic } from '../fs.mjs';
 import { extractFiles } from '../i18n/extract.mjs';
 import { buildPot, comparePot } from '../i18n/pot.mjs';
-import { EnvError } from '../errors.mjs';
+import { mergePotHeader } from '../i18n/pot-header.mjs';
+import { EnvError, UsageError } from '../errors.mjs';
 
 const USAGE = `Usage: wptk pot [theme-dir] [options]
 
@@ -13,15 +15,17 @@ Generate a POT file from gettext calls in PHP and wp.i18n calls in JavaScript.
 Options:
   --out <file>   Output path (default: languages/<text-domain>.pot).
   --check        Compare msgids with the existing POT instead of writing.
+  --merge        Regenerate entries while preserving existing header metadata.
   --json         Machine-readable output.
   -h, --help     Show this help.
 
-Only literal strings with the theme's own text domain are extracted.`;
+Only literal strings with the theme's own text domain are extracted.
+--merge and --check cannot be combined.`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {
     strings: ['out'],
-    booleans: ['check', 'help'],
+    booleans: ['check', 'merge', 'help'],
     aliases: { h: 'help' },
   });
   if (parsed.values.help) {
@@ -31,6 +35,9 @@ export async function run({ argv, globals, out }) {
   if (parsed.positionals.length > 1) {
     out.fail('pot accepts at most one theme directory.');
     return 2;
+  }
+  if (parsed.values.merge && parsed.values.check) {
+    throw new UsageError('--merge and --check cannot be combined.');
   }
 
   const cwd = parsed.positionals[0] ? path.resolve(globals.cwd, parsed.positionals[0]) : globals.cwd;
@@ -82,11 +89,20 @@ export async function run({ argv, globals, out }) {
     return comparison.ok ? 0 : 1;
   }
 
-  const pot = buildPot(extracted.entries, {
+  let pot = buildPot(extracted.entries, {
     domain,
     projectId: theme.header['Theme Name'] ?? theme.slug,
     version: theme.header.Version ?? '0.0.0',
   });
+  if (parsed.values.merge) {
+    let existing;
+    try {
+      existing = fs.readFileSync(output);
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw new EnvError(`Cannot read existing POT: ${output}`, error.message);
+    }
+    if (existing !== undefined) pot = mergePotHeader(pot, existing);
+  }
   writeAtomic(output, pot);
 
   if (globals.json) {

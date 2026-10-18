@@ -67,7 +67,12 @@ Each item is small enough for one agent session and has an acceptance command.
   `npm test` (191 pass, 1 Windows file-symlink privilege skip). Covers committed
   trees/ignores, attributes, strict paths, preflight/release/verify, offline
   partial clones, theme types and root compatibility.
-- [ ] `pot --merge` to preserve existing POT header metadata.
+- [x] `pot --merge` to preserve existing POT header metadata.
+  Acceptance: `node --test tests/integration/pot-merge.test.mjs` (9 pass) covers
+  manual/generated fields, comments, folded/escaped headers, repeatability,
+  error protection, paths, source entry rebuilding and existing behavior.
+  Verified: `npm test` (200 pass, 1 Windows file-symlink privilege skip);
+  real Yuki POT copy (112 keys) independently imported by WordPress POMO.
 - [ ] Theme Check helper: `wptk theme-check --zip <file>` that extracts into a
   temporary WordPress root and invokes WP-CLI when available.
   Acceptance: skips cleanly when WP-CLI or Theme Check is absent.

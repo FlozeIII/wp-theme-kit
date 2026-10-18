@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `pot --merge` preserves existing POT header comments, manual metadata and
+  custom fields while refreshing generated metadata and rebuilding source
+  entries. Missing files use normal defaults; malformed/ambiguous headers or
+  invalid UTF-8 fail before replacement. Supports quoted continuations and
+  folded values; run the read-only `--check` separately.
 - `package.subdir` selects a theme inside a Git repository for packaging,
   release preflight and artifact verification. Config may live at the Git root
   or selected theme root. Metadata, checks, POT/version, exclusions and default

@@ -138,7 +138,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk adopt [dir]` | Add config and agent instructions to an existing theme. |
 | `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`, `--diff <ref>`, `--fix [--dry-run]`; `--explain <rule-id>` reads rule documentation. |
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
-| `wptk pot [--out file]` | Generate a POT file; `--check` compares msgids. |
+| `wptk pot [--out file]` | Generate a POT file; `--merge` retains header metadata; `--check` compares msgids. |
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
 | `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors. |
 | `wptk preview [route]` | Open the route in the system browser. |
@@ -224,6 +224,34 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
   PHPCS-WordPress. Run those against the extracted artifact before release.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
+
+## POT header metadata
+
+```bash
+wptk pot --merge
+wptk pot --merge --out languages/my-theme.pot
+wptk pot --check
+```
+
+`--merge` reads the existing output file and retains its header comments,
+translator/team details, revision date, bug-report address and custom fields.
+Empty values are retained; missing fields receive normal defaults.
+`Project-Id-Version`, `POT-Creation-Date`, `X-Generator`, `X-Domain` and
+`Content-Type` are refreshed from normal generation. Output is UTF-8; set
+`SOURCE_DATE_EPOCH` for a reproducible creation timestamp.
+
+All message entries, references and empty translations are regenerated from
+current source. Removed strings and old entry comments/translations are dropped.
+This merges header metadata rather than translations from PO files.
+
+A missing output file is generated normally. An existing file must be UTF-8
+with a parseable header; malformed/duplicate header entries and duplicate field
+names (ignoring case) exit 2 before writing. Fix the header or use ordinary `wptk pot` to replace
+it. Quoted continuations, BOM/CRLF, folded field values and escaped quotes,
+backslashes, tabs, newlines and carriage returns are supported. Logical CRLF
+header line endings normalize to LF. Other escapes are rejected.
+`--merge` and `--check` are mutually exclusive; `--check` remains read-only.
+Without `--merge`, generation keeps its previous behavior.
 
 ## Themes in repository subdirectories
 
@@ -481,6 +509,7 @@ the WordPress ecosystem; change the license with `wptk init --license`.
 - **打包与发布**：按已提交的 Git 快照出包，严格的 `.distignore`，包内容验收，
   版本号检查，POT 新鲜度检查，发布清单。
 - **国际化**：从 PHP 与 JS 的字面量 gettext 调用生成 POT，并可做 msgid 集合比对。
+  `pot --merge` 保留已有头部的人工及自定义信息，同时更新版本等自动字段和词条。
 
 ### 安装
 

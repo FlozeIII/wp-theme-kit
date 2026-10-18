@@ -9,20 +9,29 @@ metadata:
 
 # Theme Internationalization
 
-The POT file is generated from code, not hand-edited.
+POT entries are generated from code. Use `--merge` when regenerating a file with
+maintained header metadata.
 
 ## Commands
 
 ```bash
 wptk pot
+wptk pot --merge
 wptk pot --out /tmp/theme.pot
 wptk pot --check
 wptk pot --check --json
 ```
 
 - The default output is `languages/<text-domain>.pot`.
+- `--merge` retains header comments, manual metadata and custom fields from the
+  existing output (also with `--out`). It refreshes `Project-Id-Version`,
+  `POT-Creation-Date`, `X-Generator`, `X-Domain` and UTF-8 `Content-Type`.
+  Missing files are generated normally; invalid UTF-8, malformed headers and
+  duplicate field names exit 2 without replacing the file. Repair the header or
+  use ordinary generation to replace it. This preserves header metadata only;
+  message entries and empty translations are rebuilt from source.
 - `--check` compares the msgid set with the existing POT and exits 1 when
-  strings were added or removed.
+  strings were added or removed. Run it separately from `--merge`.
 - `package` runs the same check before building a zip.
 
 ## What is extracted
@@ -41,7 +50,8 @@ hand.
 ## Workflow
 
 1. Add or change strings with the literal theme text domain.
-2. Run `wptk pot`.
+2. Run `wptk pot --merge` to retain maintained header metadata, or `wptk pot`
+   for a fresh header.
 3. Review the diff: new msgids, changed references, removed strings.
 4. Run `wptk pot --check` and make sure it exits 0.
 5. Commit the POT with the code change.
@@ -60,6 +70,7 @@ printf(
 
 ## 中文摘要
 
-POT 由代码生成，不手改。只提取字面量字符串和本主题文本域；动态字符串、缺文本域
-或别的文本域会被跳过并计数。改完文案先 `wptk pot`，再 `wptk pot --check`，
+POT 词条由代码生成。`pot --merge` 保留头部人工信息和自定义字段，并更新自动字段；
+已有文件头部异常时先修复，或用普通生成明确替换。只提取字面量字符串和本主题文本域；
+动态字符串、缺文本域或别的文本域会被跳过并计数。改完文案先生成，再单独 `wptk pot --check`，
 最后把 POT 和代码一起提交。含占位符的字符串前面加 `translators:` 注释。

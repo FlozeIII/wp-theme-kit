@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 191 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 200 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -200,6 +200,16 @@ bin/wp-theme-kit.mjs
 - `src/i18n/functions.mjs` is the single source for gettext signatures.
 - `src/i18n/extract.mjs` extracts PHP literals and `wp.i18n` literals.
 - `src/i18n/pot.mjs` writes and parses POT; comparison ignores references.
+- `src/i18n/pot-header.mjs` merges maintained header comments/metadata into a
+  fresh POT for `pot --merge`. Five generated fields always refresh:
+  Project-Id-Version, POT-Creation-Date, X-Generator, X-Domain and Content-Type.
+  Existing manual/custom fields (including empty values) override defaults.
+  UTF-8 decoding is strict; malformed/duplicate headers or duplicate field names fail
+  before atomic output. Only the header is validated. Entries/translations are
+  regenerated; absent output files use normal generation. `--check` remains
+  separate and read-only. Acceptance: `tests/integration/pot-merge.test.mjs`
+  (9 CLI tests); a real Yuki POT copy retained all 112 keys and was independently
+  imported by WordPress POMO with manual metadata intact.
 - `style.css` `Description` is treated as a translatable string.
 
 ### Scaffolding
