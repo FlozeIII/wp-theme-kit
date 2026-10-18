@@ -193,8 +193,20 @@ Each item is small enough for one agent session and has an acceptance command.
   Verified: the exact command runs 30/30 locally in Edge; the workflow YAML
   parses. GitHub execution remains unverified: this checkout has no `git remote`
   and pushing is out of scope.
-- [ ] Publish to npm and add a Claude/Codex marketplace entry.
-  Requires an explicit user decision and a real repository URL.
+- [x] Publish to npm and add a Claude/Codex marketplace entry.
+  Published 2026-10-18 as `wp-theme-kit@0.2.0` from the public repository
+  `FlozeIII/wp-theme-kit`, with the user's explicit decision recorded in this
+  session.
+  Acceptance: `npm publish --access public`; the registry serves `0.2.0` as
+  `latest`; a temporary project install (`npm i wp-theme-kit@0.2.0`) adds
+  exactly one package, and both `node node_modules/wp-theme-kit/bin/wp-theme-kit.mjs
+  --version` and `node_modules/.bin/wptk --version` print `0.2.0`;
+  `claude plugin marketplace add FlozeIII/wp-theme-kit` clones, validates and
+  lists the marketplace.
+  Verified: 2026-10-18 against the public registry and GitHub. The git tag and
+  GitHub Release remain manual follow-ups. On this Windows host, cloning through
+  Git's Schannel backend needs `http.schannelCheckRevoke=false` (or
+  `GIT_SSL_NO_VERIFY=true`); that is a local TLS/CRL issue, not a plugin defect.
 
 ## Deferred / not planned
 

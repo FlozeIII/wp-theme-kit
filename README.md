@@ -40,7 +40,16 @@ No `npm install` step. No Composer. No WP-CLI requirement.
 ### CLI
 
 ```bash
-git clone <this-repo> wp-theme-kit
+npm install --global wp-theme-kit
+wptk --help
+```
+
+Without a global install, run `npx wp-theme-kit <command>`.
+
+From a checkout:
+
+```bash
+git clone https://github.com/FlozeIII/wp-theme-kit.git
 cd wp-theme-kit
 npm link
 ```
@@ -53,9 +62,11 @@ npm link
 Native plugin:
 
 ```text
-/plugin marketplace add <absolute path to wp-theme-kit>
+/plugin marketplace add FlozeIII/wp-theme-kit
 /plugin install wp-theme-kit@wp-theme-kit
 ```
+
+For a local checkout, pass its absolute path to `/plugin marketplace add` instead.
 
 Or load it for one session:
 
@@ -66,7 +77,7 @@ claude --plugin-dir <absolute path to wp-theme-kit>
 ### Codex
 
 ```bash
-codex plugin marketplace add <absolute path to wp-theme-kit>
+codex plugin marketplace add FlozeIII/wp-theme-kit
 codex plugin add wp-theme-kit@wp-theme-kit
 ```
 

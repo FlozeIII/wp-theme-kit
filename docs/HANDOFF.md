@@ -6,6 +6,9 @@ It does not assume access to any previous chat, plan file, or local session.
 ## Current state
 
 - Version: `0.2.0`
+- Published: `wp-theme-kit@0.2.0` on npm (account `floze3`) and the public
+  repository `FlozeIII/wp-theme-kit`; the Claude marketplace entry is
+  `FlozeIII/wp-theme-kit`. Git tag and GitHub Release are still manual.
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
 - Tests: `npm test` -> 320 passing, 1 skipped (321 total) on Windows because file-symlink
@@ -515,7 +518,8 @@ repository root.
 - Mechanical fixes cover only the documented whitelist. Ambiguous syntax,
   namespaced/imported gettext calls, and symlinked source files require manual
   edits. The mu-plugin helpers are covered by PHP stub tests, not a live
-  WordPress site; npm publishing remains deferred.
+  WordPress site. npm `0.2.0` is published; the git tag, GitHub Release and live
+  wp-admin acceptance remain manual follow-ups.
 
 ## 中文摘要
 
