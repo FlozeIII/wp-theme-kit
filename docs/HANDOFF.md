@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 235 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 248 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -247,6 +247,26 @@ bin/wp-theme-kit.mjs
 - `src/preview/capture.mjs` applies guards and writes images atomically.
 - `src/preview/audit.mjs` reports console errors, failed assets, overflow,
   unloaded images, and missing selectors.
+- `src/preview/baseline.mjs` implements opt-in `audit --baseline <file>` and
+  atomic `--update-baseline`. Profiles match exact URL, actual viewport and
+  color scheme; console entries match text/count, overflow exact scrollWidth.
+  Raw facts stay in JSON with per-route/total suppression metadata. Default
+  updates write `.wp-theme-kit-audit-baseline.json` in the theme root; explicit
+  paths are cwd-relative. No automatic discovery or static-check baseline reuse.
+  New theme templates exclude the default audit baseline via `.distignore`;
+  existing themes/custom paths need the corresponding literal exclusion.
+  Updates snapshot enabled guards across all routes and replace stale entries;
+  partial/unguarded updates are rejected. Invalid files fail before browser
+  startup; incomplete scans preserve output. HTTP/network asset, image and
+  selector failures remain independent. Screenshot guards remain unchanged.
+  Capture's guard evaluator is shared with audit; configured duplicate paths
+  retain their distinct profiles. Browser spawn errors clean up and exit 2;
+  profile removal uses bounded retries for temporary Windows file locks.
+  Acceptance: `tests/integration/audit-baseline.test.mjs` (13 CLI tests, real
+  Chromium/local HTTP; browser-dependent cases skip when unavailable).
+  Real Yuki at localhost:8080 passed baseline update/read at 1200x900: HTTP 200,
+  no console errors or overflow, no remaining failures. Source HEAD/worktree
+  stayed unchanged; the temporary local PHP process was stopped afterward.
 
 ### i18n
 

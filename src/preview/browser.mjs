@@ -33,10 +33,12 @@ export async function launch({ browserPath, headless = true, timeoutMs = 15000 }
   if (headless) args.unshift('--headless=new');
 
   const child = spawn(executable, args, { stdio: 'ignore', windowsHide: true });
+  let startError = null;
+  child.on('error', (error) => { startError = error; });
   const portFile = path.join(profile, 'DevToolsActivePort');
   let port = 0;
   const started = Date.now();
-  while (Date.now() - started < timeoutMs && !port) {
+  while (Date.now() - started < timeoutMs && !port && !startError) {
     await sleep(100);
     if (fs.existsSync(portFile)) {
       port = Number(fs.readFileSync(portFile, 'utf8').split(/\r?\n/)[0]) || 0;
@@ -45,9 +47,9 @@ export async function launch({ browserPath, headless = true, timeoutMs = 15000 }
 
   if (!port) {
     child.kill();
-    fs.rmSync(profile, { recursive: true, force: true });
+    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
     throw new EnvError(
-      `The browser did not start within ${timeoutMs}ms.`,
+      startError ? `Cannot start browser: ${startError.message}` : `The browser did not start within ${timeoutMs}ms.`,
       `Tried: ${executable}`,
     );
   }
@@ -58,7 +60,7 @@ export async function launch({ browserPath, headless = true, timeoutMs = 15000 }
     async close() {
       child.kill();
       await sleep(200);
-      fs.rmSync(profile, { recursive: true, force: true });
+      fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
     },
   };
 }

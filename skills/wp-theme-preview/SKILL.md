@@ -1,6 +1,6 @@
 ---
 name: wp-theme-preview
-description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, responsive width checks, console errors, failed assets, horizontal overflow, missing selectors, dark mode, or before declaring a visual change done.
+description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, dark mode, or before declaring a visual change done.
 license: MIT
 metadata:
   author: FlozeIII
@@ -24,6 +24,8 @@ wptk shot --all --out dist/shots
 wptk shot --dark --width 375 --height 812
 wptk audit
 wptk audit /about --json
+wptk audit --update-baseline
+wptk audit --baseline .wp-theme-kit-audit-baseline.json --json
 ```
 
 - The site URL comes from `--url`, `config.preview.baseUrl`,
@@ -48,6 +50,29 @@ wptk audit /about --json
 }
 ```
 
+## Known audit findings
+
+Use `audit --update-baseline` to review and accept current console errors and
+overflow on all configured routes. The default file is
+`.wp-theme-kit-audit-baseline.json` in the theme root. Choose another file with
+`--baseline <file>`; explicit paths resolve from `--cwd`. Inspect the generated
+JSON before accepting it. Static check baselines are separate.
+In existing themes or with a custom path, add the baseline's literal path to
+`.distignore`; new templates already exclude the default audit baseline.
+
+Read the file explicitly with `audit --baseline <file>`. Matching uses the exact
+URL, viewport, color scheme and error text/count or overflow scroll width.
+Changed messages, extra occurrences and changed profiles/widths still fail.
+JSON keeps raw facts and reports total/per-route suppression. HTTP/network
+asset failures, missing images and selectors remain failures. Disabled guards
+are excluded from snapshots; baseline use never changes screenshot guards.
+
+Updates replace stale entries only after every route completes. A positional
+route or `--no-guard` is rejected with `--update-baseline`. Missing/invalid read
+files or malformed existing update files fail before browser startup; navigation
+and startup failures preserve the old file. Without baseline flags, no baseline
+is discovered. Review the remaining failures even after updating a baseline.
+
 ## Guard failures
 
 If a guard fails, the command exits nonzero and does not overwrite the existing
@@ -68,3 +93,5 @@ Common causes:
 `screenshot.png`，`--all` 按配置路由批量截图。`wptk audit` 检查状态码、控制台
 错误、失败资源、横向溢出、未加载图片与缺失选择器。守护条件失败时不要覆盖旧图；
 先用 `--no-guard` 只做诊断，修好后再正常跑。
+`audit --baseline` 显式抑制已知错误；`--update-baseline` 更新全部路由并保留原始
+观测。新增问题与资源、图片、选择器失败仍会报错，截图守护不受影响。

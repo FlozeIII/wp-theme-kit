@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `audit --baseline <file>` accepts known console errors and exact horizontal
+  overflow by URL, viewport and color scheme, preserving raw JSON observations
+  and reporting suppression counts. Message/count/width changes still fail.
+  `--update-baseline` atomically snapshots all routes; partial/unguarded updates
+  and invalid files fail safely. Static baselines and screenshot guards remain
+  separate; HTTP/network assets, images and selectors stay actionable. New theme
+  templates exclude the default audit baseline from release artifacts.
 - `release --notes [--since <ref>]` drafts grouped Markdown and JSON release
   notes from offline committed history. Automatic previous tags, explicit
   ancestor ranges, Conventional Commit groups, breaking markers and literal
@@ -90,6 +97,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- Audit JSON stays parseable on failures, and failed network assets remain
+  independent failures even when their console messages are accepted.
+- Duplicate-path preview routes retain their own configuration, including dark
+  mode. Browser spawn errors now exit as environment failures and clean up the
+  temporary profile instead of raising an unhandled process error. Profile
+  removal retries temporary Windows file locks within a bounded interval.
 - `release --rev <tag>` now requires the tag's commit to match repository HEAD
   before notes or ZIP creation, preserving existing artifacts on failure.
   Real lightweight/annotated tags of any name and explicit tag refs are
@@ -107,7 +120,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 235 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 248 passing, 1 skipped on Windows (file-symlink privileges).
+- Audit baseline: 13 CLI tests with real Chromium/local HTTP fixtures cover
+  matching, regressions, profile isolation, independent guards, updates,
+  malformed inputs, output preservation and screenshot protection.
+  Real Yuki baseline update/read passed at 1200x900 (HTTP 200, no console errors
+  or overflow), preserving source state and baseline bytes on the read pass.
 - Release tag/HEAD gate: 10 CLI tests cover reference types/ambiguity, detached
   HEAD, nested themes, notes, artifact preservation and offline failures.
   Isolated Yuki rejected an old tag at current HEAD, then produced a verified

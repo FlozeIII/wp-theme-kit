@@ -8,6 +8,7 @@ docs/
 .distignore
 .wp-theme-kit.json
 .wp-theme-kit-baseline.json
+.wp-theme-kit-audit-baseline.json
 .wp-theme-kit-install.json
 AGENTS.md
 CLAUDE.md

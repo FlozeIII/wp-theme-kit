@@ -97,7 +97,12 @@ Each item is small enough for one agent session and has an acceptance command.
 
 ## v0.2: preview and audit
 
-- [ ] `audit --baseline` for known console errors or overflow.
+- [x] `audit --baseline` for known console errors or overflow.
+  Acceptance: `tests/integration/audit-baseline.test.mjs` (13 CLI tests) covers
+  exact matches/count regressions, URL/viewport/color isolation, full updates,
+  independent guards, schema/errors, file preservation and screenshot safety.
+  Verified: `npm test` (248 pass, 1 Windows file-symlink privilege skip).
+  Real Yuki baseline update/read passed at 1200x900 without changing its source.
 - [ ] Accessibility assertions: duplicate IDs, empty links, form labels.
 - [ ] Screenshot comparison with a tolerance and a diff image.
 - [ ] Editor screenshots (`/wp-admin/post-new.php`) with a cookie fixture.

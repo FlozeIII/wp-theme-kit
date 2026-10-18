@@ -140,7 +140,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
 | `wptk pot [--out file]` | Generate a POT file; `--merge` retains header metadata; `--check` compares msgids. |
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
-| `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors. |
+| `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors; `--baseline <file>` and `--update-baseline` accept known console/overflow findings. |
 | `wptk preview [route]` | Open the route in the system browser. |
 | `wptk version [bump patch|minor|major]` | Print or bump `style.css` and `package.json`. |
 | `wptk package [out.zip] [--rev ref]` | Build from a committed revision. |
@@ -225,6 +225,48 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
   PHPCS-WordPress. Run those against the extracted artifact before release.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
+
+## Audit baselines
+
+```bash
+wptk audit --update-baseline
+wptk audit --baseline .wp-theme-kit-audit-baseline.json --json
+wptk audit --baseline review/known-browser-issues.json --update-baseline
+```
+
+Baseline use is explicit: without these options, `audit` does not discover a
+baseline automatically. Updating audits all configured routes, writes the current
+enabled console/overflow findings atomically, and applies them on that run.
+The default output is `.wp-theme-kit-audit-baseline.json` in the theme root;
+explicit paths resolve relative to `--cwd`. Review the generated file before
+accepting it. Static `check` baselines use a separate format and file.
+New theme templates exclude the default audit baseline from packages. For an
+existing theme or a custom baseline path, add its literal path to `.distignore`.
+
+The version-1 JSON object contains a `findings` array. Each entry records `url`,
+`viewport` (`width`, `height`), `colorScheme` (`light` or `dark`) and `kind`.
+`console-error` entries add exact `message` text and a positive occurrence
+`count`. `horizontal-overflow` entries add exact `scrollWidth`. Matching includes
+the URL's origin/query and the actual viewport; extra error occurrences, changed
+messages, new profiles and changed overflow widths remain failures. Repeated
+route profiles record the maximum count from one visit, never the sum of visits.
+
+JSON retains all observed facts, adds per-route `suppressed` counts/overflow
+flags, and a top-level `baseline` object with `path`, `updated` and total
+`suppressed`. Pretty output labels suppression alongside the raw counts.
+HTTP status errors, HTTP/network asset failures, unloaded images and missing
+selectors still fail. Disabled guards stay disabled and are excluded from
+snapshots. Baselines never affect `shot` or its protection of existing images.
+
+Reading never rewrites a baseline. Updates replace stale entries, require all
+routes and enabled guarding, and reject a positional route or `--no-guard`.
+Missing/invalid read files and malformed existing update files exit 2 before
+opening a browser. Navigation/startup failures preserve existing baseline bytes.
+Invalid JSON/UTF-8, unsupported versions/kinds, malformed entries and duplicate
+identities are rejected. Audit JSON stdout stays parseable on failure.
+
+`audit --baseline` 只接受精确匹配的已知控制台错误和溢出，原始观测仍保留。
+通过 `--update-baseline` 显式更新全部路由；资源、图片和选择器失败仍须修复。
 
 ## POT header metadata
 

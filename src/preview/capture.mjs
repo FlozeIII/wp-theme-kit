@@ -34,9 +34,9 @@ export function resolveRoute(context, routeArg, options = {}) {
   }
 
   const routes = context.config.preview.routes ?? [];
-  const configured = routeArg
+  const configured = options.configuredRoute ?? (routeArg
     ? routes.find((route) => route.name === routeArg || route.path === routeArg)
-    : routes[0];
+    : routes[0]);
   const route = configured ?? {};
   const routePath = routeArg && !configured && routeArg.startsWith('/') ? routeArg : (route.path ?? '/');
 
@@ -56,6 +56,7 @@ export function resolveRoutes(context, options = {}) {
   if (routes.length === 0) return [resolveRoute(context, '/', options)];
   return routes.map((route) => resolveRoute(context, route.path, {
     ...options,
+    configuredRoute: route,
     width: options.width ?? route.width,
     height: options.height ?? route.height,
   }));
@@ -111,7 +112,7 @@ async function inspectPage(page, route, guards) {
   };
 }
 
-function guardFailures(facts, guards) {
+export function guardFailures(facts, guards) {
   const failures = [];
   if (guards.noHorizontalOverflow !== false && facts.horizontalOverflow) {
     failures.push(`horizontal overflow: document is ${facts.scrollWidth}px wide in a ${facts.viewport.width}px viewport`);

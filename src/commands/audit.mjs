@@ -1,7 +1,11 @@
+import path from 'node:path';
 import { parseArgs } from '../args.mjs';
 import { loadContext } from '../config.mjs';
 import { resolveRoute, resolveRoutes } from '../preview/capture.mjs';
 import { auditReport, auditRoutes } from '../preview/audit.mjs';
+import { AUDIT_BASELINE_NAME, loadAuditBaseline } from '../preview/baseline.mjs';
+import { UsageError } from '../errors.mjs';
+import { exists } from '../fs.mjs';
 
 const USAGE = `Usage: wptk audit [route] [options]
 
@@ -10,6 +14,8 @@ horizontal overflow, unloaded images, and missing selectors.
 
 Options:
   --url <url>     Site base URL.
+  --baseline <file> Read known console errors and overflow from this file.
+  --update-baseline Write all routes to the baseline (default: ${AUDIT_BASELINE_NAME}).
   --no-guard      Report layout problems without applying guards.
   --json          Machine-readable report.
   -h, --help      Show this help.
@@ -18,8 +24,8 @@ Without a route, every route in config.preview.routes is audited.`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {
-    strings: ['url'],
-    booleans: ['no-guard', 'help'],
+    strings: ['url', 'baseline'],
+    booleans: ['no-guard', 'update-baseline', 'help'],
     aliases: { h: 'help' },
   });
   if (parsed.values.help) {
@@ -30,8 +36,18 @@ export async function run({ argv, globals, out }) {
     out.fail('audit accepts at most one route.');
     return 2;
   }
+  if (parsed.values.baseline !== undefined && !parsed.values.baseline.trim()) {
+    throw new UsageError('--baseline needs a nonempty path.');
+  }
+  const updateBaseline = parsed.values['update-baseline'] === true;
+  if (updateBaseline && (parsed.positionals.length || parsed.values['no-guard'] === true)) {
+    throw new UsageError('--update-baseline requires all configured routes with guards enabled; omit the route and --no-guard.');
+  }
 
   const context = loadContext({ cwd: globals.cwd });
+  const baselineFile = parsed.values.baseline ? path.resolve(globals.cwd, parsed.values.baseline)
+    : (updateBaseline ? path.join(context.root, AUDIT_BASELINE_NAME) : null);
+  const baseline = baselineFile && (!updateBaseline || exists(baselineFile)) ? loadAuditBaseline(baselineFile) : null;
   const routes = parsed.positionals[0]
     ? [resolveRoute(context, parsed.positionals[0], { url: parsed.values.url })]
     : resolveRoutes(context, { url: parsed.values.url });
@@ -41,6 +57,9 @@ export async function run({ argv, globals, out }) {
     routes,
     out,
     noGuards: parsed.values['no-guard'] === true,
+    baseline,
+    baselineFile,
+    updateBaseline,
   });
 
   const report = auditReport(result);
@@ -58,8 +77,13 @@ export async function run({ argv, globals, out }) {
       out.line(`  failed assets:       ${route.httpErrors.length}`);
       out.line(`  unloaded images:     ${route.missingImages.length}`);
       out.line(`  missing selectors:   ${route.missingSelectors.length}`);
+      if (route.suppressed) {
+        out.line(`  suppressed errors:   ${route.suppressed.consoleErrors}`);
+        out.line(`  suppressed overflow: ${route.suppressed.horizontalOverflow ? 'yes' : 'no'}`);
+      }
     }
     out.line('');
+    if (report.baseline) out.info(`Baseline ${report.baseline.updated ? 'written' : 'read'}: ${report.baseline.path} (${report.baseline.suppressed} suppressed)`);
     if (report.ok) out.ok('Audit passed.');
     else {
       for (const failure of report.failures) out.fail(failure);
