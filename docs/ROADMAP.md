@@ -187,7 +187,9 @@ Each item is small enough for one agent session and has an acceptance command.
   `ubuntu-latest`, `windows-latest` and `macos-latest` (Node 24) that detects a
   Chromium-family browser through `findBrowser({})`, runs the five browser
   suites (`preview`, `audit-baseline`, `accessibility`, `compare`,
-  `editor-cookie`) when found, and prints a skip notice otherwise.
+  `editor-cookie`) when found, serialized with `--test-concurrency=1` to avoid
+  launching several browsers on small runners, and prints a skip notice
+  otherwise.
   Verified: the exact command runs 30/30 locally in Edge; the workflow YAML
   parses. GitHub execution remains unverified: this checkout has no `git remote`
   and pushing is out of scope.

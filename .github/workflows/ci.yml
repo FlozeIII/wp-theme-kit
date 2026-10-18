@@ -53,7 +53,7 @@ jobs:
       - name: Browser tests
         if: steps.detect.outputs.available == 'true'
         shell: bash
-        run: node --test tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs
+        run: node --test --test-concurrency=1 tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs
       - name: No browser found
         if: steps.detect.outputs.available != 'true'
         shell: bash
