@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 210 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 225 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -185,6 +185,22 @@ bin/wp-theme-kit.mjs
   hostile attributes, offline partial clones, theme types, preflight and release,
   independent verification, custom exclusions and existing root behavior.
 - `src/zip/read.mjs` has no dependencies.
+- `src/package/notes.mjs` adds opt-in `release --notes [--since <ref>]` drafts.
+  It excludes target tags when selecting Git's nearest reachable prior tag,
+  resolves explicit ancestor boundaries, reads the committed theme version and
+  collects non-merge commits in reverse topological order. Conventional types
+  form stable groups; breaking markers lead, and unknown subjects remain whole.
+  Markdown is escaped; JSON retains complete commit IDs and range metadata.
+  Subdir histories use literal pathspecs; automatic tag selection is repo-wide.
+  Notes are computed before packaging and pin it to the same commit. Missing
+  objects never fetch; shallow histories fail clearly before output replacement.
+  History reads disable replacement refs to match the archive's original objects;
+  tag listings force a machine-safe format regardless of column/color settings.
+  Without the option, JSON shape/checklist behavior remains intact. The next
+  roadmap tag/HEAD check is still deferred.
+  Acceptance: `tests/integration/release-notes.test.mjs` (15 CLI tests); isolated
+  Yuki v1.2.0..v1.3.0 run retained all 13 non-merge commits, produced the verified
+  40-entry ZIP, repeated identically and left the source worktree unchanged.
 
 ### Optional Theme Check
 

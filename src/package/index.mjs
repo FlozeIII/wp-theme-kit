@@ -155,10 +155,10 @@ export function releasePreflight(context, rev = 'HEAD') {
     }
   }
 
-  return { repo, revision, versions, tagRef, config, theme };
+  return { repo, revision, versions, tagRef, config, theme, subdir: location.subdir };
 }
 
-export function releaseChecklist({ output, revision, versions, tagRef }) {
+export function releaseChecklist({ output, revision, versions, tagRef, notesDrafted = false }) {
   return [
     `Artifact: ${output}`,
     `Revision: ${revision}`,
@@ -167,7 +167,7 @@ export function releaseChecklist({ output, revision, versions, tagRef }) {
     'Remaining, human-only steps:',
     `  1. Confirm the artifact is built from the release commit (${revision}).`,
     `  2. Run Theme Check against the extracted artifact, not the worktree.`,
-    `  3. Write release notes from the previous tag to this one.`,
+    notesDrafted ? '  3. Review the generated release notes for accuracy.' : '  3. Write release notes from the previous tag to this one.',
     `  4. Upload the produced zip; do not use GitHub's source zip.`,
     tagRef ? `  5. Never move tag ${tagRef}; release a new version instead.` : '  5. Create and push the annotated tag if you have not already.',
   ];

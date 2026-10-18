@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `release --notes [--since <ref>]` drafts grouped Markdown and JSON release
+  notes from offline committed history. Automatic previous tags, explicit
+  ancestor ranges, Conventional Commit groups, breaking markers and literal
+  monorepo paths are supported. The heading uses the committed version; notes
+  and ZIP share a pinned target. Missing/shallow history fails before replacing
+  an artifact. Legacy release output and publishing boundaries remain intact.
 - `theme-check --zip <file>` optionally checks an extracted artifact using local
   WP-CLI, WordPress libraries and Theme Check's official command class. Temporary
   core/checker links and static options isolate the scan from site config,

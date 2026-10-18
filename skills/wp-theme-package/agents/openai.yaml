@@ -1,5 +1,5 @@
 interface:
   display_name: "WordPress Theme Package"
-  short_description: "Package, verify, run Theme Check, and prepare releases"
+  short_description: "Package, verify, check themes, and draft release notes"
 policy:
   allow_implicit_invocation: true

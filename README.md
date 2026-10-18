@@ -146,7 +146,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk package [out.zip] [--rev ref]` | Build from a committed revision. |
 | `wptk verify-package <zip>` | Inspect an artifact without WordPress. |
 | `wptk theme-check --zip <file>` | Run optional local Theme Check on an extracted artifact. |
-| `wptk release [--rev ref]` | Local preflight, package, verify, and checklist. |
+| `wptk release [--rev ref]` | Local preflight, package, verify, and checklist; `--notes [--since ref]` drafts grouped notes. |
 | `wptk install --harness ...` | Install skills and AGENTS.md entries. |
 
 Global flags: `--cwd <dir>`, `--json`, `--no-color`, `--quiet`.
@@ -315,6 +315,47 @@ Theme Check's own pass/fail policy. Missing tools do not hide a malformed ZIP.
 Archives require a single slug directory and `style.css`; traversal, Windows
 device/short-name aliases, case collisions and file/directory conflicts are
 rejected before extraction. Entries are materialized as ordinary files.
+
+## Release notes drafts
+
+```bash
+wptk release --notes
+wptk release --rev v1.2.0 --notes --since v1.1.0 --json
+```
+
+`--notes` adds a Markdown draft to the normal local release output. JSON adds a
+`notes` object containing `from` (ref and commit, or null), `to` (the packaged
+commit), `subdir`, grouped commit records and `markdown`. The draft heading uses
+the target commit's `style.css` version. Nothing is written to a separate notes
+file, tagged, pushed or published; the checklist asks you to review the draft.
+
+The default starting point is the nearest reachable tag selected by
+`git describe --tags`, excluding all tags pointing directly to the target.
+Annotated and lightweight tags count. Without a preceding tag, all history is
+included. `--since` selects an explicit ancestor commit/tag and requires
+`--notes`; the range excludes that base and includes the target. Equal endpoints
+produce an explicit no-changes draft. Shallow or unavailable history fails
+before the ZIP is replaced; Git never fetches missing objects. History reads
+ignore replacement refs, matching the archive's original commit objects, and
+tag discovery is independent of Git's column/color display configuration.
+
+Non-merge commits are listed oldest first within each group:
+
+| Group | Commit convention |
+|---|---|
+| Breaking Changes | `type!:` / `type(scope)!:`, or a body line starting `BREAKING CHANGE:` / `BREAKING-CHANGE:` |
+| Added | `feat` |
+| Fixed | `fix` |
+| Changed | `perf`, `refactor`, `style` |
+| Documentation | `docs` |
+| Maintenance | `build`, `ci`, `chore`, `test`, `revert` |
+| Other Changes | Other subjects, retained in full |
+
+Scopes and the first line of breaking-change details are retained. Markdown and
+HTML in Git text are escaped. Empty groups are omitted. For `package.subdir`,
+commit history is restricted to that literal theme directory; automatic tag
+selection remains repository-wide, so use `--since` for theme-specific tags.
+Existing release gates and behavior without `--notes` remain unchanged.
 
 ## Script footer argument types
 

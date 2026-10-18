@@ -24,6 +24,7 @@ wptk package --no-check
 wptk verify-package dist/my-theme.zip
 wptk theme-check --zip dist/my-theme.zip --wp-root /path/to/wordpress
 wptk release --rev v1.2.0
+wptk release --notes --since v1.1.0
 ```
 
 ## Repository subdirectories
@@ -91,6 +92,24 @@ Theme Check failure, and 2 is invalid input/runtime failure. JSON skips have
 No tools are downloaded or installed. Review the official findings as part of
 release acceptance, even when some are intentional for a self-hosted theme.
 
+## Release notes draft
+
+Run `wptk release --notes` to add grouped Markdown notes to the release output;
+`--json` includes a structured `notes` object. Add `--since <ref>` for an explicit
+ancestor boundary. Otherwise the base is the nearest reachable tag excluding
+target tags, or the beginning of history when no prior tag exists.
+
+The range excludes the base, includes the exact packaged commit, and omits merge
+commits. Conventional subjects are grouped by type; `!` and `BREAKING CHANGE:` /
+`BREAKING-CHANGE:` body markers lead the breaking group. Unknown subjects stay
+whole in Other Changes. For `package.subdir`, only theme-directory commits are
+included; automatic tags are repository-wide. Shallow/missing history fails
+offline before artifact creation. No separate notes file is written.
+
+Review the draft for accuracy and user impact before reusing it. The heading
+comes from the target's committed version; the normal release preflight still
+uses its existing clean-tree and version consistency checks.
+
 ## Release boundary
 
 `wptk release` is local only. Never push, move a tag, or publish a release
@@ -107,3 +126,5 @@ released tag.
 `release` 只做本地准备并打印清单，绝不自动 push、打标签或发布。
 `theme-check --zip` 在临时目录用本机工具检查产物，不加载站点配置或数据库；
 缺少工具会明确跳过，跳过不能视为检查通过。
+`release --notes` 从已提交历史生成分组草稿；可用 `--since` 指定起点，
+发布前仍须人工审核，不会自动写文件、打标签或发布。

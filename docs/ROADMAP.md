@@ -81,7 +81,12 @@ Each item is small enough for one agent session and has an acceptance command.
   explicit skips, artifact isolation, findings/status, malformed output, safe
   extraction, cleanup and config/CLI behavior. Real local WordPress/Theme Check
   runs verified Yuki and block/hybrid artifacts without loading theme PHP.
-- [ ] `release --notes` to draft grouped release notes from Git history.
+- [x] `release --notes` to draft grouped release notes from Git history.
+  Acceptance: `node --test tests/integration/release-notes.test.mjs` (15 pass)
+  covers tag/explicit ranges, groups/breaking markers, monorepos, empty histories,
+  errors/offline behavior, target versions, legacy output and identical ZIPs.
+  Verified: `npm test` (225 pass, 1 Windows file-symlink privilege skip);
+  isolated Yuki history retained 13 commits and produced a verified 40-entry ZIP.
 - [ ] Validate that the tag's commit is `HEAD` when releasing from a tag.
 
 ## v0.2: preview and audit
