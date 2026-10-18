@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- A full Simplified Chinese README (`README.zh-CN.md`) kept in structural
+  parity with the English one, with language links at the top of both files.
+  User-facing command, configuration and behaviour changes must update both.
+
 ## [0.2.1] - 2026-10-18
 
 ### Fixed

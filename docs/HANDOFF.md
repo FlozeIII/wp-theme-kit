@@ -467,7 +467,7 @@ bin/wp-theme-kit.mjs
 2. Parse options with `parseArgs`; do not add a dependency.
 3. Register it in `src/cli.mjs` with a one-line summary.
 4. Add an integration test that spawns the CLI and checks output and exit code.
-5. Add it to the command table in `README.md`.
+5. Add it to the command table in `README.md` and `README.zh-CN.md`.
 
 ## How to add or change a skill
 
@@ -475,7 +475,8 @@ bin/wp-theme-kit.mjs
 2. Keep the frontmatter portable and the description free of `<` and `>`.
 3. Update or add `agents/openai.yaml`.
 4. Run `claude plugin validate . --strict`.
-5. Update `README.md` if the skill's public workflow changed.
+5. Update `README.md` and `README.zh-CN.md` if the skill's public workflow
+   changed.
 
 ## Working with more than one agent
 

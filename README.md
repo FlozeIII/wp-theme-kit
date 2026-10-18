@@ -1,5 +1,7 @@
 # wp-theme-kit
 
+English | [简体中文](README.zh-CN.md)
+
 A cross-harness toolkit for developing WordPress themes. It ships one shared
 skill pack and one zero-dependency Node CLI, usable from Claude Code, Codex,
 DeepSeek Harness, or a plain terminal.
@@ -815,77 +817,8 @@ the WordPress ecosystem; change the license with `wptk init --license`.
 
 ---
 
-## 中文说明
+## 中文文档
 
-`wp-theme-kit` 是一套跨 harness 的 WordPress 主题开发工具：一份共享技能包 +
-一个零依赖 Node CLI，可在 Claude Code、Codex、DeepSeek Harness 或普通终端里使用。
+完整中文文档见 [README.zh-CN.md](README.zh-CN.md)。修改 README 时请同步更新两个语言
+版本：英文 `README.md` 是 npm 展示的规范版本，中文版必须与其结构、命令和示例保持一致。
 
-### 能力
-
-- **检查**：主题结构、`style.css` 头、模板引用、转义、文本域、SQL、nonce、
-  全局前缀、block 模板与 `theme.json`、HTML/JS/CSS 常见问题。
-- **脚手架**：新建 classic / block / hybrid 主题，生成模板、模板部件、PHP 模块、
-  自定义区块与 block pattern。
-- **预览与截图**：真实视口截图、批量路由截图、控制台错误、失败资源、横向溢出、
-  图片加载与选择器检查；用 cookie 夹具截取登录后的编辑页，并对比两张截图的
-  差异（容差 + diff 图）。
-- **本地观测**：`mu-plugin` 把邮件捕获与 HTTP stub 助手装进本地
-  `wp-content/mu-plugins/`，记录清单、只更新旧版本，生产环境默认不生效。
-- **打包与发布**：按已提交的 Git 快照出包，严格的 `.distignore`，包内容验收，
-  版本号检查，POT 新鲜度检查，发布清单。
-- **国际化**：从 PHP 与 JS 的字面量 gettext 调用生成 POT，并可做 msgid 集合比对。
-  `pot --merge` 保留已有头部的人工及自定义信息，同时更新版本等自动字段和词条。
-
-### 安装
-
-```bash
-git clone <repo> wp-theme-kit
-cd wp-theme-kit
-npm link
-```
-
-Claude Code：
-
-```text
-/plugin marketplace add <wp-theme-kit 绝对路径>
-/plugin install wp-theme-kit@wp-theme-kit
-```
-
-Codex：
-
-```bash
-codex plugin marketplace add <wp-theme-kit 绝对路径>
-codex plugin add wp-theme-kit@wp-theme-kit
-```
-
-DeepSeek：
-
-```bash
-node install.mjs --harness deepseek --project <主题目录>
-```
-
-三个 harness 也可以统一用：
-
-```bash
-wptk install --harness all --project <主题目录>
-```
-
-### 快速开始
-
-```bash
-wptk doctor
-wptk check
-wptk init my-theme --type classic
-wptk pot
-wptk shot --url http://localhost:8080
-wptk package --rev v0.2.0
-wptk verify-package dist/my-theme.zip
-```
-
-### 约定
-
-- 主题 slug 用小写 kebab-case，并与部署目录、文本域一致。
-- PHP 全局函数、类、常量、option/meta key 使用项目前缀。
-- 输出处转义；输入处清洗；写操作前验证 nonce 与权限。
-- 新功能优先放新文件，用显式 `require_once` 接入，不要 glob。
-- 打包只认已提交内容；`release` 不会自动 push、打标签或发布。
