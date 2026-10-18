@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `package.subdir` selects a theme inside a Git repository for packaging,
+  release preflight and artifact verification. Config may live at the Git root
+  or selected theme root. Metadata, checks, POT/version, exclusions and default
+  output use the theme root; only the committed subtree ships under its slug.
+  Strict paths, physical-directory checks, non-tree rejection, isolated Git
+  attributes, commit timestamps, atomic output and offline object reads preserve
+  packaging invariants. Null/empty configuration keeps root-theme behavior.
 - `php.script-footer` warns on known nonboolean `wp_enqueue_script` footer
   arguments, accepting booleans and WordPress 6.3+ options arrays. Literal arrays
   check the final known `in_footer` value; unrelated fields remain out of scope.
@@ -76,7 +83,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 177 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 191 passing, 1 skipped on Windows (file-symlink privileges).
+- Subdirectory packaging: 14 CLI tests cover ZIP paths/bytes, committed-only
+  exclusions, tags/older commits, traversal/aliases/gitlinks, Git attributes,
+  Unicode/spaces, theme types, preflight, release and verification, custom
+  exclusions, legacy root behavior and missing partial-clone objects offline.
 - Script footer acceptance: 10 CLI tests cover scalar/array types, duplicate
   keys, conservative skips, call identity, theme types, JS/PHP agreement,
   no source execution, suppression/baselines, diff/fix rechecks and formats.

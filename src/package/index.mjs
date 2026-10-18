@@ -4,9 +4,10 @@ import { runCheck } from '../check/index.mjs';
 import { DEFAULT_IGNORE, normalizeIgnore, readTextIfExists, walkThemeSource } from '../fs.mjs';
 import { extractFiles } from '../i18n/extract.mjs';
 import { comparePot } from '../i18n/pot.mjs';
-import { assertRepoRoot, createArchive, git, resolveRevision } from './archive.mjs';
+import { createArchive, git, resolveRevision } from './archive.mjs';
 import { verifyPackage } from './verify.mjs';
 import { versionReport } from './version.mjs';
+import { resolvePackageContext } from './context.mjs';
 
 function potStatus(root, config, theme) {
   const file = path.join(root, 'languages', `${theme.textDomain}.pot`);
@@ -50,8 +51,9 @@ export async function packageTheme({
   verify = true,
   out,
 }) {
+  const location = resolvePackageContext(context);
+  context = location.context;
   const { root, config, theme } = context;
-  assertRepoRoot(root);
 
   if (check) {
     const code = await runCheck({
@@ -84,14 +86,15 @@ export async function packageTheme({
     out.warn(`Version numbers disagree: ${versions.versions.map((item) => `${item.file}=${item.version}`).join(', ')}`);
   }
 
-  const revision = resolveRevision(root, rev);
+  const revision = resolveRevision(location.repoRoot, rev);
   const target = output
     ? path.resolve(output)
     : defaultOutput(root, theme.slug, config.package.output);
 
   const result = createArchive({
-    repoRoot: root,
+    repoRoot: location.repoRoot,
     revision,
+    subdir: location.subdir,
     slug: theme.slug,
     distignore: config.package.distignore,
     output: target,
@@ -119,8 +122,10 @@ export async function packageTheme({
 }
 
 export function releasePreflight(context, rev = 'HEAD') {
+  const location = resolvePackageContext(context);
+  context = location.context;
   const { root, config, theme } = context;
-  const repo = assertRepoRoot(root);
+  const repo = location.repoRoot;
   const status = git(repo, 'status', '--porcelain').trim();
   if (status) {
     throw new GateError(

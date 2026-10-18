@@ -28,6 +28,7 @@ const DEFAULTS = {
     baseline: null,
   },
   package: {
+    subdir: null,
     distignore: '.distignore',
     output: 'dist/{slug}.zip',
     check: true,
@@ -125,15 +126,16 @@ function validateConfig(config, { configPath } = {}) {
 /**
  * Resolve the theme root, its config, and the effective theme metadata.
  *
- * @param {{ cwd?: string; configFile?: string; overrides?: object }} options
+ * @param {{ cwd?: string; configFile?: string; overrides?: object; themeRoot?: string }} options
  */
-export function loadContext({ cwd = process.cwd(), configFile, overrides = {} } = {}) {
+export function loadContext({ cwd = process.cwd(), configFile, overrides = {}, themeRoot } = {}) {
   let root = path.resolve(cwd);
   const explicitConfig = configFile ? path.resolve(configFile) : null;
   const foundConfig = explicitConfig ?? findConfigFile(root);
 
   // A config found above the working directory identifies the theme root.
   if (foundConfig && isFile(foundConfig)) root = path.dirname(foundConfig);
+  if (themeRoot) root = path.resolve(themeRoot);
 
   const fileConfig = foundConfig && isFile(foundConfig) ? readConfigFile(foundConfig) : {};
   const inferredTheme = loadTheme(root, deepMerge(DEFAULTS, fileConfig));
@@ -163,6 +165,7 @@ export function loadContext({ cwd = process.cwd(), configFile, overrides = {} } 
     config,
     theme,
     kitRoot: KIT_ROOT,
+    overrides,
   };
 }
 

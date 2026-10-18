@@ -60,9 +60,13 @@ Each item is small enough for one agent session and has an acceptance command.
 
 ## v0.2: packaging and release
 
-- [ ] Support a theme in a repository subdirectory via `package.subdir`.
+- [x] Support a theme in a repository subdirectory via `package.subdir`.
   Acceptance: a monorepo fixture packages only that subdirectory with the correct
   top-level slug.
+  Verified: `node --test tests/integration/package-subdir.test.mjs` (14 pass);
+  `npm test` (191 pass, 1 Windows file-symlink privilege skip). Covers committed
+  trees/ignores, attributes, strict paths, preflight/release/verify, offline
+  partial clones, theme types and root compatibility.
 - [ ] `pot --merge` to preserve existing POT header metadata.
 - [ ] Theme Check helper: `wptk theme-check --zip <file>` that extracts into a
   temporary WordPress root and invokes WP-CLI when available.

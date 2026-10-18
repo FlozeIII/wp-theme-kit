@@ -8,6 +8,7 @@ Prepare a release locally: require a clean tree, check version consistency,
 build the zip, verify it, and print the remaining human steps.
 
 This command never pushes, tags, or publishes anything.
+package.subdir selects a nested theme; the clean-tree gate covers the whole repository.
 
 Options:
   --rev <tag|sha>   Revision to package (default: HEAD).

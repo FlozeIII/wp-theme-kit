@@ -2,6 +2,7 @@ import path from 'node:path';
 import { parseArgs } from '../args.mjs';
 import { loadContext } from '../config.mjs';
 import { verifyPackage } from '../package/verify.mjs';
+import { resolvePackageContext } from '../package/context.mjs';
 import { UsageError } from '../errors.mjs';
 
 const USAGE = `Usage: wptk verify-package <file.zip>
@@ -27,7 +28,10 @@ export async function run({ argv, globals, out }) {
   }
 
   const zip = path.resolve(globals.cwd, parsed.positionals[0]);
-  const context = loadContext({ cwd: globals.cwd });
+  let context = loadContext({ cwd: globals.cwd });
+  if (context.config.package.subdir != null && context.config.package.subdir !== '') {
+    context = resolvePackageContext(context).context;
+  }
   const result = verifyPackage(zip, context.theme);
 
   if (globals.json) {

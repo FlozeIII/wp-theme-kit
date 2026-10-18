@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 177 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 191 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -163,12 +163,26 @@ bin/wp-theme-kit.mjs
 ### Packaging pipeline
 
 - `src/package/distignore.mjs` parses strict literal paths.
+- `src/package/context.mjs` resolves optional `package.subdir` from the Git root,
+  accepting config at the repository root or selected theme root. It rejects
+  path traversal, patterns, invalid types and physical directory aliases.
+  Package/release/verify re-infer theme metadata while preserving explicit
+  config/overrides; other CLI commands retain their context behavior.
+  Checks, POT/version, exclusion paths and default output are theme-relative.
 - `src/package/archive.mjs` resolves a revision, reads `.distignore` from that
   revision, builds through a temporary bare repo with alternates, neutralizes
-  attributes, and writes atomically.
+  attributes, and writes atomically. Subdirectory mode archives the selected
+  committed tree directly under slug/, using the original commit timestamp
+  (Git archive --mtime support required). Non-tree selections fail; all Git reads
+  disable lazy fetch. The report revision remains the resolved commit ID.
 - `src/package/verify.mjs` reads the zip's central directory and checks the
   artifact, not the worktree.
 - `src/package/index.mjs` runs preflight checks and orchestrates.
+- Release's clean-tree gate still covers the whole Git repository. Acceptance:
+  `tests/integration/package-subdir.test.mjs` (14 CLI tests) covers monorepo
+  isolation, old commits/tags, dirty files, strict locations, aliases/gitlinks,
+  hostile attributes, offline partial clones, theme types, preflight and release,
+  independent verification, custom exclusions and existing root behavior.
 - `src/zip/read.mjs` has no dependencies.
 
 ### Preview pipeline
@@ -290,7 +304,8 @@ repository root.
 - Static checks are heuristics, not Theme Check or PHPCS.
 - The POT extractor handles literal calls; dynamic strings are skipped.
 - Block template validation is structural, not a block registry.
-- Packaging requires the theme root to be the Git root.
+- Nested themes require explicit `package.subdir`; directories must exist in
+  the worktree and requested commit. Subtree archives require Git archive --mtime.
 - Mechanical fixes cover only the documented whitelist. Ambiguous syntax,
   namespaced/imported gettext calls, and symlinked source files require manual
   edits. The mu-plugin E2E harness installer and npm publishing remain deferred.

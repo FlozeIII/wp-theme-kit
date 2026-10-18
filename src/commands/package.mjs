@@ -14,8 +14,9 @@ Options:
   --json            Machine-readable report.
   -h, --help        Show this help.
 
-The exclusion list is read from the committed .distignore. Uncommitted and
-untracked files never enter the package.`;
+Set package.subdir to a repository-relative literal path for a nested theme.
+The exclusion list and default output are theme-relative; .distignore is read
+from the requested commit. Uncommitted and untracked files never enter the package.`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {

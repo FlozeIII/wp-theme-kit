@@ -10,7 +10,7 @@ function gitResult(repoRoot, args) {
   return spawnSync('git', ['-c', 'core.autocrlf=false', ...args], {
     cwd: repoRoot,
     encoding: 'utf8',
-    env: { ...process.env, GIT_ATTR_NOSYSTEM: '1' },
+    env: { ...process.env, GIT_ATTR_NOSYSTEM: '1', GIT_NO_LAZY_FETCH: '1' },
     windowsHide: true,
   });
 }
@@ -51,8 +51,8 @@ export function assertRepoRoot(repoRoot) {
   };
   if (normalize(actual) !== normalize(repoRoot)) {
     throw new UsageError(
-      `The theme directory is not the git repository root: ${repoRoot}`,
-      `The repository root is ${actual}. Run wptk from the theme root, or use a separate repository per theme.`,
+      `The theme directory is not the git repository root: ${repoRoot}. Configure package.subdir to opt in.`,
+      `The repository root is ${actual}. Set package.subdir to the theme's repository-relative path.`,
     );
   }
   return actual;
@@ -81,6 +81,14 @@ export function listRevisionFiles(repoRoot, revision) {
   return output.split('\0').filter(Boolean);
 }
 
+export function literalPackagePath(value, label = 'package.subdir') {
+  if (typeof value !== 'string' || !value || /[\\:*?\[\]\x00-\x1f\x7f]/.test(value)
+    || value.split('/').some((part) => !part || part === '.' || part === '..' || part.toLowerCase() === '.git')) {
+    throw new UsageError(`${label} must be a root-relative literal path without dot segments, links, or patterns.`);
+  }
+  return value;
+}
+
 /**
  * Create a zip from a committed revision.
  *
@@ -91,6 +99,7 @@ export function listRevisionFiles(repoRoot, revision) {
 export function createArchive({
   repoRoot,
   revision,
+  subdir = '',
   slug,
   distignore = '.distignore',
   output,
@@ -100,14 +109,21 @@ export function createArchive({
     throw new UsageError(`Invalid theme slug "${slug}". Use lowercase letters, digits, and hyphens.`);
   }
 
-  const ignoreText = readRevisionFile(repoRoot, revision, distignore);
+  if (subdir) {
+    literalPackagePath(subdir);
+    if (git(repoRoot, 'cat-file', '-t', `${revision}:${subdir}`).trim() !== 'tree') {
+      throw new GateError(`The selected path is not a committed directory: ${subdir}`);
+    }
+  }
+  const ignoreFile = subdir ? `${subdir}/${literalPackagePath(distignore, 'package.distignore')}` : distignore;
+  const ignoreText = readRevisionFile(repoRoot, revision, ignoreFile);
   if (ignoreText === null) {
     throw new GateError(
-      `Cannot read ${distignore} from ${revision}.`,
+      `Cannot read ${ignoreFile} from ${revision}.`,
       `Commit ${distignore} before packaging; it is the only exclusion list.`,
     );
   }
-  const parsed = parseDistignore(ignoreText, { source: distignore });
+  const parsed = parseDistignore(ignoreText, { source: ignoreFile });
   const exclusions = parsed.map((entry) => entry.pathspec);
 
   const target = path.resolve(output);
@@ -138,7 +154,8 @@ export function createArchive({
       '--format=zip',
       `--prefix=${slug}/`,
       `--output=${staging}`,
-      revision,
+      ...(subdir ? [`--mtime=${git(repoRoot, 'show', '-s', '--format=%cI', revision).trim()}`] : []),
+      subdir ? `${revision}:${subdir}` : revision,
       '--',
       '.',
       ...exclusions,

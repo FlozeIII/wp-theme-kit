@@ -175,6 +175,7 @@ error.
     "rules": { "php.abspath-guard": "off" }
   },
   "package": {
+    "subdir": null,
     "distignore": ".distignore",
     "output": "dist/{slug}.zip",
     "check": true,
@@ -223,6 +224,32 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
   PHPCS-WordPress. Run those against the extracted artifact before release.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
+
+## Themes in repository subdirectories
+
+Set `package.subdir` to the theme's literal path from the Git repository root:
+
+```json
+{ "package": { "subdir": "themes/my-theme" } }
+```
+
+Place the config at the repository root or the selected theme root. `package`,
+`release` and `verify-package` then infer metadata from that theme. Other
+commands keep their existing context selection. Checks, POT/version files,
+`.distignore` paths and default output are theme-relative: the default ZIP in
+this example is `themes/my-theme/dist/<slug>.zip`. Explicit output arguments
+retain their existing CLI resolution.
+
+The ZIP contains only `<slug>/` and the selected committed subtree. Its exclusion
+list comes from the same revision inside that theme; root/sibling files and
+uncommitted data stay outside. Attribute isolation and atomic writes still apply.
+Git object reads stay offline. Release requires the whole repository to be clean.
+
+Use forward-slash literal paths; Unicode and spaces work. Absolute paths, dot
+segments, glob/pathspec syntax and symlink/junction directory aliases are
+rejected. The subtree must exist as a directory in the requested commit.
+Null/empty `package.subdir` preserves repository-root-only packaging. Subtree
+archives require Git with `archive --mtime` support for stable commit timestamps.
 
 ## Script footer argument types
 

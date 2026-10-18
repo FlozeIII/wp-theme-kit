@@ -25,6 +25,27 @@ wptk verify-package dist/my-theme.zip
 wptk release --rev v1.2.0
 ```
 
+## Repository subdirectories
+
+For a theme inside a larger Git repository, set package.subdir in the repository
+root config or the selected theme's own config:
+
+```json
+{ "package": { "subdir": "themes/my-theme" } }
+```
+
+The path is Git-root-relative, literal and uses forward slashes. Use real
+directories; absolute paths, dot segments, patterns and directory links stop
+packaging. Empty or null keeps repository-root-only packaging.
+
+Package, release and verify-package select that theme. Their metadata, checks,
+POT/version files, exclusion paths and default output are theme-relative;
+explicit output arguments retain normal CLI path resolution. Other commands
+keep their existing context selection. Read the requested commit's theme-local
+.distignore. The resulting ZIP contains only slug/ and that subtree's files.
+Release requires the whole repository to be clean. Subtree archives require
+Git with archive --mtime support to preserve the original commit's timestamp.
+
 ## Preflight
 
 `wptk package` runs static checks and a POT freshness check by default. It also
@@ -36,7 +57,7 @@ not for shipping around a failing check.
 
 ## .distignore
 
-`.distignore` is the only exclusion list. It supports root-relative literal
+`.distignore` is the only exclusion list. It supports theme-root-relative literal
 paths and a trailing slash for directories. Wildcards, negation, escapes, and
 absolute paths are rejected with a line number.
 
