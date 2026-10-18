@@ -41,10 +41,14 @@ jobs:
         id: detect
         shell: bash
         run: |
-          if node --input-type=module -e "import { findBrowser } from './src/env.mjs'; process.exit(findBrowser({}) ? 0 : 1)"; then
+          set -euo pipefail
+          path="$(node --input-type=module -e "import { findBrowser } from './src/env.mjs'; console.log(findBrowser({}) ?? '')")"
+          if [ -n "$path" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "Browser: $path"
           else
             echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "No Chromium-family browser found."
           fi
       - name: Browser tests
         if: steps.detect.outputs.available == 'true'
@@ -52,4 +56,5 @@ jobs:
         run: node --test tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs
       - name: No browser found
         if: steps.detect.outputs.available != 'true'
+        shell: bash
         run: echo "No Chromium-family browser on this runner; browser tests skipped."

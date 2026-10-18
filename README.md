@@ -83,9 +83,9 @@ node install.mjs --harness deepseek --global
 ```
 
 `install.mjs` creates directory junctions on Windows (falling back to copies),
-writes an install manifest, and supports `--uninstall`. The default is linking,
-so the six skills are never duplicated; pass `--copy` only when links are not
-usable.
+writes an install manifest, and supports `--uninstall`. The default is linking;
+if a link cannot be created it copies instead, and `--copy` forces copies
+deliberately.
 
 ### Project-level install for all three
 

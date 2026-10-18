@@ -415,13 +415,15 @@ bin/wp-theme-kit.mjs
 - `AGENTS.md` is the shared durable instruction file for Codex and DeepSeek.
 - `src/install/index.mjs` links skills into `.claude/skills`, `.agents/skills`,
   and `.codex/skills`, and writes the AGENTS.md block. Project installs use the
-  theme root; `--global` uses the harness homes (`CLAUDE_CONFIG_DIR`,
-  `DSH_AGENTS_HOME`, `CODEX_HOME`, `DSH_HOME`, else `~`). Acceptance covers both:
-  `tests/integration/install.test.mjs` removes a project install and a global
-  install, checks that unrelated user files (`skills/keep.txt`, user text in
-  `AGENTS.md`) survive, and runs `--uninstall` twice. The DeepSeek route has its
-  own acceptance in the same file: project and global installs must be links
-  (`"type": "link"` in the manifest), never copies unless `--copy` is passed.
+  theme root; `--global` uses the harness directories (`CLAUDE_CONFIG_DIR`,
+  `DSH_AGENTS_HOME`, `CODEX_HOME`, `DSH_HOME`, each defaulting to `~/.claude`,
+  `~/.agents`, `~/.codex` and `~/.dsh`; the manifest stays at `~`). Acceptance
+  covers both: `tests/integration/install.test.mjs` removes a project install and
+  a global install, checks that unrelated user files (`skills/keep.txt`, user
+  text in `~/.dsh/AGENTS.md` and `~/.codex/AGENTS.md`) survive, and runs
+  `--uninstall` twice. The DeepSeek route has its own acceptance in the same
+  file: project and global installs must be links (`"type": "link"` in the
+  manifest), never copies unless a link cannot be created or `--copy` is passed.
 
 ## Invariants
 

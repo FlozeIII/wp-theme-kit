@@ -180,7 +180,7 @@ Each item is small enough for one agent session and has an acceptance command.
   commands, AGENTS.md blocks and the home-root manifest exist, then
   `--uninstall` removes them, keeps an unrelated `skills/keep.txt` and user text
   in `~/.dsh/AGENTS.md`, and a second `--uninstall` exits 0.
-  Verified: `npm test` (319 pass, 1 Windows skip, 320 total).
+  Verified: `npm test` (320 pass, 1 Windows skip, 321 total).
 - [x] Add a Windows/macOS/Linux CI job that runs browser tests when a browser is
   available.
   Acceptance: `.github/workflows/ci.yml` adds a `browser` job on

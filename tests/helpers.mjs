@@ -188,6 +188,18 @@ msgstr ""
 `;
 }
 
+/** Environment overrides that point every harness home at one temp directory. */
+export function globalEnv(home) {
+  return {
+    HOME: home,
+    USERPROFILE: home,
+    CLAUDE_CONFIG_DIR: path.join(home, '.claude'),
+    DSH_AGENTS_HOME: path.join(home, '.agents'),
+    CODEX_HOME: path.join(home, '.codex'),
+    DSH_HOME: path.join(home, '.dsh'),
+  };
+}
+
 export function zipNames(file) {
   // Lazy import avoids loading zlib in helpers that do not need it.
   return import('../src/zip/read.mjs').then(({ readZip }) => [...readZip(file).keys()]);
