@@ -58,6 +58,7 @@ test('target tags are excluded as bases and --since selects an explicit ancestor
   git(root, 'tag', '-a', 'v1.0.0', '-m', 'Target annotated release');
   git(root, 'tag', 'target-alias');
   change(root, 'feat: After the requested release');
+  git(root, 'checkout', '--detach', target);
   git(root, 'config', 'color.ui', 'always');
   git(root, 'config', 'column.tag', 'always');
   const automatic = release(root, ['--notes', '--rev', 'v1.0.0', '--json']);
@@ -151,12 +152,12 @@ test('unknown type names remain whole and an empty breaking marker still marks a
 
 test('the draft heading uses the target commit version rather than a newer checkout version', () => {
   const { root } = repository();
-  change(root, 'fix: Released correction');
+  const target = change(root, 'fix: Released correction');
   git(root, 'tag', 'v1.0.0');
   const style = fs.readFileSync(path.join(root, 'style.css'), 'utf8').replace('Version: 1.0.0', 'Version: 2.0.0');
   write(root, 'style.css', style);
   commitAll(root, 'chore: Prepare next version');
-  const result = release(root, ['--notes', '--rev', 'v1.0.0', '--json']);
+  const result = release(root, ['--notes', '--rev', target, '--json']);
   assert.equal(result.status, 0, result.stdout + result.stderr);
   const report = JSON.parse(result.stdout);
   assert.ok(report.notes.markdown.startsWith('## 1.0.0 (draft)\n'));

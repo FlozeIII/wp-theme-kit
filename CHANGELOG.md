@@ -90,6 +90,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- `release --rev <tag>` now requires the tag's commit to match repository HEAD
+  before notes or ZIP creation, preserving existing artifacts on failure.
+  Real lightweight/annotated tags of any name and explicit tag refs are
+  recognized; ambiguous short names require an explicit ref regardless of Git
+  warning settings. Full refs use exact namespaces; packaging pins the preflight
+  commit. Detached HEAD and nested themes work; historical SHA/branch
+  releases and `package` behavior remain available. Git reads stay offline.
 - Recognize `?>` as the end of a PHP line comment so gettext fixes leave
   adjacent HTML and JavaScript unchanged, including when a real PHP call
   appears on the same line.
@@ -100,7 +107,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 191 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 235 passing, 1 skipped on Windows (file-symlink privileges).
+- Release tag/HEAD gate: 10 CLI tests cover reference types/ambiguity, detached
+  HEAD, nested themes, notes, artifact preservation and offline failures.
+  Isolated Yuki rejected an old tag at current HEAD, then produced a verified
+  40-entry ZIP with 13 note commits after checking out the tag's commit.
 - Subdirectory packaging: 14 CLI tests cover ZIP paths/bytes, committed-only
   exclusions, tags/older commits, traversal/aliases/gitlinks, Git attributes,
   Unicode/spaces, theme types, preflight, release and verification, custom

@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 225 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 235 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -196,11 +196,24 @@ bin/wp-theme-kit.mjs
   objects never fetch; shallow histories fail clearly before output replacement.
   History reads disable replacement refs to match the archive's original objects;
   tag listings force a machine-safe format regardless of column/color settings.
-  Without the option, JSON shape/checklist behavior remains intact. The next
-  roadmap tag/HEAD check is still deferred.
+  Without the option, JSON shape/checklist behavior remains intact.
   Acceptance: `tests/integration/release-notes.test.mjs` (15 CLI tests); isolated
   Yuki v1.2.0..v1.3.0 run retained all 13 non-merge commits, produced the verified
   40-entry ZIP, repeated identically and left the source worktree unchanged.
+- Release preflight resolves real Git tag references instead of guessing from
+  version spelling. Any direct lightweight/annotated tag must peel to repository
+  HEAD, including full `refs/tags/` and `tags/` names. Mismatches fail with both
+  commits and a detached-checkout hint before notes/checks/archive replacement.
+  Ambiguous short names require explicit tag/branch refs even when Git warning
+  settings disable ambiguity detection. Full refs use their exact namespace;
+  packaging pins the preflight commit while retaining the user's requestedRev.
+  SHA, branch and commit expressions
+  retain historical behavior; `package` still accepts old tags.
+  Acceptance: `tests/integration/release-tag.test.mjs` (10 CLI tests) covers notes,
+  nested configs, detached HEAD, ref names, output preservation and offline
+  missing/non-commit refs. Isolated Yuki rejected v1.3.0 at newer HEAD and then
+  produced a verified 40-entry ZIP with 13 note commits at detached tag HEAD;
+  the source repository's HEAD, tags and working tree were unchanged.
 
 ### Optional Theme Check
 

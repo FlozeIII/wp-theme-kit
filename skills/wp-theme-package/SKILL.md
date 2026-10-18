@@ -54,6 +54,18 @@ Git with archive --mtime support to preserve the original commit's timestamp.
 warns when `style.css` and `package.json` versions disagree. `wptk release`
 additionally requires a clean working tree and consistent versions.
 
+When `release --rev` names a Git tag, the peeled commit must equal repository
+HEAD. This covers lightweight/annotated tags of any name and explicit
+`refs/tags/<name>` / `tags/<name>` references. Detached HEAD is supported.
+A mismatch stops before notes or ZIP creation and preserves existing output.
+Check out the commit printed in the error using `git switch --detach <commit>`
+and retry. Keep released tags immutable.
+
+Use an explicit tag or branch ref for ambiguous names; full refs use their exact
+namespace and the ZIP uses the preflight's resolved commit. SHA, branch and commit
+expressions keep historical release behavior; `package --rev <tag>` can build
+an old tag without changing HEAD. Subdirectory themes compare repository HEAD.
+
 If preflight fails, fix the cause. `--no-check` exists for diagnosing packaging,
 not for shipping around a failing check.
 
@@ -108,7 +120,7 @@ offline before artifact creation. No separate notes file is written.
 
 Review the draft for accuracy and user impact before reusing it. The heading
 comes from the target's committed version; the normal release preflight still
-uses its existing clean-tree and version consistency checks.
+requires a clean tree, consistent versions and tags matching HEAD.
 
 ## Release boundary
 
@@ -124,6 +136,7 @@ released tag.
 排除清单，只支持根目录相对字面路径。默认先跑静态检查和 POT 新鲜度检查；失败
 就修原因，不要用 `--no-check` 绕过。`verify-package` 验的是产物不是工作区。
 `release` 只做本地准备并打印清单，绝不自动 push、打标签或发布。
+通过标签发布时，标签提交必须等于 HEAD；不一致时保留原 ZIP，按提示检出提交后重试。
 `theme-check --zip` 在临时目录用本机工具检查产物，不加载站点配置或数据库；
 缺少工具会明确跳过，跳过不能视为检查通过。
 `release --notes` 从已提交历史生成分组草稿；可用 `--since` 指定起点，

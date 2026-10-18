@@ -11,9 +11,10 @@ build the zip, verify it, and print the remaining human steps.
 
 This command never pushes, tags, or publishes anything.
 package.subdir selects a nested theme; the clean-tree gate covers the whole repository.
+When --rev names a tag, its commit must be HEAD (detached HEAD is supported).
 
 Options:
-  --rev <tag|sha>   Revision to package (default: HEAD).
+  --rev <ref|sha>   Revision to package; tags must match HEAD (default: HEAD).
   --out <file.zip>  Output path (default: config.package.output).
   --notes           Draft grouped release notes from committed Git history.
   --since <ref>     Notes start after this ancestor (requires --notes).
@@ -49,12 +50,12 @@ export async function run({ argv, globals, out }) {
   const result = await packageTheme({
     context,
     output: parsed.values.out,
-    rev: notes ? preflight.revision : rev,
+    rev: preflight.revision,
     check: parsed.values.check !== false,
     verify: parsed.values.verify !== false,
     out,
   });
-  if (notes) result.requestedRev = rev;
+  result.requestedRev = rev;
 
   const checklist = releaseChecklist({
     output: result.output,

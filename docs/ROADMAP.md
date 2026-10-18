@@ -87,7 +87,13 @@ Each item is small enough for one agent session and has an acceptance command.
   errors/offline behavior, target versions, legacy output and identical ZIPs.
   Verified: `npm test` (225 pass, 1 Windows file-symlink privilege skip);
   isolated Yuki history retained 13 commits and produced a verified 40-entry ZIP.
-- [ ] Validate that the tag's commit is `HEAD` when releasing from a tag.
+- [x] Validate that the tag's commit is `HEAD` when releasing from a tag.
+  Acceptance: `tests/integration/release-tag.test.mjs` (10 CLI tests) covers real
+  tag refs/ambiguity, detached HEAD, historical SHA/branches, notes, nested
+  themes, artifact preservation and offline missing/non-commit refs.
+  Verified: `npm test` (235 pass, 1 Windows file-symlink privilege skip);
+  isolated Yuki rejects the old tag at newer HEAD and releases at detached tag
+  HEAD with the verified 40-entry ZIP and 13 note commits.
 
 ## v0.2: preview and audit
 

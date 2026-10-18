@@ -316,6 +316,24 @@ Archives require a single slug directory and `style.css`; traversal, Windows
 device/short-name aliases, case collisions and file/directory conflicts are
 rejected before extraction. Entries are materialized as ordinary files.
 
+## Release tag preflight
+
+`wptk release --rev <tag>` requires the tag's commit to equal the repository's
+`HEAD`. Lightweight and annotated tags of any name count, including full
+`refs/tags/<name>` and `tags/<name>` references. A mismatch fails before notes
+or packaging and preserves an existing ZIP. Check out the reported commit with
+`git switch --detach <commit>` and retry; keep released tags immutable.
+
+Use explicit `refs/tags/<name>` or `refs/heads/<name>` when a short name is
+ambiguous. Full refs use their exact namespace, and the ZIP uses the preflight's
+resolved commit. A version-shaped branch alone is still a branch. SHA, branch and
+commit-expression revisions retain historical release behavior; `wptk package`
+also continues to accept historical tags. The gate applies with `--notes` and
+`package.subdir`, and all Git reads stay offline.
+
+通过标签执行 `release` 时，标签提交必须等于当前 HEAD；不一致时保留原 ZIP。
+可检出提示的提交后重试；历史产物仍可通过 `package --rev <tag>` 构建。
+
 ## Release notes drafts
 
 ```bash
