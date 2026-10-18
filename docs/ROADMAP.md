@@ -211,6 +211,8 @@ Each item is small enough for one agent session and has an acceptance command.
   GitHub Release remain manual follow-ups. On this Windows host, cloning through
   Git's Schannel backend needs `http.schannelCheckRevoke=false` (or
   `GIT_SSL_NO_VERIFY=true`); that is a local TLS/CRL issue, not a plugin defect.
+  A `0.2.1` patch with the browser/CI hardening below was published the same
+  day; `0.2.1` is the new `latest` and `wp-theme-kit@0.2.1` installs cleanly.
 
 ## Deferred / not planned
 

@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [semantic versioning](https://semver.org/).
 
+## [0.2.1] - 2026-10-18
+
+### Fixed
+
+- Browser automation no longer hangs or fails on cleanup: the CDP HTTP connect,
+  WebSocket handshake and each command are bounded, closing a page rejects
+  pending calls, and the temporary profile is removed with a retry that never
+  fails the command.
+- Windows stops the whole Chromium process tree, so a finished command releases
+  its sockets and profile instead of leaving the caller waiting.
+- Browser startup tolerates slower CI machines, and the browser suites allow
+  180 seconds per test.
+- Cross-platform CI defects are fixed: Windows path comparisons use `realpath`,
+  the unsafe harness-path fixture is platform-specific, and the relocated-CLI
+  fixture copies files explicitly.
+- CI runs browser acceptance on Ubuntu and macOS because hosted Windows runners
+  intermittently hang headless Edge; Windows keeps the non-browser suite. Jobs
+  cap each test at 180 seconds and force-exit the runner.
+
 ## [0.2.0] - 2026-10-18
 
 ### Added
