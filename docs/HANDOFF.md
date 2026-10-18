@@ -8,7 +8,8 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.2.1`
 - Published: `wp-theme-kit@0.2.1` on npm (account `floze3`) and the public
   repository `FlozeIII/wp-theme-kit`; the Claude marketplace entry is
-  `FlozeIII/wp-theme-kit`. Git tag and GitHub Release are still manual.
+  `FlozeIII/wp-theme-kit`. Git tag `v0.2.1` is pushed; the GitHub Release
+  remains manual.
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
 - Tests: `npm test` -> 321 passing, 1 skipped (322 total) on Windows because file-symlink

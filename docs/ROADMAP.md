@@ -213,6 +213,9 @@ Each item is small enough for one agent session and has an acceptance command.
   `GIT_SSL_NO_VERIFY=true`); that is a local TLS/CRL issue, not a plugin defect.
   A `0.2.1` patch with the browser/CI hardening below was published the same
   day; `0.2.1` is the new `latest` and `wp-theme-kit@0.2.1` installs cleanly.
+  `dist-tags.latest` is `0.2.1`, tag `v0.2.1` is pushed, and a fresh temporary
+  install adds exactly one package with `dependencies: {}`; both the node CLI
+  and the `.bin/wptk` shim print `0.2.1`.
 
 ## Deferred / not planned
 
