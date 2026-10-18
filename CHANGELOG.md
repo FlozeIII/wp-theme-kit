@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `php.script-footer` warns on known nonboolean `wp_enqueue_script` footer
+  arguments, accepting booleans and WordPress 6.3+ options arrays. Literal arrays
+  check the final known `in_footer` value; unrelated fields remain out of scope.
+  Dynamic expressions, unknown keys/unpacks and non-function calls are skipped.
+  Complex same-quote interpolations are also skipped; docs record the existing
+  JS fallback's inline heredoc-terminator limitation.
+  Both analyzers preserve inspected source; existing check workflows apply with
+  no automatic fix. Shared call safeguards are reused from the printf rule.
 - `php.printf-arguments` warns when literal `printf` formats need more value
   arguments. Supports singular gettext source strings, positional indexes and
   reuse, flags/padding, literal and star width/precision, global names and both
@@ -33,10 +41,10 @@ All notable changes to this project are documented here. The format follows
   existing diff/baseline/fix loops, and HTML-comment suppression directives.
 - JSON findings include `documentationUrl`, an encoded absolute file URL to
   the matching explanation in the installed catalogue. Stable explicit anchors
-  cover all 41 checks and `meta.rule-error`; diff, dry-run, and post-fix reports
+  cover all 42 checks and `meta.rule-error`; diff, dry-run, and post-fix reports
   use the same links without changing baseline identities or non-JSON output.
 - `check --explain <rule-id>` prints a rule's rationale and before/after examples
-  from the shipped catalogue, with entries for all 41 current rules. It works
+  from the shipped catalogue, with entries for all 42 current rules. It works
   offline without a theme or toolchain, supports Markdown and JSON output, and
   rejects invalid IDs, unsupported formats, and conflicting scan options.
 - `check --diff <ref>` limits reports and mechanical fixes to changed files,
@@ -68,7 +76,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 167 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 177 passing, 1 skipped on Windows (file-symlink privileges).
+- Script footer acceptance: 10 CLI tests cover scalar/array types, duplicate
+  keys, conservative skips, call identity, theme types, JS/PHP agreement,
+  no source execution, suppression/baselines, diff/fix rechecks and formats.
+  Local WordPress runtime fixtures verified scalar and array truthiness.
 - printf acceptance: 11 real CLI tests cover shortages/corrections, format
   variants, gettext wrappers, global-call identity, conservative skips,
   theme types, JS/PHP parity, a PHP runtime oracle, suppression/baselines,
@@ -92,7 +104,7 @@ All notable changes to this project are documented here. The format follows
   formats, exact rule targets, internal diagnostics, unique anchors, diff/fix
   reports, existing baseline fingerprints, non-JSON output, and a relocated kit
   with Unicode, spaces, `#`, and `%` in its path.
-- `check --explain` acceptance: 6 CLI integration tests cover all 41 catalogue
+- `check --explain` acceptance: 6 CLI integration tests cover all 42 catalogue
   entries, execution outside a theme without tools, broken configuration,
   read-only behavior, text/JSON formats, help, and invalid/conflicting options.
 - `check --diff` acceptance: 14 CLI integration tests cover real Git changes,

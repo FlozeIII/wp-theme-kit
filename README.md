@@ -224,6 +224,29 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
 
+## Script footer argument types
+
+`php.script-footer` checks the fifth argument of `wp_enqueue_script()`. Use
+`true`/`false`, or a WordPress 6.3+ options array such as
+`[ 'strategy' => 'defer', 'in_footer' => true ]`. A string such as `'false'`
+is truthy in WordPress and still selects the footer.
+
+Known string/numeric/null fifth arguments warn. For literal short/long arrays,
+the rule checks the final known `in_footer` entry; string/numeric/null/array
+values warn. Booleans, omitted arguments, empty arrays and other options are
+accepted. Comments, parentheses, nested values and trailing commas work.
+
+Complex string interpolations with nested same-quote expressions are skipped.
+Unresolved expressions, named arguments, call unpacking and arrays with unknown
+keys or unpacking are skipped, as are heredoc/nowdoc and binary strings. Escaped
+numeric/Unicode array keys are unresolved. Only global enqueue-script calls are
+checked; methods/classes and namespace-qualified calls are excluded, and files
+with namespaces/imports require explicitly global names. Inspected PHP is never
+executed. Existing severity, suppression, baseline, diff and fix-recheck behavior
+applies; the rule does not choose a footer value or automatically fix it.
+The existing JS fallback may miss later calls after a heredoc closing label
+with following syntax on the same line; use the PHP analyzer for these files.
+
 ## printf argument counts
 
 `php.printf-arguments` warns when a literal PHP `printf()` format needs more
@@ -337,7 +360,7 @@ GitHub annotations do not include link metadata.
 ## Rule explanations
 
 Run `wptk check --explain php.unescaped-output` for a rule's rationale and
-before/after examples. All 41 current rules have entries in the shipped
+before/after examples. All 42 current rules have entries in the shipped
 [rule catalogue](skills/wp-theme-dev/references/checks.md#rule-explanations),
 which is also the CLI's explanation source. Rule IDs are exact and case-sensitive.
 

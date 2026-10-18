@@ -51,8 +51,12 @@ Each item is small enough for one agent session and has an acceptance command.
   and translated formats, PHP counting semantics, conservative skips, JS/PHP
   parity and the existing pipeline; authored runtime fixtures confirm counts.
   Verified: 11 pass; `npm test` (167 pass, 1 Windows file-symlink privilege skip).
-- [ ] Add a rule for `wp_enqueue_script` in the footer argument that is not
+- [x] Add a rule for `wp_enqueue_script` in the footer argument that is not
   boolean.
+  Acceptance: `node --test tests/integration/check-script-footer.test.mjs`
+  covers boolean/WordPress 6.3+ options forms, final-value semantics, conservative
+  skips, JS/PHP parity and the existing check pipeline.
+  Verified: 10 pass; `npm test` (177 pass, 1 Windows file-symlink privilege skip).
 
 ## v0.2: packaging and release
 

@@ -51,6 +51,7 @@ this presentation metadata; pretty and GitHub output remain unchanged.
 | `php.unescaped-output` | warning | `echo`, `print`, and `<?=` output has escaping |
 | `php.unescaped-printf` | warning | `printf()` values are escaped |
 | `php.printf-arguments` | warning | literal `printf()` formats have enough value arguments |
+| `php.script-footer` | warning | `wp_enqueue_script()` uses boolean footer values or supported options arrays |
 | `php.text-domain` | warning | gettext calls use the expected literal domain; a different literal domain is an error |
 | `php.translator-comment` | info | placeholder strings have a `translators:` comment |
 | `php.forbidden-function` | error | removed or unsafe functions |
@@ -457,6 +458,58 @@ After:
 ```php
 function demo_theme_setup() { add_theme_support( 'title-tag' ); }
 add_action( 'after_setup_theme', 'demo_theme_setup' );
+```
+
+### `php.script-footer`
+
+<a id="php-script-footer"></a>
+
+Default: warning. Applies to PHP files in all theme types.
+
+Rationale: WordPress coerces footer values by truthiness, so the string `'false'`
+still puts a script in the footer. Use an explicit boolean to express intent.
+The fifth `wp_enqueue_script()` argument accepts a boolean, or an options array
+since WordPress 6.3. The rule warns on known string, numeric and null fifth
+arguments. Simple quoted interpolations such as "footer-$name" are recognized;
+complex interpolations with nested same-quote expressions are skipped.
+
+Short/long literal arrays are accepted. If `in_footer` is present, its final
+known value should be boolean; string, numeric, null and array values warn.
+Duplicate known keys follow PHP's last-value behavior. Omitted fifth arguments,
+empty arrays and arrays without `in_footer` are accepted. Other fields such as
+`strategy`, `fetchpriority` or `module_dependencies` are outside this rule.
+
+Variables, constants, calls, concatenation, indexed expressions, named arguments
+and call-level unpacking are skipped. Unresolved array keys or top-level array
+unpacking cause that array to be skipped because they may replace `in_footer`.
+Heredoc/nowdoc, binary strings, and double-quoted keys with numeric/Unicode
+escapes are conservatively skipped. Parentheses, comments, nesting and trailing
+commas are supported. Only global function calls are checked, case-insensitively;
+methods, constructors, attributes and namespace-qualified functions are excluded.
+Files with namespaces/imports require an explicitly global function name.
+`wp_register_script()` and `wp_enqueue_style()` are outside this rule.
+
+PHP `token_get_all` and the JS fallback use the same literal classification,
+without executing inspected PHP. Severity, suppression, baselines, diff, output
+formats and fix rechecks apply as usual. There is no automatic fix because
+choosing the intended footer value requires judgement.
+
+Existing fallback limitation: a heredoc/nowdoc closing label sharing its line
+with a closing parenthesis or other syntax can make the JS lexer consume later
+source. Later calls may be missed in JS mode; use the PHP analyzer for such
+files. This rule does not extend the shared lexer.
+
+Before:
+
+```php
+wp_enqueue_script( 'app', '/app.js', array(), '1.0', 'false' );
+```
+
+After:
+
+```php
+wp_enqueue_script( 'app', '/app.js', array(), '1.0', false );
+// WordPress 6.3+: array( 'strategy' => 'defer', 'in_footer' => false ) also works.
 ```
 
 ### `php.printf-arguments`

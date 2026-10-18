@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 167 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 177 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -57,6 +57,23 @@ bin/wp-theme-kit.mjs
 - `src/check/analyzer.php` produces the same tokens with `token_get_all`.
 - `src/check/analyze.mjs` picks one, batch-runs PHP, and falls back per file.
 - `src/check/rules/{structure,php,assets}.mjs` contain the rules.
+- `src/check/rules/enqueue.mjs` provides `php.script-footer`, a warning for known
+  nonboolean fifth `wp_enqueue_script` arguments, and nonboolean final known
+  `in_footer` values in literal short/long options arrays (WordPress 6.3+).
+  Empty/missing options and unrelated fields are accepted. Unknown expressions,
+  argument lists, array keys or array unpacking are skipped. Scalar/array type
+  classification re-lexes only the reconstructed argument without evaluating it,
+  so native partial string tokens and JS whole strings agree. Both analyzers
+  preserve source. No automatic fix is offered; the existing pipeline applies.
+  Acceptance: `tests/integration/check-script-footer.test.mjs` (10 CLI tests;
+  native comparison skips without PHP). Local WordPress runtime fixtures also
+  confirmed that string 'false' selects the footer in both parameter forms.
+  Complex same-quote interpolations are skipped. Existing JS lexer limitation:
+  heredoc/nowdoc closing labels followed by syntax on the same line can consume
+  later source and hide later calls; PHP mode avoids that fallback limitation.
+- `src/check/php-calls.mjs` holds the shared global-call resolution, namespace/
+  import and attribute safeguards, plus known positional argument grouping.
+  These helpers were extracted unchanged from the printf rule for both rules.
 - `src/check/rules/printf.mjs` adds `php.printf-arguments`, a warning in all PHP
   files. `src/check/printf-format.mjs` computes minimum value counts for literal
   formats, positional reuse/mixing, `%%`, flags/padding and star width/precision.
@@ -113,12 +130,12 @@ bin/wp-theme-kit.mjs
   catalogue. JSON report findings add `documentationUrl` after suppression and
   fix planning, so baseline identities/schema and non-JSON output stay intact.
   Explicit HTML anchors use rule IDs with dots replaced by hyphens. They cover
-  all 41 registered checks plus the synthetic `meta.rule-error` diagnostic.
+  all 42 registered checks plus the synthetic `meta.rule-error` diagnostic.
   URLs are installation-specific and require no network calls; use a Markdown
   viewer supporting explicit anchors, or read the entry through `--explain`.
   Acceptance: `tests/integration/check-documentation.test.mjs` (6 CLI tests).
 - `src/check/explain.mjs` reads the rule entry directly from the shipped
-  `skills/wp-theme-dev/references/checks.md` catalogue. All 41 current rules
+  `skills/wp-theme-dev/references/checks.md` catalogue. All 42 current rules
   have rationale and before/after examples under exact level-three ID headings.
   Code fences protect example headings from section splitting. Explanation
   bypasses theme/configuration/tool discovery; scan flags and unsupported

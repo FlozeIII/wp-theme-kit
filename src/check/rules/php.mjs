@@ -12,6 +12,7 @@ import {
 import { GETTEXT_SIGNATURES } from '../../i18n/functions.mjs';
 import { expandTemplateArguments } from '../template-arguments.mjs';
 import { printfArguments } from './printf.mjs';
+import { scriptFooter } from './enqueue.mjs';
 
 const DEFAULT_SAFE_OUTPUT = [
   'esc_html', 'esc_attr', 'esc_url', 'esc_js', 'esc_textarea', 'esc_xml',
@@ -614,6 +615,7 @@ export const rules = [
   unescapedOutput,
   unescapedPrintf,
   printfArguments,
+  scriptFooter,
   textDomain,
   translatorComments,
   forbiddenFunctions,
