@@ -127,3 +127,35 @@ test('global install is removable and preserves unrelated user files', () => {
   const second = runCli(['install', '--harness', 'all', '--global', '--uninstall'], { cwd: home, env });
   assert.equal(second.status, 0, second.stderr);
 });
+
+test('deepseek install links skills instead of copying them', () => {
+  const project = tempDir();
+  classicTheme(project);
+  const projectInstall = runCli(['install', '--harness', 'deepseek', '--project', project]);
+  assert.equal(projectInstall.status, 0, projectInstall.stderr);
+  const projectSkill = path.join(project, '.agents', 'skills', 'wp-theme-dev');
+  assert.ok(fs.existsSync(path.join(projectSkill, 'SKILL.md')));
+  assert.equal(fs.lstatSync(projectSkill).isSymbolicLink(), true);
+  const manifest = JSON.parse(read(project, '.wp-theme-kit-install.json'));
+  const entry = manifest.skills.find((item) => item.path === projectSkill);
+  assert.equal(entry?.type, 'link');
+  assert.equal(fs.existsSync(path.join(projectSkill, 'SKILL.md')), true);
+
+  const home = tempDir('wptk-dsh-home-');
+  const env = {
+    HOME: home,
+    USERPROFILE: home,
+    DSH_AGENTS_HOME: path.join(home, '.agents'),
+    DSH_HOME: path.join(home, '.dsh'),
+  };
+  const globalInstall = runCli(['install', '--harness', 'deepseek', '--global'], { cwd: home, env });
+  assert.equal(globalInstall.status, 0, globalInstall.stderr);
+  const globalSkill = path.join(home, '.agents', 'skills', 'wp-theme-dev');
+  assert.equal(fs.lstatSync(globalSkill).isSymbolicLink(), true);
+  assert.match(fs.readFileSync(path.join(home, '.dsh', 'AGENTS.md'), 'utf8'), /wp-theme-kit:begin/);
+
+  const uninstall = runCli(['install', '--harness', 'deepseek', '--global', '--uninstall'], { cwd: home, env });
+  assert.equal(uninstall.status, 0, uninstall.stderr);
+  assert.equal(fs.existsSync(globalSkill), false);
+  assert.equal(fs.readFileSync(path.join(home, '.dsh', 'AGENTS.md'), 'utf8').includes('wp-theme-kit:begin'), false);
+});

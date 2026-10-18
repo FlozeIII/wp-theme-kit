@@ -163,8 +163,17 @@ Each item is small enough for one agent session and has an acceptance command.
 
 ## v0.3: harness adapters
 
-- [ ] Add a first-class DeepSeek Harness install path that does not require
+- [x] Add a first-class DeepSeek Harness install path that does not require
   copying skills.
+  Already shipped by `install --harness deepseek` (`.agents/skills` plus a
+  marked `AGENTS.md`, or `~/.agents/skills` plus `~/.dsh/AGENTS.md` with
+  `--global`); default is a link/junction and `--copy` is opt-in. Local evidence
+  that DSH scans that directory: `~/.agents/skills/reverse-engineer-anything`
+  appears in the DSH skill catalog while absent from `~/.dsh/skills`.
+  Acceptance: `tests/integration/install.test.mjs` now asserts project and
+  global DeepSeek installs are links and the manifest records `type: "link"`,
+  the AGENTS.md block appears, and `--uninstall` removes both.
+  Verified: `npm test` (320 pass, 1 Windows skip, 321 total).
 - [x] Add a `wptk install --uninstall` test for global installs.
   Acceptance: `tests/integration/install.test.mjs` now also installs
   `--harness all --global` into a temporary home, proves skills (symlinked),

@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 319 passing, 1 skipped (320 total) on Windows because file-symlink
+- Tests: `npm test` -> 320 passing, 1 skipped (321 total) on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -415,7 +415,9 @@ bin/wp-theme-kit.mjs
   `DSH_AGENTS_HOME`, `CODEX_HOME`, `DSH_HOME`, else `~`). Acceptance covers both:
   `tests/integration/install.test.mjs` removes a project install and a global
   install, checks that unrelated user files (`skills/keep.txt`, user text in
-  `AGENTS.md`) survive, and runs `--uninstall` twice.
+  `AGENTS.md`) survive, and runs `--uninstall` twice. The DeepSeek route has its
+  own acceptance in the same file: project and global installs must be links
+  (`"type": "link"` in the manifest), never copies unless `--copy` is passed.
 
 ## Invariants
 
