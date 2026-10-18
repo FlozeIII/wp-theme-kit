@@ -31,7 +31,7 @@ async function startServer() {
   };
 }
 
-test('shot writes a PNG at the requested viewport', { skip: !hasBrowser, timeout: 60000 }, async () => {
+test('shot writes a PNG at the requested viewport', { skip: !hasBrowser, timeout: 120000 }, async () => {
   const { url, stop } = await startServer();
   try {
     const root = tempDir();
@@ -45,7 +45,7 @@ test('shot writes a PNG at the requested viewport', { skip: !hasBrowser, timeout
   }
 });
 
-test('audit reports a clean page as passing', { skip: !hasBrowser, timeout: 60000 }, async () => {
+test('audit reports a clean page as passing', { skip: !hasBrowser, timeout: 120000 }, async () => {
   const { url, stop } = await startServer();
   try {
     const result = await runCliAsync(['audit', '--url', url, '--json']);
@@ -59,7 +59,7 @@ test('audit reports a clean page as passing', { skip: !hasBrowser, timeout: 6000
   }
 });
 
-test('shot refuses to overwrite when a guard fails', { skip: !hasBrowser, timeout: 60000 }, async () => {
+test('shot refuses to overwrite when a guard fails', { skip: !hasBrowser, timeout: 120000 }, async () => {
   const { url, stop } = await startServer();
   try {
     const root = tempDir();

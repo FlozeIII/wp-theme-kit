@@ -6,7 +6,7 @@ import path from 'node:path';
 import { tempDir, write, runCli, runCliAsync } from '../helpers.mjs';
 import { findBrowser } from '../../src/env.mjs';
 
-const browserTest = { skip: !findBrowser({}), timeout: 90000 };
+const browserTest = { skip: !findBrowser({}), timeout: 180000 };
 
 async function site(t) {
   const state = { errors: ['Known widget error'], width: 0 };

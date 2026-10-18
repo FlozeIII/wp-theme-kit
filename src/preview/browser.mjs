@@ -41,7 +41,7 @@ function stopBrowser(child) {
  * Launch a headless Chromium-family browser with a system-chosen CDP port.
  * The temporary profile is removed on close.
  */
-export async function launch({ browserPath, headless = true, timeoutMs = 15000 } = {}) {
+export async function launch({ browserPath, headless = true, timeoutMs = 30000 } = {}) {
   const executable = browserPath || findBrowser({});
   if (!executable) {
     throw new EnvError(
@@ -287,11 +287,11 @@ export async function newPage(browser, { colorScheme = 'light', reducedMotion = 
       throw new Error(`Timed out after ${timeoutMs}ms: ${String(expression).slice(0, 120)}`);
     },
 
-    async waitForSelector(selector, timeoutMs = 15000) {
+    async waitForSelector(selector, timeoutMs = 30000) {
       return page.waitFor(`Boolean(document.querySelector(${JSON.stringify(selector)}))`, timeoutMs);
     },
 
-    async waitForImages(timeoutMs = 15000) {
+    async waitForImages(timeoutMs = 30000) {
       return page.waitFor(
         'Array.from(document.images).every((img) => img.complete)',
         timeoutMs,

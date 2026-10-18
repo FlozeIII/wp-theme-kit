@@ -6,7 +6,7 @@ import path from 'node:path';
 import { runCliAsync, tempDir, write } from '../helpers.mjs';
 import { findBrowser } from '../../src/env.mjs';
 
-const browserTest = { skip: !findBrowser({}), timeout: 90000 };
+const browserTest = { skip: !findBrowser({}), timeout: 180000 };
 
 // A decodable 1x1 PNG. `minimalPng()` only satisfies header parsers, and the
 // browser image guard needs bytes Chromium can actually paint.

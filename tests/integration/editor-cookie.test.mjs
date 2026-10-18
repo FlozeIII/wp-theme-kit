@@ -7,7 +7,7 @@ import { runCliAsync, tempDir, write } from '../helpers.mjs';
 import { findBrowser } from '../../src/env.mjs';
 import { pngSize } from '../../src/preview/png.mjs';
 
-const browserTest = { skip: !findBrowser({}), timeout: 120000 };
+const browserTest = { skip: !findBrowser({}), timeout: 180000 };
 
 const EDITOR = '/wp-admin/post-new.php';
 

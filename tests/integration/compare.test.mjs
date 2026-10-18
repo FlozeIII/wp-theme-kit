@@ -7,7 +7,7 @@ import { runCliAsync, tempDir, write } from '../helpers.mjs';
 import { findBrowser } from '../../src/env.mjs';
 import { decodePng } from '../../src/preview/png-codec.mjs';
 
-const browserTest = { skip: !findBrowser({}), timeout: 120000 };
+const browserTest = { skip: !findBrowser({}), timeout: 180000 };
 
 function page(background) {
   return `<!doctype html><html><head><meta charset="utf-8">

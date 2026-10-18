@@ -131,8 +131,15 @@ test('a relocated CLI encodes its own installation path, independently of cwd an
   // Windows path while still covering spaces and non-ASCII names.
   const prefix = process.platform === 'win32' ? 'wptk 工具 ' : 'wptk 工具 #100% ';
   const installed = fs.realpathSync.native(tempDir(prefix));
+  const copyTree = (from, to) => {
+    fs.mkdirSync(to, { recursive: true });
+    for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
+      if (entry.isDirectory()) copyTree(path.join(from, entry.name), path.join(to, entry.name));
+      else fs.copyFileSync(path.join(from, entry.name), path.join(to, entry.name));
+    }
+  };
   for (const directory of ['bin', 'src']) {
-    fs.cpSync(path.join(KIT_ROOT, directory), path.join(installed, directory), { recursive: true });
+    copyTree(path.join(KIT_ROOT, directory), path.join(installed, directory));
   }
   assert.ok(fs.existsSync(path.join(installed, 'bin/wp-theme-kit.mjs')), 'the relocated CLI was copied');
   const relative = 'skills/wp-theme-dev/references/checks.md';
