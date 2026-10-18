@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 288 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 318 passing, 1 skipped (319 total) on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -48,6 +48,8 @@ bin/wp-theme-kit.mjs
         -> src/theme-check/       optional static WordPress artifact inspection
         -> src/scaffold/          templates and code generation
         -> src/preview/           CDP screenshots, audits and PNG comparison
+        -> src/mu-plugin/         helper install, fixture and mail parsing
+        -> templates/mu-plugin/   mu-plugin helper templates
         -> src/i18n/              POT extraction and comparison
         -> src/install/           harness installation
         -> src/config.mjs         .wp-theme-kit.json + inference
@@ -327,6 +329,55 @@ bin/wp-theme-kit.mjs
   no console errors or overflow, no remaining failures. Source HEAD/worktree
   stayed unchanged; the temporary local PHP process was stopped afterward.
 
+### Mu-plugin helpers
+
+- `wptk mu-plugin install|status|remove|mail` (ADR 0001; replaces the earlier
+  undefined `wptk harness install` idea). `src/mu-plugin/index.mjs` owns helper
+  filenames/version, the manifest (`.wp-theme-kit-harness.json` in
+  `wp-content/mu-plugins/`), config paths, install planning, mail index parsing
+  and deletion; `src/commands/mu-plugin.mjs` performs atomic writes with
+  rollback and presents results. `src/mu-plugin/fixtures.mjs` validates fixture
+  documents; the HTTP matcher lives only in the PHP stub, so the schema has one
+  implementation.
+- Install copies `templates/mu-plugin/wp-theme-kit-mail.php` and
+  `wp-theme-kit-http-stub.php` atomically with rollback on failure. Older marked
+  helpers upgrade; newer or unmarked files are blocked unless `--force`, and a
+  current marked helper missing from the manifest is adopted. The harness config
+  (`wp-content/wp-theme-kit-harness/wp-theme-kit-harness.json`) is written once
+  and never overwritten; `mail/`, `http/` and `index.php` are created alongside.
+  All four actions require `wp-content` and exit 2 on a non-WordPress root.
+- Mail capture hooks `pre_wp_mail`, writes a single-part (plain or HTML) RFC822
+  `.eml` named `Ymd-His-<sha1(recipients)[0..8]>.eml` plus one JSON line in
+  `mail/index.jsonl`, copies readable attachments beside it under a hashed name
+  (never embedded), and returns true. The HTTP stub hooks `pre_http_request`,
+  replays the first valid fixture whose method matches and whose URL regex
+  matches the full URL, and supports `body`, `json`, `bodyFile` (relative,
+  <=5 MiB) or `base64`; `delayMs` is capped at 10000 ms. Unmatched requests pass
+  through unless `http.strict` is true (then a `wptk_no_fixture` `WP_Error`),
+  and `http.hosts` limits stubbed hosts. Both helpers are inert on
+  `wp_get_environment_type() === 'production'` unless the
+  `wp_theme_kit_harness_enabled` filter opts in, and neither prints values.
+- `mail` lists newest-first (default 50) with `--limit`, and `--clear` deletes
+  only indexed `.eml`/attachment files plus the index; an unsafe or malformed
+  config is refused (exit 2). `remove` needs a manifest (exit 1 otherwise) and
+  deletes only regular files whose marker names the helper it recorded; a
+  mismatch is reported and exits 1. `status` reports helpers with per-helper
+  state (`unchanged`/`update`/`blocked`), root, directories, config error and
+  invalid fixtures without printing contents.
+- JSON mode keeps stdout to one JSON document; on error paths usage text and
+  hints go to stderr.
+- Acceptance: `tests/unit/mu-plugin.test.mjs` (10 tests for validation, load,
+  manifest, planning, index, mail read/clear/default limit),
+  `tests/integration/mu-plugin-install.test.mjs` (15 CLI tests over a fake
+  WordPress root, including adoption, marker-checked removal, status drift and
+  config errors, JSON purity, plus `php -l` when PHP exists) and
+  `tests/integration/mu-plugin-behavior.test.mjs` (5 PHP tests against stub
+  WordPress functions: capture with `.eml` naming and single-part layout,
+  fixture replay, invalid-fixture skipping, pass-through/strict, production
+  guard; skipped when PHP is unavailable).
+- Live acceptance against a running WordPress install has not been done here;
+  record it when a site is available.
+
 ### i18n
 
 - `src/i18n/functions.mjs` is the single source for gettext signatures.
@@ -450,13 +501,15 @@ repository root.
   the worktree and requested commit. Subtree archives require Git archive --mtime.
 - Mechanical fixes cover only the documented whitelist. Ambiguous syntax,
   namespaced/imported gettext calls, and symlinked source files require manual
-  edits. The mu-plugin E2E harness installer and npm publishing remain deferred.
+  edits. The mu-plugin helpers are covered by PHP stub tests, not a live
+  WordPress site; npm publishing remains deferred.
 
 ## 中文摘要
 
 交接时先提交基线，再让新 Agent 依次读 `AGENTS.md`、`docs/HANDOFF.md`、
 `docs/ROADMAP.md`，跑 `npm test` 和 `claude plugin validate . --strict`。
 架构是 `bin -> cli -> commands -> 领域模块`；检查规则在 `src/check/rules/`，
-打包在 `src/package/`，预览在 `src/preview/`，技能在 `skills/`。
+打包在 `src/package/`，预览在 `src/preview/`，mu-plugin 在 `src/mu-plugin/`
+与 `templates/mu-plugin/`，技能在 `skills/`。
 保持零运行时依赖、只从已提交快照打包、技能 frontmatter 三端兼容、不自动发布。
 多 Agent 并行时一人一个分支/工作树，不要同时改同一个文件。

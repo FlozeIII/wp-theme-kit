@@ -140,6 +140,13 @@ Common causes:
 - console error: a missing script dependency or a JavaScript exception;
 - missing selector: the route did not render the expected template.
 
+## Mu-plugin helpers
+
+For captured mail and HTTP fixture replay inside a real WordPress install, see
+`skills/wp-theme-dev/references/mu-plugin-helpers.md`. The helpers only observe:
+they write under `wp-content/wp-theme-kit-harness/`, never send mail, and stay
+inert on production unless the `wp_theme_kit_harness_enabled` filter opts in.
+
 ## 中文摘要
 
 截图必须在 `goto` 之前设好真实视口。`wptk shot` 默认产出 1200×900 的

@@ -76,10 +76,13 @@ arguments.
 - [Check rule catalog](references/checks.md)
 - [Release checklist](references/release-checklist.md)
 - [Environment](references/environment.md)
+- [Mu-plugin helpers](references/mu-plugin-helpers.md)
 
 ## 中文摘要
 
 本技能是 wp-theme-kit 的总入口。先读 `.wp-theme-kit.json`，用 `wptk doctor`
 确认环境，再按任务路由到 check、scaffold、preview、package、i18n 子技能。
-CLI 是唯一的能力来源；技能只负责编排。不要自动 push、打标签或发布，也不要
-在未确认时覆盖用户文件。所有输出都要按主题的文本域、前缀和转义约定处理。
+需要观察真实 WordPress 行为时，用 `wptk mu-plugin` 安装邮件捕获和 HTTP
+stub 助手；它们只在开发环境生效，不会打印凭据。CLI 是唯一的能力来源；技能
+只负责编排。不要自动 push、打标签或发布，也不要在未确认时覆盖用户文件。
+所有输出都要按主题的文本域、前缀和转义约定处理。

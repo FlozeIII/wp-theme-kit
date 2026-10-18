@@ -70,6 +70,10 @@ const COMMANDS = new Map([
     summary: 'Install skills and agent instructions for each harness.',
     load: () => import('./commands/install.mjs'),
   }],
+  ['mu-plugin', {
+    summary: 'Install optional WordPress observation helpers.',
+    load: () => import('./commands/mu-plugin.mjs'),
+  }],
 ]);
 
 function takeGlobals(argv) {
@@ -193,7 +197,10 @@ export async function main(argv) {
 
     if (error instanceof WptkError) {
       out.fail(error.message);
-      if (error.hint) out.hint(error.hint);
+      if (error.hint) {
+        if (globals?.json) process.stderr.write(`${error.hint}\n`);
+        else out.hint(error.hint);
+      }
       return error.exitCode;
     }
 

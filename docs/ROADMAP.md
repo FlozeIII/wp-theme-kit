@@ -141,8 +141,25 @@ Each item is small enough for one agent session and has an acceptance command.
   `claude plugin validate . --strict`.
   Live wp-admin acceptance is pending a running WordPress site and admin
   credentials; record it here when available rather than committing secrets.
-- [ ] A `wptk harness install` command for the mu-plugin observation helpers
-  (mail capture, upstream stub) described in the original design notes.
+- [x] `wptk mu-plugin` commands for the mu-plugin observation helpers (mail
+  capture, HTTP stub). The name intentionally differs from the earlier
+  `wptk harness install` idea; see ADR 0001 for the naming conflict with AI
+  harnesses.
+  Acceptance: `install|status|remove|mail` install marked helpers into
+  `wp-content/mu-plugins/`, write a one-time harness config, upgrade older
+  helpers and refuse newer or unmarked files without `--force`; mail capture
+  writes an `.eml` plus `index.jsonl` and suppresses delivery; the HTTP stub
+  replays the first matching fixture, passes through by default and fails with
+  `wptk_no_fixture` in strict mode; both helpers are inert on production unless
+  the `wp_theme_kit_harness_enabled` filter opts in; values never printed.
+  Adoption, marker-checked removal, per-helper status drift, config-error
+  refusal, single-part `.eml` naming and JSON-pure stdout are covered too.
+  Unit: 10 fixture/manifest/mail tests. Integration: 15 CLI tests plus 5 PHP
+  behavior tests against stub WordPress functions (skipped without PHP).
+  Verified: `npm test` (318 pass, 1 Windows skip, 319 total);
+  `mu-plugin --help`; `claude plugin validate . --strict`.
+  Live acceptance against a running WordPress install is pending; record it
+  here when available.
 
 ## v0.3: harness adapters
 

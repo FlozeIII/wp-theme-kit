@@ -149,6 +149,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk theme-check --zip <file>` | Run optional local Theme Check on an extracted artifact. |
 | `wptk release [--rev ref]` | Local preflight, package, verify, and checklist; `--notes [--since ref]` drafts grouped notes. |
 | `wptk install --harness ...` | Install skills and AGENTS.md entries. |
+| `wptk mu-plugin <install\|status\|remove\|mail>` | Optional mail capture and HTTP stub helpers for local WordPress runs; `--wp-root`, `--helper`, `--force`, `--limit`, `--clear`. |
 
 Global flags: `--cwd <dir>`, `--json`, `--no-color`, `--quiet`.
 Exit codes: `0` success, `1` check or gate failure, `2` usage or environment
@@ -348,6 +349,95 @@ defaults to `/`, `httpOnly` to `true`, `secure` to `false` and `sameSite` to
 navigation is already authenticated. Values are never printed, and an invalid
 fixture exits 2 before a browser starts. Keep the fixture out of Git and rotate
 the session when you are done.
+
+## Mu-plugin helpers
+
+`wptk mu-plugin` installs two optional PHP helpers into a local WordPress site's
+`wp-content/mu-plugins/`. They are development-time observation tools: they
+never ship with a theme and must not be installed on production.
+
+```bash
+wptk mu-plugin install --wp-root ../wordpress
+wptk mu-plugin status --wp-root ../wordpress
+wptk mu-plugin mail --limit 5 --wp-root ../wordpress
+wptk mu-plugin mail --clear --wp-root ../wordpress
+wptk mu-plugin remove --wp-root ../wordpress
+```
+
+| File | Purpose |
+| --- | --- |
+| `wp-theme-kit-mail.php` | Captures `wp_mail()` into `.eml` files and `index.jsonl` instead of sending. |
+| `wp-theme-kit-http-stub.php` | Replays JSON fixtures for outgoing HTTP requests. |
+
+`--helper mail|http|all` limits `install` and `remove`. Each helper carries a
+`WP-Theme-Kit-Helper` header and a `Version`, and
+`wp-content/mu-plugins/.wp-theme-kit-harness.json` records what was installed.
+Older helpers are upgraded; newer or unmarked files are refused unless
+`--force` is passed, so a hand-edited or third-party file is never silently
+replaced. A marked helper that is already current but missing from the manifest
+is adopted on the next `install`. `remove` exits 1 when no manifest exists and
+deletes only files whose marker names the helper it recorded; a file with a
+different marker is reported and left alone.
+
+The WordPress root comes from `--wp-root`, then `wordpress.path` in
+`.wp-theme-kit.json`, `WPTK_WP_ROOT`, or an ancestor containing `wp-load.php`.
+`install` writes `wp-content/wp-theme-kit-harness/wp-theme-kit-harness.json`
+once; later runs keep an existing file:
+
+```json
+{
+  "version": 1,
+  "enabled": { "mail": true, "http": true },
+  "mailDir": "mail",
+  "httpDir": "http",
+  "http": { "strict": false, "hosts": [] }
+}
+```
+
+`wptk mu-plugin mail` lists captured messages newest first, 50 by default;
+`--limit n` narrows the list and `--clear` deletes indexed `.eml` files,
+attachments and `index.jsonl` while leaving unrelated files alone. Everything
+stays under `wp-content/wp-theme-kit-harness/mail/`. A config whose
+`mailDir`/`httpDir` is absolute or contains `..` is refused by `mail` and
+reported by `status`; the helpers stay disabled in that case rather than
+falling back to another directory.
+
+Drop HTTP fixtures as `*.json` files in `wp-content/wp-theme-kit-harness/http/`.
+They are evaluated in file-name order and the first match wins:
+
+```json
+{
+  "match": { "method": "GET", "url": "^https://api\\.example\\.com/v1/" },
+  "status": 200,
+  "headers": { "content-type": "application/json" },
+  "json": { "ok": true }
+}
+```
+
+`match.method` is an uppercase method or `*`; `match.url` is a regular
+expression over the full URL. Exactly one of `body` (text), `json` (encoded
+JSON), `bodyFile` (relative file, at most 5 MiB) or `base64` supplies the
+response body. `status` defaults to 200 and `delayMs` to 0; a delay is capped
+at 10000 ms so a fixture cannot stall a request for longer. Unmatched requests
+pass through to the network; set `http.strict` to `true` to return a
+`wptk_no_fixture` `WP_Error` instead, and use `http.hosts` to limit which hosts
+are stubbed. `wptk mu-plugin status` reports invalid fixtures without printing
+file contents.
+
+Both helpers stay inert when `wp_get_environment_type()` is `production` unless
+the `wp_theme_kit_harness_enabled` filter returns true. They write only inside
+`wp-content/wp-theme-kit-harness/`, never deliver captured mail, and never print
+cookie or credential values.
+
+With `--json`, stdout carries one JSON document and errors go to stderr. Keys:
+`install` returns `root`, `helpers`, `changed[]` and `config{path,created}`;
+`status` returns `root`, `installed[]{helper,file,version,state,reason?}`,
+`dirs{muPlugins,harness,mail,http}`, `config{exists,path,error}` and
+`fixtures{total,valid,invalid}`; `remove` returns `root`, `helpers`,
+`changed[]`, `config` and `installed[]`; `mail` returns `dir`, `total`, `count`
+and `messages[]`, or `{cleared}` with `--clear`. `changed[]` entries carry
+`helper`, `file` and `action` (`install`, `update`, `adopted`, `unchanged`,
+`removed`, `absent`, `skipped`).
 
 ## POT header metadata
 
@@ -724,7 +814,10 @@ the WordPress ecosystem; change the license with `wptk init --license`.
 - **脚手架**：新建 classic / block / hybrid 主题，生成模板、模板部件、PHP 模块、
   自定义区块与 block pattern。
 - **预览与截图**：真实视口截图、批量路由截图、控制台错误、失败资源、横向溢出、
-  图片加载与选择器检查。
+  图片加载与选择器检查；用 cookie 夹具截取登录后的编辑页，并对比两张截图的
+  差异（容差 + diff 图）。
+- **本地观测**：`mu-plugin` 把邮件捕获与 HTTP stub 助手装进本地
+  `wp-content/mu-plugins/`，记录清单、只更新旧版本，生产环境默认不生效。
 - **打包与发布**：按已提交的 Git 快照出包，严格的 `.distignore`，包内容验收，
   版本号检查，POT 新鲜度检查，发布清单。
 - **国际化**：从 PHP 与 JS 的字面量 gettext 调用生成 POT，并可做 msgid 集合比对。

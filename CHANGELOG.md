@@ -8,6 +8,17 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `wptk mu-plugin install|status|remove|mail` installs optional mail-capture and
+  HTTP-stub helpers into a local WordPress site's `wp-content/mu-plugins/`,
+  records them in a manifest, upgrades older copies, adopts current marked
+  helpers missing from the manifest, and refuses newer or unmarked files without
+  `--force`. `remove` deletes only regular files whose marker names the recorded
+  helper. Captured mail is listed (newest first, 50 by default) and cleared from
+  the CLI; HTTP fixtures replay in file-name order with pass-through or strict
+  mode. A one-time harness config controls both helpers, which stay inert on
+  production unless the `wp_theme_kit_harness_enabled` filter opts in; an unsafe
+  config is refused by `mail` and reported by `status`. JSON mode keeps stdout
+  to one document.
 - `shot` and `audit` accept `--cookie-file <json>` (and `preview.cookieFile`) to
   load session cookies for authenticated pages such as `/wp-admin/post-new.php`.
   Cookies are applied to every route before navigation, values never appear in
