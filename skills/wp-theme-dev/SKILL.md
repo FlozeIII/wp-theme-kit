@@ -33,7 +33,7 @@ LLM, so the same workflow works in Claude Code, Codex, and DeepSeek Harness.
 | Static checks, acceptance, fixing findings | `wp-theme-check` |
 | New theme, templates, parts, modules, blocks, patterns | `wp-theme-scaffold` |
 | Screenshots, visual audit, local preview | `wp-theme-preview` |
-| Version bump, package, verify, release | `wp-theme-package` |
+| Version bump, package, verify, Theme Check on a ZIP, release | `wp-theme-package` |
 | POT generation and translation freshness | `wp-theme-i18n` |
 
 If several apply, run them in this order: scaffold, check, preview, i18n,

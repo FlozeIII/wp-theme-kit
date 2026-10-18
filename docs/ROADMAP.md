@@ -73,9 +73,14 @@ Each item is small enough for one agent session and has an acceptance command.
   error protection, paths, source entry rebuilding and existing behavior.
   Verified: `npm test` (200 pass, 1 Windows file-symlink privilege skip);
   real Yuki POT copy (112 keys) independently imported by WordPress POMO.
-- [ ] Theme Check helper: `wptk theme-check --zip <file>` that extracts into a
+- [x] Theme Check helper: `wptk theme-check --zip <file>` that extracts into a
   temporary WordPress root and invokes WP-CLI when available.
   Acceptance: skips cleanly when WP-CLI or Theme Check is absent.
+  Verified: `node --test tests/integration/theme-check.test.mjs` (10 pass on Windows);
+  `npm test` (210 pass, 1 Windows file-symlink privilege skip). Tests cover
+  explicit skips, artifact isolation, findings/status, malformed output, safe
+  extraction, cleanup and config/CLI behavior. Real local WordPress/Theme Check
+  runs verified Yuki and block/hybrid artifacts without loading theme PHP.
 - [ ] `release --notes` to draft grouped release notes from Git history.
 - [ ] Validate that the tag's commit is `HEAD` when releasing from a tag.
 

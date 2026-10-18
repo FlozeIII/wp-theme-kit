@@ -145,6 +145,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk version [bump patch|minor|major]` | Print or bump `style.css` and `package.json`. |
 | `wptk package [out.zip] [--rev ref]` | Build from a committed revision. |
 | `wptk verify-package <zip>` | Inspect an artifact without WordPress. |
+| `wptk theme-check --zip <file>` | Run optional local Theme Check on an extracted artifact. |
 | `wptk release [--rev ref]` | Local preflight, package, verify, and checklist. |
 | `wptk install --harness ...` | Install skills and AGENTS.md entries. |
 
@@ -278,6 +279,42 @@ segments, glob/pathspec syntax and symlink/junction directory aliases are
 rejected. The subtree must exist as a directory in the requested commit.
 Null/empty `package.subdir` preserves repository-root-only packaging. Subtree
 archives require Git with `archive --mtime` support for stable commit timestamps.
+
+## Theme Check on a ZIP
+
+```bash
+wptk theme-check --zip dist/my-theme.zip --wp-root /path/to/wordpress
+wptk theme-check --zip dist/my-theme.zip --json
+```
+
+This optional helper uses an existing local WordPress core, PHP/WP-CLI and the
+Theme Check plugin's official CLI adapter at
+`wp-content/plugins/theme-check/wp-cli/class-theme-check-cli.php`.
+WordPress discovery uses `--wp-root`, `wordpress.path` in the kit config,
+`WPTK_WP_ROOT`, or an installation above the working directory. PHP and WP-CLI
+use the same discovery as `doctor` (including `WPTK_PHP` and `WPTK_WP_CLI`).
+Nothing is downloaded or installed.
+
+The helper validates the ZIP and extracts it as
+`<temporary-root>/wp-content/themes/<slug>/`. It invokes WP-CLI `eval-file
+--skip-wordpress` with WordPress's theme/formatting libraries and the official
+Theme Check command class. It uses static options and an in-memory cache,
+without loading a site's configuration, database, plugins or theme PHP.
+Core/checker directory links are removed before the temporary root is cleaned,
+including after failed checks. WP-CLI configuration and cache are temporary.
+This is an isolated static inspection, not a live-site runtime test; child-theme
+parent files are not supplied. The local runtime acceptance used WordPress 7.1.3
+and Theme Check 20260901.
+
+Exit codes are `0` for a completed pass or an explicit tooling skip, `1` for a
+Theme Check failure, and `2` for invalid input or tool/runtime errors. A skip
+prints its reason; JSON distinguishes it with `skipped: true` and `ok: null`.
+Completed JSON reports contain `skipped: false`, boolean `ok`, and the checker's
+`findings` rows with `type` and `value`. Recommendations and warnings retain
+Theme Check's own pass/fail policy. Missing tools do not hide a malformed ZIP.
+Archives require a single slug directory and `style.css`; traversal, Windows
+device/short-name aliases, case collisions and file/directory conflicts are
+rejected before extraction. Entries are materialized as ordinary files.
 
 ## Script footer argument types
 

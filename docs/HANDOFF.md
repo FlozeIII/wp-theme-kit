@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 200 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 210 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -41,6 +41,7 @@ bin/wp-theme-kit.mjs
      -> src/commands/<name>.mjs   thin argument parsing and presentation
         -> src/check/             static analysis
         -> src/package/           git archive, verify, version
+        -> src/theme-check/       optional static WordPress artifact inspection
         -> src/scaffold/          templates and code generation
         -> src/preview/           CDP screenshots and audits
         -> src/i18n/              POT extraction and comparison
@@ -184,6 +185,29 @@ bin/wp-theme-kit.mjs
   hostile attributes, offline partial clones, theme types, preflight and release,
   independent verification, custom exclusions and existing root behavior.
 - `src/zip/read.mjs` has no dependencies.
+
+### Optional Theme Check
+
+- `theme-check --zip` validates one slug directory and literal extraction paths
+  before dependency discovery; malformed input exits 2 even without tooling.
+- `src/theme-check/archive.mjs` materializes ZIP entries as regular files under
+  a new temporary root, rejecting traversal, Windows device/short-name aliases,
+  case collisions and file/directory conflicts.
+- `src/theme-check/index.mjs` discovers local WordPress/PHP/WP-CLI and the
+  installed Theme Check CLI adapter. Missing tooling returns a visible skip
+  (`ok: null`, `skipped: true`, exit 0); invocation/output errors exit 2.
+- `src/theme-check/run.php` runs through WP-CLI eval-file --skip-wordpress.
+  It loads only static core libraries, supplies non-DB options and an in-memory
+  cache, and invokes the official Theme_Check_Command. Site config, DB, active
+  plugins and theme PHP are not loaded. Child-theme parent files are absent.
+  Core/checker links, CLI config and cache are temporary; links are unlinked
+  before recursive cleanup. Completed reports preserve checker status (0/1)
+  and type/value findings. The subprocess is bounded to 60 seconds.
+- Acceptance: `tests/integration/theme-check.test.mjs` (10 CLI tests on Windows;
+  the missing-PHP/direct-launcher fixture is Windows-specific).
+  Real WordPress 7.1.3 / Theme Check 20260901 / WP-CLI accepted classic Yuki
+  (REQUIRED 1, WARNING 1, RECOMMENDED 5, INFO 5) and block/hybrid fixtures;
+  theme PHP was never executed. Runtime compatibility errors remain visible.
 
 ### Preview pipeline
 

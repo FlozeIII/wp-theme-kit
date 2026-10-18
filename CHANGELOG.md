@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `theme-check --zip <file>` optionally checks an extracted artifact using local
+  WP-CLI, WordPress libraries and Theme Check's official command class. Temporary
+  core/checker links and static options isolate the scan from site config,
+  database and theme PHP. Reports preserve checker findings/status; missing tools
+  skip explicitly. Strict archive paths, isolated CLI config/cache and cleanup
+  apply on success and failure. No runtime dependencies or downloads.
 - `pot --merge` preserves existing POT header comments, manual metadata and
   custom fields while refreshing generated metadata and rebuilding source
   entries. Missing files use normal defaults; malformed/ambiguous headers or

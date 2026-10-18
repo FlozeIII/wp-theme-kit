@@ -34,6 +34,10 @@ const COMMANDS = new Map([
     summary: 'Verify a built theme zip without WordPress.',
     load: () => import('./commands/verify-package.mjs'),
   }],
+  ['theme-check', {
+    summary: 'Run optional local Theme Check against a theme ZIP.',
+    load: () => import('./commands/theme-check.mjs'),
+  }],
   ['version', {
     summary: 'Print or bump the theme version.',
     load: () => import('./commands/version.mjs'),

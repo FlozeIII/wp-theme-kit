@@ -1,6 +1,6 @@
 ---
 name: wp-theme-package
-description: Package, verify, and prepare a WordPress theme release. Use for version bumps, installable zip creation, .distignore review, package verification, release preflight, or when the user asks to ship a theme without pushing or publishing.
+description: Package, verify, and prepare a WordPress theme release. Use for version bumps, installable zip creation, .distignore review, package verification, Theme Check on a ZIP, release preflight, or when the user asks to ship a theme without pushing or publishing.
 license: MIT
 metadata:
   author: FlozeIII
@@ -22,6 +22,7 @@ wptk package
 wptk package dist/my-theme-1.2.0.zip --rev v1.2.0
 wptk package --no-check
 wptk verify-package dist/my-theme.zip
+wptk theme-check --zip dist/my-theme.zip --wp-root /path/to/wordpress
 wptk release --rev v1.2.0
 ```
 
@@ -77,6 +78,19 @@ Commit a `.distignore` that excludes at least: tests, docs, `.scratch`, `.git`,
 - `theme.json` is valid and uses version 2 or 3;
 - `screenshot.png` is a readable PNG no larger than 1200x900.
 
+For optional WordPress Theme Check, run `wptk theme-check --zip <file>`.
+Use `--wp-root` or configured WordPress discovery to select local core and an
+installed Theme Check CLI adapter. The helper checks only the extracted ZIP in
+a temporary WordPress layout; it loads static core libraries without the site's
+configuration, database or theme PHP. Parent files for child themes are not
+provided. Temporary directory links are removed before cleanup.
+
+Read the result: exit 0 means pass or a clearly stated missing-tool skip, 1 is a
+Theme Check failure, and 2 is invalid input/runtime failure. JSON skips have
+`skipped: true` and `ok: null`; they do not establish a passing Theme Check.
+No tools are downloaded or installed. Review the official findings as part of
+release acceptance, even when some are intentional for a self-hosted theme.
+
 ## Release boundary
 
 `wptk release` is local only. Never push, move a tag, or publish a release
@@ -91,3 +105,5 @@ released tag.
 排除清单，只支持根目录相对字面路径。默认先跑静态检查和 POT 新鲜度检查；失败
 就修原因，不要用 `--no-check` 绕过。`verify-package` 验的是产物不是工作区。
 `release` 只做本地准备并打印清单，绝不自动 push、打标签或发布。
+`theme-check --zip` 在临时目录用本机工具检查产物，不加载站点配置或数据库；
+缺少工具会明确跳过，跳过不能视为检查通过。
