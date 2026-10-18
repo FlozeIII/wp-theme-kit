@@ -126,7 +126,7 @@ test('pretty and GitHub output stay free of JSON link metadata', () => {
 });
 
 test('a relocated CLI encodes its own installation path, independently of cwd and theme', () => {
-  const installed = tempDir('wptk 工具 #100% ');
+  const installed = fs.realpathSync.native(tempDir('wptk 工具 #100% '));
   for (const directory of ['bin', 'src']) {
     fs.cpSync(path.join(KIT_ROOT, directory), path.join(installed, directory), { recursive: true });
   }

@@ -6,6 +6,7 @@ on:
 
 jobs:
   test:
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -18,7 +19,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: Run tests
-        run: node --test
+        run: node --test --test-timeout=180000
       - name: Validate manifests
         shell: bash
         run: |
@@ -53,7 +54,7 @@ jobs:
       - name: Browser tests
         if: steps.detect.outputs.available == 'true'
         shell: bash
-        run: node --test --test-concurrency=1 tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs
+        run: node --test --test-concurrency=1 --test-timeout=180000 tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs
       - name: No browser found
         if: steps.detect.outputs.available != 'true'
         shell: bash

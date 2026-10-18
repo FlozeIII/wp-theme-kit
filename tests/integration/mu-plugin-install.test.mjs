@@ -231,7 +231,8 @@ test('status surfaces an unsafe harness config and mail refuses it', (t) => {
   json(dir, 'install');
   const configPath = path.join(dir, HARNESS_DIR, 'wp-theme-kit-harness.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  fs.writeFileSync(configPath, `${JSON.stringify({ ...config, mailDir: 'D:/elsewhere' }, null, 2)}\n`);
+  const outside = process.platform === 'win32' ? 'D:/elsewhere' : '/etc/elsewhere';
+  fs.writeFileSync(configPath, `${JSON.stringify({ ...config, mailDir: outside }, null, 2)}\n`);
 
   const status = json(dir, 'status');
   assert.match(status.config.error, /unsafe mailDir/);

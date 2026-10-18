@@ -198,7 +198,7 @@ test('theme-local configuration, paths with spaces and default output remain the
   const result = runCli(['package', '--cwd', theme, '--json']);
   assert.equal(result.status, 0, result.stderr);
   const output = path.join(theme, 'build/demo-theme.zip');
-  assert.equal(JSON.parse(result.stdout).output, output);
+  assert.equal(fs.realpathSync.native(JSON.parse(result.stdout).output), fs.realpathSync.native(output));
   assert.ok(readZip(output).has('demo-theme/style.css'));
   assert.equal(fs.existsSync(path.join(root, 'build/demo-theme.zip')), false);
 });

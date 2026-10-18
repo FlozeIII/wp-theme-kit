@@ -8,6 +8,19 @@ import { EnvError } from '../errors.mjs';
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * Remove a temporary browser profile without ever failing the caller.
+ * Chromium may still be flushing files when the process has just been killed,
+ * so a best-effort retry is followed by leaving leftovers to the OS cleaner.
+ */
+function removeProfile(profile) {
+  try {
+    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+  } catch {
+    // Best effort: a killed browser can hold the directory briefly.
+  }
+}
+
+/**
  * Launch a headless Chromium-family browser with a system-chosen CDP port.
  * The temporary profile is removed on close.
  */
@@ -47,7 +60,7 @@ export async function launch({ browserPath, headless = true, timeoutMs = 15000 }
 
   if (!port) {
     child.kill();
-    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+    removeProfile(profile);
     throw new EnvError(
       startError ? `Cannot start browser: ${startError.message}` : `The browser did not start within ${timeoutMs}ms.`,
       `Tried: ${executable}`,
@@ -60,7 +73,7 @@ export async function launch({ browserPath, headless = true, timeoutMs = 15000 }
     async close() {
       child.kill();
       await sleep(200);
-      fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+      removeProfile(profile);
     },
   };
 }
@@ -82,7 +95,10 @@ export async function withBrowser(fn, options = {}) {
  * default layout and then crops, which looks like horizontal overflow.
  */
 export async function newPage(browser, { colorScheme = 'light', reducedMotion = false } = {}) {
-  const response = await fetch(`http://127.0.0.1:${browser.port}/json/new?about:blank`, { method: 'PUT' });
+  const response = await fetch(`http://127.0.0.1:${browser.port}/json/new?about:blank`, {
+    method: 'PUT',
+    signal: AbortSignal.timeout(10000),
+  });
   if (!response.ok) throw new Error(`Could not open a browser page: HTTP ${response.status}`);
   const target = await response.json();
 
@@ -173,8 +189,12 @@ export async function newPage(browser, { colorScheme = 'light', reducedMotion = 
   });
 
   await new Promise((resolve, reject) => {
-    ws.addEventListener('open', resolve, { once: true });
-    ws.addEventListener('error', () => reject(new Error('CDP connection failed.')), { once: true });
+    const timer = setTimeout(() => {
+      try { ws.close(); } catch { /* ignore */ }
+      reject(new Error('CDP connection timed out.'));
+    }, 15000);
+    ws.addEventListener('open', () => { clearTimeout(timer); resolve(); }, { once: true });
+    ws.addEventListener('error', () => { clearTimeout(timer); reject(new Error('CDP connection failed.')); }, { once: true });
   });
 
   const send = (method, params = {}) => new Promise((resolve, reject) => {
@@ -183,7 +203,14 @@ export async function newPage(browser, { colorScheme = 'light', reducedMotion = 
       return;
     }
     const id = ++nextId;
-    pending.set(id, { resolve, reject });
+    const timer = setTimeout(() => {
+      pending.delete(id);
+      reject(new Error(`CDP command timed out after 30000ms: ${method}`));
+    }, 30000);
+    pending.set(id, {
+      resolve: (value) => { clearTimeout(timer); resolve(value); },
+      reject: (error) => { clearTimeout(timer); reject(error); },
+    });
     ws.send(JSON.stringify({ id, method, params }));
   });
 
