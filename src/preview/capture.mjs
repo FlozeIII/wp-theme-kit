@@ -141,6 +141,7 @@ export function guardFailures(facts, guards) {
  * @param {boolean} [options.strict]
  * @param {boolean} [options.noGuards]
  * @param {Function|null} [options.collect] async (page, route) => extra facts
+ * @param {Array<object>} [options.cookies] cookies set before the first request
  * @param {object} options.out
  */
 export async function captureRoutes({
@@ -152,6 +153,7 @@ export async function captureRoutes({
   strict = true,
   noGuards = false,
   collect = null,
+  cookies = [],
   out,
 }) {
   const browserPath = context.config.preview.browser;
@@ -170,6 +172,7 @@ export async function captureRoutes({
       const page = await newPage(browser, { colorScheme: route.colorScheme ?? 'light' });
       try {
         await page.setViewport(route.width, route.height);
+        for (const cookie of cookies) await page.setCookie(cookie);
         await page.goto(route.url);
 
         const guards = noGuards

@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `shot` and `audit` accept `--cookie-file <json>` (and `preview.cookieFile`) to
+  load session cookies for authenticated pages such as `/wp-admin/post-new.php`.
+  Cookies are applied to every route before navigation, values never appear in
+  output, and invalid fixtures exit 2 before the browser starts.
 - `compare <expected.png> <actual.png>` compares two screenshots without a
   browser, failing when more than `--tolerance` (0..1) of pixels differ by more
   than `--channel` (0..255). `--out` writes a diff PNG with changed pixels in red

@@ -10,6 +10,7 @@ Thumbs.db
 .vscode/
 .scratch/
 .wp-theme-kit-install.json
+.wp-theme-kit-cookies.json
 .claude/
 .codex/
 .agents/skills/

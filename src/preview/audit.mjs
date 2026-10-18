@@ -8,7 +8,7 @@ import {
  * Inspect routes without taking screenshots. Returns route facts and a pass/fail flag.
  */
 export async function auditRoutes({ context, routes, out, noGuards = false,
-  baseline = null, baselineFile, updateBaseline = false }) {
+  baseline = null, baselineFile, updateBaseline = false, cookies = [] }) {
   const results = await captureRoutes({
     context,
     routes,
@@ -16,6 +16,7 @@ export async function auditRoutes({ context, routes, out, noGuards = false,
     strict: false,
     noGuards,
     collect: collectAccessibility,
+    cookies,
     out: { ...out, warn() {} },
   });
 

@@ -139,9 +139,9 @@ wptk verify-package dist/my-theme.zip
 | `wptk check [dir]` | Run offline checks. `--format json` or `github`, `--baseline`, `--fail-on`, `--diff <ref>`, `--fix [--dry-run]`; `--explain <rule-id>` reads rule documentation. |
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
 | `wptk pot [--out file]` | Generate a POT file; `--merge` retains header metadata; `--check` compares msgids. |
-| `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
+| `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`; `--cookie-file` for authenticated pages. |
 | `wptk compare <expected> <actual>` | Pixel diff with `--tolerance`, `--channel`; `--out` writes a red/gray diff PNG. |
-| `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors, duplicate ids, empty links, unlabeled controls; `--baseline <file>` and `--update-baseline` accept known console/overflow findings. |
+| `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors, duplicate ids, empty links, unlabeled controls; `--cookie-file` for authenticated pages; `--baseline <file>` and `--update-baseline` accept known console/overflow findings. |
 | `wptk preview [route]` | Open the route in the system browser. |
 | `wptk version [bump patch|minor|major]` | Print or bump `style.css` and `package.json`. |
 | `wptk package [out.zip] [--rev ref]` | Build from a committed revision. |
@@ -317,6 +317,37 @@ gray+alpha and RGBA PNGs up to 50 megapixels are supported; Chromium screenshots
 use that subset. Palettes, 16-bit images, interlacing and `tRNS` transparency are
 rejected. JSON reports `changedPixels`, `totalPixels`, `changedRatio`,
 `maxChannelDelta`, the effective options and the diff path.
+
+## Editor screenshots and cookie fixtures
+
+Admin screens such as `/wp-admin/post-new.php` need a logged-in session. Keep
+the cookies in a JSON fixture outside version control and pass it to `shot` or
+`audit`:
+
+```json
+{
+  "cookies": [
+    {
+      "name": "wordpress_logged_in_abc123",
+      "value": "user|...",
+      "url": "http://localhost:8080"
+    }
+  ]
+}
+```
+
+```bash
+wptk shot /wp-admin/post-new.php --cookie-file .wp-theme-kit-cookies.json --out dist/editor.png
+wptk audit /wp-admin/post-new.php --cookie-file .wp-theme-kit-cookies.json
+```
+
+`--cookie-file` overrides `preview.cookieFile`, which is resolved from the theme
+root. Each cookie needs `name`, `value` and either `url` or `domain`; `path`
+defaults to `/`, `httpOnly` to `true`, `secure` to `false` and `sameSite` to
+`Lax`. Cookies are set on every route before the first request, so the initial
+navigation is already authenticated. Values are never printed, and an invalid
+fixture exits 2 before a browser starts. Keep the fixture out of Git and rotate
+the session when you are done.
 
 ## POT header metadata
 

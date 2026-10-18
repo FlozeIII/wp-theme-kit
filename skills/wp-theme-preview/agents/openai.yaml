@@ -1,5 +1,5 @@
 interface:
   display_name: "WordPress Theme Preview"
-  short_description: "Screenshot themes, audit findings and compare screenshots"
+  short_description: "Screenshot, audit, compare and capture authenticated pages"
 policy:
   allow_implicit_invocation: true

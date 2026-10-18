@@ -129,7 +129,18 @@ Each item is small enough for one agent session and has an acceptance command.
   copy passes, color change fails with a decoded diff, tolerance/channel, size
   mismatch, overwrite refusal, atomic write failure, argument and input errors).
   Verified: `npm test` (277 pass, 1 Windows skip); `compare --help`.
-- [ ] Editor screenshots (`/wp-admin/post-new.php`) with a cookie fixture.
+- [x] Editor screenshots (`/wp-admin/post-new.php`) with a cookie fixture.
+  Acceptance: `shot`/`audit --cookie-file <json>` and `preview.cookieFile` set
+  session cookies on every route before navigation; values never printed; bad
+  fixtures exit 2 before the browser starts.
+  Unit: 6 cookie validation tests. Integration: 5 CLI tests (4 in real Chromium
+  over a local HTTP server: 401 without cookies, editor 200/title on two routes,
+  authenticated screenshot, config/flag resolution; 1 browser-free invalid
+  fixture test).
+  Verified: `npm test` (288 pass, 1 Windows skip); `shot --help`, `audit --help`,
+  `claude plugin validate . --strict`.
+  Live wp-admin acceptance is pending a running WordPress site and admin
+  credentials; record it here when available rather than committing secrets.
 - [ ] A `wptk harness install` command for the mu-plugin observation helpers
   (mail capture, upstream stub) described in the original design notes.
 

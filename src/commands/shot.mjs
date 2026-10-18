@@ -2,6 +2,7 @@ import path from 'node:path';
 import { parseArgs } from '../args.mjs';
 import { loadContext } from '../config.mjs';
 import { captureRoutes, resolveRoute, resolveRoutes } from '../preview/capture.mjs';
+import { loadCookies, resolveCookieFile } from '../preview/cookies.mjs';
 
 const USAGE = `Usage: wptk shot [route] [options]
 
@@ -15,6 +16,7 @@ Options:
   --dark               Emulate prefers-color-scheme: dark.
   --full-page          Capture the full document height.
   --all                Capture every route in config.preview.routes.
+  --cookie-file <json>  Session cookies for authenticated pages (or preview.cookieFile).
   --no-guard           Capture even if layout guards fail.
   --json               Machine-readable result.
   -h, --help           Show this help.
@@ -24,7 +26,7 @@ dist/shots/<route>.png.`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {
-    strings: ['url', 'out'],
+    strings: ['url', 'out', 'cookie-file'],
     numbers: ['width', 'height'],
     booleans: ['dark', 'full-page', 'all', 'no-guard', 'help'],
     aliases: { h: 'help' },
@@ -57,6 +59,14 @@ export async function run({ argv, globals, out }) {
       ? path.resolve(context.root, 'dist/shots')
       : path.resolve(context.root, 'screenshot.png');
 
+  const cookieFile = resolveCookieFile({
+    flag: parsed.values['cookie-file'],
+    config: context.config.preview.cookieFile,
+    cwd: globals.cwd,
+    root: context.root,
+  });
+  const cookies = cookieFile ? loadCookies(cookieFile) : [];
+
   const results = await captureRoutes({
     context,
     routes,
@@ -65,6 +75,7 @@ export async function run({ argv, globals, out }) {
     fullPage: parsed.values['full-page'] === true,
     strict: parsed.values['no-guard'] !== true,
     noGuards: parsed.values['no-guard'] === true,
+    cookies,
     out,
   });
 

@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 277 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 288 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -292,6 +292,20 @@ bin/wp-theme-kit.mjs
   `tests/integration/compare.test.mjs` (2 CLI tests over real `shot` captures:
   identical copy, color change plus decoded diff, tolerance/channel, size
   mismatch, overwrite refusal and argument validation).
+- `src/preview/cookies.mjs` validates `--cookie-file`/`preview.cookieFile`
+  fixtures (JSON `{cookies:[...]}`; name/value required, exactly one of `url` or
+  `domain`, defaults path `/`, httpOnly true, secure false, sameSite Lax, and
+  `None` requires secure). `capture.mjs` applies them to every route before
+  `goto`; `shot` and `audit` both accept the flag, and the config path is
+  theme-root-relative. `resolveCookieFile` centralizes path resolution and
+  rejects an empty flag or empty config instead of silently skipping
+  authentication. Values are never printed and invalid fixtures exit 2 before
+  the browser starts. Acceptance: `tests/unit/cookies.test.mjs` (6 validation
+  tests) and `tests/integration/editor-cookie.test.mjs` (5 CLI tests: 4 in real
+  Chromium covering 401 without cookies, 200/editor title on two routes,
+  authenticated screenshot, and config/flag resolution; 1 browser-free
+  validation test for bad fixtures). Live wp-admin acceptance still needs a
+  running site and credentials.
 - `src/preview/baseline.mjs` implements opt-in `audit --baseline <file>` and
   atomic `--update-baseline`. Profiles match exact URL, actual viewport and
   color scheme; console entries match text/count, overflow exact scrollWidth.

@@ -4,6 +4,7 @@ import { loadContext } from '../config.mjs';
 import { resolveRoute, resolveRoutes } from '../preview/capture.mjs';
 import { auditReport, auditRoutes } from '../preview/audit.mjs';
 import { AUDIT_BASELINE_NAME, loadAuditBaseline } from '../preview/baseline.mjs';
+import { loadCookies, resolveCookieFile } from '../preview/cookies.mjs';
 import { UsageError } from '../errors.mjs';
 import { exists } from '../fs.mjs';
 
@@ -14,12 +15,13 @@ horizontal overflow, unloaded images, duplicate ids, links without an
 accessible name, unlabeled form controls, and missing selectors.
 
 Options:
-  --url <url>     Site base URL.
-  --baseline <file> Read known console errors and overflow from this file.
-  --update-baseline Write all routes to the baseline (default: ${AUDIT_BASELINE_NAME}).
-  --no-guard      Report problems without applying guards.
-  --json          Machine-readable report.
-  -h, --help      Show this help.
+  --url <url>          Site base URL.
+  --cookie-file <json>  Session cookies for authenticated pages (or preview.cookieFile).
+  --baseline <file>    Read known console errors and overflow from this file.
+  --update-baseline    Write all routes to the baseline (default: ${AUDIT_BASELINE_NAME}).
+  --no-guard           Report problems without applying guards.
+  --json               Machine-readable report.
+  -h, --help           Show this help.
 
 Without a route, every route in config.preview.routes is audited.
 Accessibility assertions run by default; set preview.guards.accessibility to
@@ -27,7 +29,7 @@ false to report them without failing.`;
 
 export async function run({ argv, globals, out }) {
   const parsed = parseArgs(argv, {
-    strings: ['url', 'baseline'],
+    strings: ['url', 'baseline', 'cookie-file'],
     booleans: ['no-guard', 'update-baseline', 'help'],
     aliases: { h: 'help' },
   });
@@ -55,6 +57,14 @@ export async function run({ argv, globals, out }) {
     ? [resolveRoute(context, parsed.positionals[0], { url: parsed.values.url })]
     : resolveRoutes(context, { url: parsed.values.url });
 
+  const cookieFile = resolveCookieFile({
+    flag: parsed.values['cookie-file'],
+    config: context.config.preview.cookieFile,
+    cwd: globals.cwd,
+    root: context.root,
+  });
+  const cookies = cookieFile ? loadCookies(cookieFile) : [];
+
   const result = await auditRoutes({
     context,
     routes,
@@ -63,6 +73,7 @@ export async function run({ argv, globals, out }) {
     baseline,
     baselineFile,
     updateBaseline,
+    cookies,
   });
 
   const report = auditReport(result);

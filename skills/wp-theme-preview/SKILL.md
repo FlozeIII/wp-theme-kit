@@ -1,6 +1,6 @@
 ---
 name: wp-theme-preview
-description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, screenshot comparison and diff images, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, duplicate ids, empty links, unlabeled form controls, dark mode, or before declaring a visual change done.
+description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, screenshot comparison and diff images, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, duplicate ids, empty links, unlabeled form controls, authenticated editor screenshots with a cookie fixture, dark mode, or before declaring a visual change done.
 license: MIT
 metadata:
   author: FlozeIII
@@ -22,8 +22,10 @@ wptk shot
 wptk shot /about --out dist/about.png
 wptk shot --all --out dist/shots
 wptk shot --dark --width 375 --height 812
+wptk shot /wp-admin/post-new.php --cookie-file .wp-theme-kit-cookies.json --out dist/editor.png
 wptk audit
 wptk audit /about --json
+wptk audit /wp-admin/post-new.php --cookie-file .wp-theme-kit-cookies.json --json
 wptk audit --update-baseline
 wptk audit --baseline .wp-theme-kit-audit-baseline.json --json
 wptk compare baseline/home.png dist/shots/home.png --tolerance 0.001
@@ -37,6 +39,26 @@ wptk compare baseline/home.png dist/shots/home.png --out dist/home.diff.png --js
 - `audit` reports status, title, console errors, failed assets, horizontal
   overflow, unloaded images, missing `expect` selectors, duplicate ids, links
   without an accessible name, and unlabeled form controls.
+- `--cookie-file` (or `preview.cookieFile`) loads a JSON cookie fixture for
+  authenticated pages such as `/wp-admin/post-new.php`. Cookies are applied
+  before the first request; values are never printed.
+
+## Cookie fixtures
+
+Keep session cookies out of the repository and pass them per run:
+
+```json
+{
+  "cookies": [
+    { "name": "wordpress_logged_in_abc123", "value": "user|...", "url": "http://localhost:8080" }
+  ]
+}
+```
+
+`name`, `value` and `url` or `domain` are required; `path` defaults to `/`,
+`httpOnly` to true, `secure` to false and `sameSite` to `Lax`. A malformed
+fixture exits 2 before the browser starts. Never commit the fixture; rotate the
+session after capturing admin screens.
 
 ## Route configuration
 
