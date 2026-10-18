@@ -1,6 +1,6 @@
 ---
 name: wp-theme-preview
-description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, duplicate ids, empty links, unlabeled form controls, dark mode, or before declaring a visual change done.
+description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, screenshot comparison and diff images, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, duplicate ids, empty links, unlabeled form controls, dark mode, or before declaring a visual change done.
 license: MIT
 metadata:
   author: FlozeIII
@@ -26,6 +26,8 @@ wptk audit
 wptk audit /about --json
 wptk audit --update-baseline
 wptk audit --baseline .wp-theme-kit-audit-baseline.json --json
+wptk compare baseline/home.png dist/shots/home.png --tolerance 0.001
+wptk compare baseline/home.png dist/shots/home.png --out dist/home.diff.png --json
 ```
 
 - The site URL comes from `--url`, `config.preview.baseUrl`,
@@ -64,6 +66,20 @@ These are DOM heuristics, not a WCAG audit. Fix the markup instead of accepting
 a baseline: the findings are not baselineable. Set
 `preview.guards.accessibility` to `false` to observe without failing, or use
 `--no-guard` for diagnostics. `shot` does not run them.
+
+## Screenshot comparison
+
+`wptk compare <expected> <actual>` runs offline and needs no browser. It exits 1
+when more than `--tolerance` (0..1, default 0) of pixels differ by more than
+`--channel` (0..255, default 0). `--out` writes a diff PNG with changed pixels
+red and the expected image faded toward white; it must not point at an input
+image. Sizes must match; a mismatch exits 1 with `reason: "size-mismatch"` and
+writes no diff. Only 8-bit non-interlaced gray/RGB/gray+alpha/RGBA PNGs up to
+50 megapixels are supported, which is what Chromium screenshots use; palettes,
+16-bit, interlacing and `tRNS` transparency are rejected.
+
+Use it for visual regressions: capture with `shot`, commit the baseline image,
+then re-shoot and compare in CI. Keep tolerance small and explain it in the PR.
 
 ## Known audit findings
 
@@ -109,5 +125,7 @@ Common causes:
 错误、失败资源、横向溢出、未加载图片、缺失选择器，以及重复 id、无可访问名称的
 链接、缺少标签的表单控件。守护条件失败时不要覆盖旧图；先用 `--no-guard` 只做
 诊断，修好后再正常跑。无障碍问题不可加入 baseline，必须修标记。
+`wptk compare` 离线比较两张 PNG，按容差与单通道阈值判定，`--out` 生成红色差异
+图；尺寸不同直接失败。
 `audit --baseline` 显式抑制已知错误；`--update-baseline` 更新全部路由并保留原始
 观测。新增问题与资源、图片、选择器失败仍会报错，截图守护不受影响。

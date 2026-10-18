@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 262 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 277 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -47,7 +47,7 @@ bin/wp-theme-kit.mjs
         -> src/package/           git archive, verify, version
         -> src/theme-check/       optional static WordPress artifact inspection
         -> src/scaffold/          templates and code generation
-        -> src/preview/           CDP screenshots and audits
+        -> src/preview/           CDP screenshots, audits and PNG comparison
         -> src/i18n/              POT extraction and comparison
         -> src/install/           harness installation
         -> src/config.mjs         .wp-theme-kit.json + inference
@@ -274,6 +274,24 @@ bin/wp-theme-kit.mjs
   Hidden/`aria-hidden` text, image `alt` and SVG `title` are excluded. Ids are
   compared verbatim (empty ids only). The fixture serves a decodable 1x1 PNG
   because `minimalPng()` only satisfies header parsers and browsers reject it.
+- `src/preview/png-codec.mjs` decodes the 8-bit non-interlaced PNG subset
+  Chromium emits (gray, RGB, gray+alpha, RGBA; filters 0-4; IHDR first, IEND last,
+  every chunk CRC checked) and encodes RGBA diff images with `node:zlib`. Palette,
+  16-bit, interlaced, `tRNS` and images above 50 megapixels are rejected with
+  exit 2. `png.mjs` still only reads the header for `shot`.
+- `src/preview/compare.mjs` compares RGBA images: `channel` is the per-channel
+  delta that marks a pixel changed, `tolerance` the allowed changed-pixel ratio
+  (inclusive), and the diff image paints changed pixels red with unchanged
+  pixels faded 80% toward white.
+- `src/commands/compare.mjs` provides browser-free
+  `wptk compare <expected> <actual>` with `--out`, `--tolerance`, `--channel`
+  and `--json`; exit 0 within tolerance, 1 for a change or size mismatch, 2 for
+  bad input. `--out` may not overwrite an input image. JSON keeps stdout
+  parseable and suppresses pretty lines. Acceptance:
+  `tests/unit/png-codec.test.mjs` (7), `tests/unit/compare.test.mjs` (6) and
+  `tests/integration/compare.test.mjs` (2 CLI tests over real `shot` captures:
+  identical copy, color change plus decoded diff, tolerance/channel, size
+  mismatch, overwrite refusal and argument validation).
 - `src/preview/baseline.mjs` implements opt-in `audit --baseline <file>` and
   atomic `--update-baseline`. Profiles match exact URL, actual viewport and
   color scheme; console entries match text/count, overflow exact scrollWidth.

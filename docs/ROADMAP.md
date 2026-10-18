@@ -116,7 +116,19 @@ Each item is small enough for one agent session and has an acceptance command.
   exercised through the real CLI in Edge.
   Yuki has no site URL configured, so live WordPress acceptance remains pending
   for the next browser session with a running site.
-- [ ] Screenshot comparison with a tolerance and a diff image.
+- [x] Screenshot comparison with a tolerance and a diff image.
+  Acceptance: `wptk compare <expected> <actual>` exits 0 within
+  `--tolerance`/`--channel`, 1 for a change or size mismatch, 2 for bad input;
+  `--out` writes a decodable diff PNG (changed pixels red); JSON stays
+  parseable; `shot` is untouched.
+  Unit: 7 PNG-codec tests (color-type expansion, Sub/Up/Average/Paeth filters,
+  round-trip, known-good fixture, rejected variants, chunk ordering) and 6
+  comparison tests (ratio, channel threshold, inclusive tolerance, size
+  mismatch, diff colors).
+  Integration: 2 CLI tests over real `shot` captures in Chromium (identical
+  copy passes, color change fails with a decoded diff, tolerance/channel, size
+  mismatch, overwrite refusal, atomic write failure, argument and input errors).
+  Verified: `npm test` (277 pass, 1 Windows skip); `compare --help`.
 - [ ] Editor screenshots (`/wp-admin/post-new.php`) with a cookie fixture.
 - [ ] A `wptk harness install` command for the mu-plugin observation helpers
   (mail capture, upstream stub) described in the original design notes.

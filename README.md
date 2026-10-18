@@ -140,6 +140,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk make template|part|module|block|pattern <name>` | Generate a focused file. |
 | `wptk pot [--out file]` | Generate a POT file; `--merge` retains header metadata; `--check` compares msgids. |
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`. |
+| `wptk compare <expected> <actual>` | Pixel diff with `--tolerance`, `--channel`; `--out` writes a red/gray diff PNG. |
 | `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors, duplicate ids, empty links, unlabeled controls; `--baseline <file>` and `--update-baseline` accept known console/overflow findings. |
 | `wptk preview [route]` | Open the route in the system browser. |
 | `wptk version [bump patch|minor|major]` | Print or bump `style.css` and `package.json`. |
@@ -294,6 +295,28 @@ JSON adds `duplicateIds`, `emptyLinks` and `unlabeledControls` per route; pretty
 output adds their counts. These are static DOM heuristics, not a WCAG audit:
 they never replace keyboard, zoom and screen-reader review. `shot` does not run
 them, so screenshot behavior is unchanged.
+
+## Screenshot comparison
+
+```bash
+wptk shot --out dist/shots/home.png
+wptk compare baseline/home.png dist/shots/home.png --tolerance 0.001 --channel 8
+wptk compare baseline/home.png dist/shots/home.png --out dist/home.diff.png --json
+```
+
+`compare` decodes both PNGs and exits 1 when more than `--tolerance` (0..1,
+default 0) of the pixels differ by more than `--channel` (0..255, default 0).
+`--out` writes a diff PNG: changed pixels are red and unchanged pixels are the
+expected image faded toward white. Sizes must match; a mismatch exits 1 with
+`reason: "size-mismatch"` and writes no diff. `--out` must not point at an input
+image. Bad arguments, unreadable files and unsupported PNGs exit 2.
+
+The comparison is offline and browser-free, so it fits CI: capture with `shot`,
+then diff against committed baselines. Only 8-bit non-interlaced gray, RGB,
+gray+alpha and RGBA PNGs up to 50 megapixels are supported; Chromium screenshots
+use that subset. Palettes, 16-bit images, interlacing and `tRNS` transparency are
+rejected. JSON reports `changedPixels`, `totalPixels`, `changedRatio`,
+`maxChannelDelta`, the effective options and the diff path.
 
 ## POT header metadata
 

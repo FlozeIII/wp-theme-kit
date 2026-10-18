@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `compare <expected.png> <actual.png>` compares two screenshots without a
+  browser, failing when more than `--tolerance` (0..1) of pixels differ by more
+  than `--channel` (0..255). `--out` writes a diff PNG with changed pixels in red
+  and unchanged pixels faded, and refuses to overwrite an input; size mismatches
+  exit 1 without a diff. Supports 8-bit non-interlaced gray, RGB, gray+alpha and
+  RGBA PNGs up to 50 megapixels; palettes, 16-bit, interlacing and `tRNS`
+  transparency are rejected.
 - `audit` now asserts duplicate `id` attributes, links with no accessible name
   and form controls with no label, failing the run and listing each finding with
   its route. Names come from `aria-labelledby`, `aria-label`, visible text, image

@@ -50,6 +50,10 @@ const COMMANDS = new Map([
     summary: 'Take a screenshot with a real viewport.',
     load: () => import('./commands/shot.mjs'),
   }],
+  ['compare', {
+    summary: 'Compare two screenshots and write a diff image.',
+    load: () => import('./commands/compare.mjs'),
+  }],
   ['audit', {
     summary: 'Audit routes in a real browser.',
     load: () => import('./commands/audit.mjs'),
