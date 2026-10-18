@@ -334,9 +334,9 @@ export function findClosing(tokens, openIndex, open = '(', close = ')') {
   return -1;
 }
 
-/** Split the arguments of a call whose `(` is at `openIndex`. */
-export function splitArguments(tokens, openIndex) {
-  const closeIndex = findClosing(tokens, openIndex);
+/** Split comma-separated arguments; optional delimiters also support array literals. */
+export function splitArguments(tokens, openIndex, open = '(', close = ')') {
+  const closeIndex = findClosing(tokens, openIndex, open, close);
   if (closeIndex === -1) return { args: [], closeIndex };
   const args = [];
   let current = [];

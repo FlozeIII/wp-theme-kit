@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `php.template-part-missing` recognizes literal positional array argument
+  unpacking for `get_template_part`, including short/long arrays, mixed leading
+  arguments, multiple unpacks, comments, trailing commas and third data values.
+  Specialized/generic fallbacks match WordPress; unresolved expanded paths,
+  keyed arrays, heredoc/nowdoc paths, namespace-qualified functions and methods
+  are conservatively skipped without source execution. Fully qualified global
+  calls are supported, with matching JS/PHP analyzer results.
 - `block.attribute-json` validates syntax in opening and self-closing block
   attributes under `templates/` and `parts/`. It shares delimiter scanning with
   balance checks, reports stable file/line diagnostics, and respects existing
@@ -53,7 +60,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 145 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 156 passing, 1 skipped on Windows (file-symlink privileges).
+- Template-array acceptance: 11 real CLI tests cover candidates/fallbacks,
+  literal syntax variants, dynamic skips, methods, JS/PHP tokenizer agreement,
+  global/namespace calls, heredoc/nowdoc skips, legacy/data arguments,
+  ignores/baselines, diff/fix rechecks and formats.
+  The local WordPress implementation independently confirmed five candidate
+  lists and missing/specialized/generic lookup results without executing theme
+  source.
 - Attribute JSON acceptance: 11 real CLI tests cover malformed syntax, nested
   values and escaping, syntax-only value types, BOM/CRLF, comment boundaries,
   independent balance/suppression, scope/overrides, diff/baselines, fix rechecks,

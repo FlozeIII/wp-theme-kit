@@ -224,6 +224,32 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
 
+## Literal array template arguments
+
+`php.template-part-missing` recognizes positional arguments unpacked from
+literal arrays in classic/hybrid themes:
+
+```php
+get_template_part( ...[ 'template-parts/card', 'single' ] );
+get_template_part( ...array( 'template-parts/card', 'single' ) );
+get_template_part( 'template-parts/card', ...[ 'single', [ 'value' => $data ] ] );
+```
+
+It checks `template-parts/card-single.php` and the generic fallback
+`template-parts/card.php`, warning only when both are absent. Empty, `null`,
+or omitted names use only the generic target. Multiple literal unpacks,
+comments, trailing commas, and nested third data arguments are supported.
+WordPress accepts a string slug; passing an array directly as the slug does
+not define a list of template candidates.
+
+Expanded global calls also accept `\get_template_part`. Slug/name must be exact
+single/double-quoted static strings. Dynamic values, concatenation, interpolated
+strings, heredoc/nowdoc paths, keyed arrays, nested array unpacking,
+indexed expressions, unknown spread sources, namespace-qualified functions and object/static method calls
+are conservatively skipped. No checked PHP is executed. Ordinary unspread
+calls and other template APIs keep their existing behavior; ignores, severity,
+baselines, diff, fix rechecks and output formats use the existing rule pipeline.
+
 ## Block markup balance
 
 `block.markup-balance` reports errors for unclosed blocks, unexpected or

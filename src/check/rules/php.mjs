@@ -6,9 +6,11 @@ import {
   isPunct,
   isVar,
   nextMeaningful,
+  prevMeaningful,
   splitArguments,
 } from '../lexer-php.mjs';
 import { GETTEXT_SIGNATURES } from '../../i18n/functions.mjs';
+import { expandTemplateArguments } from '../template-arguments.mjs';
 
 const DEFAULT_SAFE_OUTPUT = [
   'esc_html', 'esc_attr', 'esc_url', 'esc_js', 'esc_textarea', 'esc_xml',
@@ -520,10 +522,22 @@ export const templateParts = {
     };
 
     for (const call of calls(ctx.tokens)) {
-      if (call.name === 'get_template_part') {
-        const slug = literalArg(call.args[0] ?? []);
+      if (['get_template_part', '\\get_template_part'].includes(call.name)) {
+        const args = expandTemplateArguments(call.args);
+        if (!args) continue;
+        if (args === call.args && call.name !== 'get_template_part') continue;
+        if (args !== call.args) {
+          const before = prevMeaningful(ctx.tokens, call.nameIndex);
+          if (['->', '?->', '::'].includes(ctx.tokens[before]?.value)) continue;
+          // The JS lexer splits qualified names, while PHP 8 emits one token.
+          if (ctx.tokens[before]?.value === '\\') {
+            const qualifier = ctx.tokens[prevMeaningful(ctx.tokens, before)];
+            if (qualifier?.type === 'ident' || isKeyword(qualifier, 'namespace')) continue;
+          }
+        }
+        const slug = literalArg(args[0] ?? []);
         if (!slug) continue;
-        const name = literalArg(call.args[1] ?? []);
+        const name = literalArg(args[1] ?? []);
         const candidates = name
           ? [`${slug}-${name}.php`, `${slug}.php`]
           : [`${slug}.php`];

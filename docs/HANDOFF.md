@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 145 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 156 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -57,6 +57,21 @@ bin/wp-theme-kit.mjs
 - `src/check/analyzer.php` produces the same tokens with `token_get_all`.
 - `src/check/analyze.mjs` picks one, batch-runs PHP, and falls back per file.
 - `src/check/rules/{structure,php,assets}.mjs` contain the rules.
+- `src/check/template-arguments.mjs` expands unkeyed literal positional arrays
+  (`...[...]`, `...array(...)`) for `get_template_part` target checks. It accepts
+  leading direct arguments, multiple unpacks, comments, trailing commas and
+  third data arguments. Fully qualified global calls are supported. Expanded
+  path slots must be exact single/double-quoted static strings;
+  optional null/empty/omitted names use the generic target. Keyed/nested unpacks,
+  dynamic paths and unknown spread sources are skipped, as are heredoc/nowdoc
+  paths, namespace-qualified functions and expanded methods.
+  No PHP is evaluated. The existing `php.template-part-missing` rule keeps its
+  specialized/generic fallback, messages, pipeline and ordinary-call behavior.
+  `splitArguments` accepts optional delimiter pairs for this array grouping;
+  its default call behavior is unchanged.
+  Acceptance: `tests/integration/check-template-arrays.test.mjs` (11 CLI tests;
+  native PHP comparison skips when PHP is unavailable). WordPress's local
+  `general-template.php` independently confirmed candidate ordering and lookup.
 - `src/check/rules/blocks.mjs` adds the file-scoped `block.markup-balance`
   error rule for HTML under `templates/` and `parts/` in all theme types.
   Its comment scanner tracks a stack and delimiter lines, accepts self-closing

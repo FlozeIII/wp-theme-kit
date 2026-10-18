@@ -42,7 +42,7 @@ this presentation metadata; pretty and GitHub output remain unchanged.
 | `classic.index-missing` | error | `index.php` exists |
 | `classic.markup` | warning | `wp_head`, `wp_footer`, `wp_body_open`, `body_class`, `language_attributes`; skip link is info |
 | `classic.title-tag` | info | `title-tag` support or a literal `<title>` exists |
-| `php.template-part-missing` | warning | literal `get_header`, `get_footer`, `get_sidebar`, `get_template_part`, `comments_template` targets exist |
+| `php.template-part-missing` | warning | literal template API targets exist; `get_template_part` also supports literal positional array unpacking |
 
 ## PHP
 
@@ -715,6 +715,27 @@ Default: warning. Applies to literal template references in classic/hybrid theme
 Rationale: Missing template files silently remove expected page content.
 Check literal header, footer, sidebar, comment, and template-part targets.
 Dynamic targets are skipped; `get_template_part()` also checks the slug fallback.
+
+Literal positional argument arrays may be unpacked with either PHP syntax:
+
+```php
+get_template_part( ...[ 'template-parts/card', 'single' ] );
+get_template_part( ...array( 'template-parts/card', 'single' ) );
+get_template_part( 'template-parts/card', ...[ 'single', [ 'value' => $data ] ] );
+```
+
+The named candidate is tried before `template-parts/card.php`; the checker warns
+only if neither exists. Multiple literal unpacks, empty arrays, comments and
+trailing commas are supported. Null, empty or omitted names use the generic
+candidate. The third `$args` value is data, not another target.
+
+Expanded global calls also accept `\get_template_part`. Slug/name expressions
+must each be an exact non-interpolated single/double-quoted string literal (or
+the optional null name). Heredoc/nowdoc paths, keyed arrays, nested array
+unpacking, concatenation, indexed expressions, dynamic path values, unknown
+spread sources, namespace-qualified functions and object/static methods are
+skipped. The kit does not evaluate checked PHP.
+An ordinary array passed as slug is not a WordPress candidate-list API.
 
 Before:
 

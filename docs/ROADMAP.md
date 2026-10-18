@@ -40,7 +40,11 @@ Each item is small enough for one agent session and has an acceptance command.
   Acceptance: `node --test tests/integration/check-block-attributes.test.mjs`
   covers invalid syntax and valid nesting/escaping, with existing check loops.
   Verified: 11 pass; `npm test` (145 pass, 1 Windows file-symlink privilege skip).
-- [ ] Recognize `get_template_part()` targets built from a literal array form.
+- [x] Recognize `get_template_part()` targets built from a literal array form.
+  Acceptance: `node --test tests/integration/check-template-arrays.test.mjs`
+  checks literal positional unpacks, candidate fallback, dynamic skips and
+  JS/PHP agreement. Local WordPress runtime candidate lists also verified.
+  Verified: 11 pass; `npm test` (156 pass, 1 Windows file-symlink privilege skip).
 - [ ] Add a PHP `token_get_all` rule for `printf` placeholder/argument count
   mismatches.
 - [ ] Add a rule for `wp_enqueue_script` in the footer argument that is not
