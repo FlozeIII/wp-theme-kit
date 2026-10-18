@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 134 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 145 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -68,6 +68,17 @@ bin/wp-theme-kit.mjs
   HTML sources read directives only from HTML comments; C/JS comment syntax in
   ordinary text cannot suppress findings.
   Acceptance: `tests/integration/check-blocks.test.mjs` (11 CLI tests).
+- The same module provides `block.attribute-json`, an independent error rule
+  using the shared delimiter generator. Nonempty attribute text on complete
+  opening/self-closing comments must parse as JSON; valid values of any type
+  are accepted without schema validation. Closing and unfinished comments are
+  excluded. Error messages are stable across Node parse-error wording and
+  point to the opening line. Messages include the one-based opening column
+  in UTF-16 code units to distinguish same-name errors on one line.
+  Balance state, ignores, baseline/diff, existing
+  output formats and fix rechecks retain their separate behavior. JSON errors
+  are not mechanically fixed.
+  Acceptance: `tests/integration/check-block-attributes.test.mjs` (11 CLI tests).
 - `src/check/index.mjs` discovers files, runs rules, applies severity overrides,
   inline ignores, and baselines, then renders the report.
 - A rule calls `ctx.add({ line, severity, message, hint, file })`.
@@ -76,12 +87,12 @@ bin/wp-theme-kit.mjs
   catalogue. JSON report findings add `documentationUrl` after suppression and
   fix planning, so baseline identities/schema and non-JSON output stay intact.
   Explicit HTML anchors use rule IDs with dots replaced by hyphens. They cover
-  all 39 registered checks plus the synthetic `meta.rule-error` diagnostic.
+  all 40 registered checks plus the synthetic `meta.rule-error` diagnostic.
   URLs are installation-specific and require no network calls; use a Markdown
   viewer supporting explicit anchors, or read the entry through `--explain`.
   Acceptance: `tests/integration/check-documentation.test.mjs` (6 CLI tests).
 - `src/check/explain.mjs` reads the rule entry directly from the shipped
-  `skills/wp-theme-dev/references/checks.md` catalogue. All 39 current rules
+  `skills/wp-theme-dev/references/checks.md` catalogue. All 40 current rules
   have rationale and before/after examples under exact level-three ID headings.
   Code fences protect example headings from section splitting. Explanation
   bypasses theme/configuration/tool discovery; scan flags and unsupported

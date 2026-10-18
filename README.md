@@ -247,6 +247,27 @@ This checks delimiter balance; it does not validate HTML, registered block
 types, or attribute JSON syntax. Read the rationale and examples with
 `wptk check --explain block.markup-balance`.
 
+## Block attribute JSON
+
+`block.attribute-json` reports invalid JSON in complete opening and self-closing
+block comments in HTML under `templates/` and `parts/`, in every theme type.
+It shares the delimiter scanner with the balance rule and points to the opening
+comment's actual file and line, including multiline attributes and CRLF sources.
+Messages include the one-based opening column (UTF-16 code units) so identical
+invalid blocks on the same line remain separate findings.
+
+The text after the block name, excluding the final self-closing slash, must be
+valid JSON when nonempty. Missing attributes are allowed. This is syntax
+validation: valid JSON objects, arrays, strings, numbers, booleans and `null`
+are accepted without checking attribute types, schemas, or block registration.
+
+Closing comments are excluded. Unterminated comments are reported by
+`block.markup-balance`; a complete delimiter with invalid JSON still participates
+in balance checking. The two rules can be configured and suppressed independently.
+Existing ignores, baseline, diff, formats and fail-on options apply normally.
+`--fix` does not rewrite attributes and retains these errors after other fixes.
+Use `wptk check --explain block.attribute-json` for examples.
+
 ## JSON finding documentation
 
 Every entry in a check report's `findings` array includes `documentationUrl`,
@@ -270,7 +291,7 @@ GitHub annotations do not include link metadata.
 ## Rule explanations
 
 Run `wptk check --explain php.unescaped-output` for a rule's rationale and
-before/after examples. All 39 current rules have entries in the shipped
+before/after examples. All 40 current rules have entries in the shipped
 [rule catalogue](skills/wp-theme-dev/references/checks.md#rule-explanations),
 which is also the CLI's explanation source. Rule IDs are exact and case-sensitive.
 

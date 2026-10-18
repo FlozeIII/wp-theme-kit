@@ -145,7 +145,7 @@ test('attribute JSON remains opaque to the balance check', () => {
   const root = fixture();
   write(root, 'templates/index.html', '<!-- wp:group {"broken": } -->\n<!-- /wp:group -->');
   const { result, findings } = check(root);
-  assert.equal(result.status, 0);
+  assert.equal(result.status, 1);
   assert.deepEqual(findings, []);
 });
 

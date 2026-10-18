@@ -73,6 +73,7 @@ this presentation metadata; pretty and GitHub output remain unchanged.
 | `block.block-json` | error | required fields and `render`/`style` targets |
 | `block.pattern-header` | warning | pattern files have Title and Slug headers |
 | `block.markup-balance` | error | block delimiters in `templates/` and `parts/` HTML are balanced |
+| `block.attribute-json` | error | opening and self-closing block attributes contain valid JSON |
 
 ## HTML, CSS, JavaScript
 
@@ -163,7 +164,7 @@ Each entry below uses a level-three heading containing its exact rule ID;
 the CLI reads that entry directly from this shipped catalogue.
 Keep its explicit `<a id="rule-id-with-hyphens"></a>` anchor stable so existing
 JSON documentation links keep locating the rule. Internal diagnostics are
-documented separately from the 39 registered checks.
+documented separately from the 40 registered checks.
 The output is Markdown by default; `--json` or `--format json` returns
 `{ "rule": "<id>", "documentation": "<Markdown entry>" }`. This mode needs
 no theme or toolchain, does not load configuration, and rejects scan options
@@ -1086,11 +1087,52 @@ After:
 <!-- /wp:group -->
 ```
 
+### `block.attribute-json`
+
+<a id="block-attribute-json"></a>
+
+Default: error. Applies to HTML files recursively under `templates/` and `parts/`.
+
+Rationale: WordPress needs valid JSON to read serialized block attributes.
+Check nonempty attribute text on complete opening and self-closing block
+delimiters. Closing and unterminated comments are excluded; delimiter balance
+is checked independently. Findings point to the opening comment's line.
+
+This rule checks JSON syntax only, not attribute types, schemas, or block
+registration. No automatic repair is offered for ambiguous attribute values.
+
+Trim attribute text after the name and remove the final self-closing slash
+before parsing. Missing attributes are allowed. Valid JSON values of any type
+are accepted, including arrays and primitives; this is not schema validation.
+Nested objects, escaped quotes and backslashes are handled by JSON parsing.
+Each invalid delimiter produces one stable error, independent of engine-specific
+parse-error text. The message includes the one-based opening column (UTF-16 code
+units), preserving separate errors for same-name blocks on one line. Invalid
+JSON does not change the separate balance stack.
+
+Scope ignores, HTML-comment suppression, rule overrides, baselines, diff and
+fail-on thresholds apply normally. Other mechanical fixes preserve remaining
+attribute errors on recheck. Ordinary comments and escaped markup are ignored.
+
+Before:
+
+```html
+<!-- wp:group {"layout": } -->
+<!-- /wp:group -->
+```
+
+After:
+
+```html
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<!-- /wp:group -->
+```
+
 ### `meta.rule-error`
 
 <a id="meta-rule-error"></a>
 
-Default: info. This is an internal diagnostic, not one of the 39 registered checks.
+Default: info. This is an internal diagnostic, not one of the 40 registered checks.
 
 Rationale: When a rule throws, the checker reports the exception and continues
 with other rules. This diagnostic means that one rule did not finish; it does
