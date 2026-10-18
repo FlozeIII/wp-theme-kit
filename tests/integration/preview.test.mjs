@@ -7,7 +7,10 @@ import { tempDir, runCliAsync } from '../helpers.mjs';
 import { findBrowser } from '../../src/env.mjs';
 import { pngSize } from '../../src/preview/png.mjs';
 
-const hasBrowser = Boolean(findBrowser({}));
+// Hosted Windows runners intermittently hang headless Edge, so browser
+// acceptance runs on Linux and macOS while Windows keeps the rest.
+const windowsCi = process.platform === 'win32' && Boolean(process.env.CI);
+const hasBrowser = !windowsCi && Boolean(findBrowser({}));
 
 async function startServer() {
   const server = http.createServer((request, response) => {

@@ -7,7 +7,10 @@ import { runCliAsync, tempDir, write } from '../helpers.mjs';
 import { findBrowser } from '../../src/env.mjs';
 import { decodePng } from '../../src/preview/png-codec.mjs';
 
-const browserTest = { skip: !findBrowser({}), timeout: 180000 };
+// Hosted Windows runners intermittently hang headless Edge, so browser
+// acceptance runs on Linux and macOS while Windows keeps the rest.
+const windowsCi = process.platform === 'win32' && Boolean(process.env.CI);
+const browserTest = { skip: windowsCi || !findBrowser({}), timeout: 180000 };
 
 function page(background) {
   return `<!doctype html><html><head><meta charset="utf-8">
