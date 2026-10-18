@@ -80,3 +80,50 @@ test('copy install is removable with --force', () => {
   assert.equal(remove.status, 0, remove.stderr);
   assert.equal(fs.existsSync(skill), false);
 });
+
+test('global install is removable and preserves unrelated user files', () => {
+  const home = tempDir('wptk-global-home-');
+  const env = {
+    HOME: home,
+    USERPROFILE: home,
+    CLAUDE_CONFIG_DIR: path.join(home, '.claude'),
+    DSH_AGENTS_HOME: path.join(home, '.agents'),
+    CODEX_HOME: path.join(home, '.codex'),
+    DSH_HOME: path.join(home, '.dsh'),
+  };
+  fs.mkdirSync(path.join(home, '.agents', 'skills'), { recursive: true });
+  fs.writeFileSync(path.join(home, '.agents', 'skills', 'keep.txt'), 'keep\n');
+  fs.mkdirSync(path.join(home, '.dsh'), { recursive: true });
+  fs.writeFileSync(path.join(home, '.dsh', 'AGENTS.md'), '# Mine\n');
+
+  const install = runCli(['install', '--harness', 'all', '--global'], { cwd: home, env });
+  assert.equal(install.status, 0, install.stderr);
+
+  const claudeSkill = path.join(home, '.claude', 'skills', 'wp-theme-dev', 'SKILL.md');
+  const agentsSkill = path.join(home, '.agents', 'skills', 'wp-theme-check', 'SKILL.md');
+  const codexSkill = path.join(home, '.codex', 'skills', 'wp-theme-package', 'SKILL.md');
+  assert.ok(fs.existsSync(claudeSkill));
+  assert.ok(fs.existsSync(agentsSkill));
+  assert.ok(fs.existsSync(codexSkill));
+  assert.equal(fs.lstatSync(path.dirname(claudeSkill)).isSymbolicLink(), true);
+  assert.ok(fs.existsSync(path.join(home, '.claude', 'commands', 'wp-theme-kit', 'wp-check.md')));
+  assert.match(fs.readFileSync(path.join(home, '.dsh', 'AGENTS.md'), 'utf8'), /wp-theme-kit:begin/);
+  assert.match(fs.readFileSync(path.join(home, '.codex', 'AGENTS.md'), 'utf8'), /wp-theme-kit:begin/);
+  const manifest = path.join(home, '.wp-theme-kit-install.json');
+  assert.equal(fs.existsSync(manifest), true);
+
+  const uninstall = runCli(['install', '--harness', 'all', '--global', '--uninstall'], { cwd: home, env });
+  assert.equal(uninstall.status, 0, uninstall.stderr);
+  assert.equal(fs.existsSync(claudeSkill), false);
+  assert.equal(fs.existsSync(agentsSkill), false);
+  assert.equal(fs.existsSync(codexSkill), false);
+  assert.equal(fs.existsSync(path.join(home, '.claude', 'commands', 'wp-theme-kit', 'wp-check.md')), false);
+  assert.equal(fs.existsSync(manifest), false);
+  assert.equal(fs.readFileSync(path.join(home, '.agents', 'skills', 'keep.txt'), 'utf8'), 'keep\n');
+  const dshAgents = fs.readFileSync(path.join(home, '.dsh', 'AGENTS.md'), 'utf8');
+  assert.equal(dshAgents.includes('wp-theme-kit:begin'), false);
+  assert.equal(dshAgents.trim(), '# Mine');
+
+  const second = runCli(['install', '--harness', 'all', '--global', '--uninstall'], { cwd: home, env });
+  assert.equal(second.status, 0, second.stderr);
+});

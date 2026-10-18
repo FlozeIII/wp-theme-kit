@@ -165,7 +165,13 @@ Each item is small enough for one agent session and has an acceptance command.
 
 - [ ] Add a first-class DeepSeek Harness install path that does not require
   copying skills.
-- [ ] Add a `wptk install --uninstall` test for global installs.
+- [x] Add a `wptk install --uninstall` test for global installs.
+  Acceptance: `tests/integration/install.test.mjs` now also installs
+  `--harness all --global` into a temporary home, proves skills (symlinked),
+  commands, AGENTS.md blocks and the home-root manifest exist, then
+  `--uninstall` removes them, keeps an unrelated `skills/keep.txt` and user text
+  in `~/.dsh/AGENTS.md`, and a second `--uninstall` exits 0.
+  Verified: `npm test` (319 pass, 1 Windows skip, 320 total).
 - [ ] Add a Windows/macOS/Linux CI job that runs browser tests when a browser is
   available.
 - [ ] Publish to npm and add a Claude/Codex marketplace entry.
