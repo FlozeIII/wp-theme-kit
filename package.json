@@ -1,7 +1,11 @@
 {
   "name": "wp-theme-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Cross-harness toolkit for developing WordPress themes: checks, scaffolding, previews, packaging, and i18n.",
+  "homepage": "https://github.com/FlozeIII/wp-theme-kit#readme",
+  "bugs": {
+    "url": "https://github.com/FlozeIII/wp-theme-kit/issues"
+  },
   "type": "module",
   "bin": {
     "wptk": "bin/wp-theme-kit.mjs"

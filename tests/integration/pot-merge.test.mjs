@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { classicTheme, read, runCli, tempDir, write } from '../helpers.mjs';
+import { VERSION } from '../../src/version.mjs';
 
 const POT = 'languages/demo-theme.pot';
 const EPOCH = { SOURCE_DATE_EPOCH: '1704067200' };
@@ -45,7 +46,7 @@ msgstr "Old translation"
     '"Project-Id-Version: Demo Theme 2.3.4\\n"',
     '"POT-Creation-Date: 2024-01-01 00:00+0000\\n"',
     '"Content-Type: text/plain; charset=UTF-8\\n"',
-    '"X-Generator: wp-theme-kit 0.1.0\\n"',
+    `"X-Generator: wp-theme-kit ${VERSION}\\n"`,
     '"X-Domain: demo-theme\\n"',
     '#: inc/messages.php:1\nmsgid "New message"\nmsgstr ""',
   ]) assert.ok(output.includes(line), line);

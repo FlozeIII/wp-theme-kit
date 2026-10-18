@@ -5,7 +5,7 @@ It does not assume access to any previous chat, plan file, or local session.
 
 ## Current state
 
-- Version: `0.1.0`
+- Version: `0.2.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
 - Tests: `npm test` -> 320 passing, 1 skipped (321 total) on Windows because file-symlink

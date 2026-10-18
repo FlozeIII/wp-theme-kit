@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { classicTheme, runCli, tempDir } from '../helpers.mjs';
+import { VERSION } from '../../src/version.mjs';
 
 test('--version prints the package version', () => {
   const result = runCli(['--version']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /^0\.1\.0/);
+  assert.equal(result.stdout.trim(), VERSION);
 });
 
 test('--help lists the command surface', () => {
