@@ -11,6 +11,7 @@ import {
 } from '../lexer-php.mjs';
 import { GETTEXT_SIGNATURES } from '../../i18n/functions.mjs';
 import { expandTemplateArguments } from '../template-arguments.mjs';
+import { printfArguments } from './printf.mjs';
 
 const DEFAULT_SAFE_OUTPUT = [
   'esc_html', 'esc_attr', 'esc_url', 'esc_js', 'esc_textarea', 'esc_xml',
@@ -612,6 +613,7 @@ function firstLineContaining(ctx, needles) {
 export const rules = [
   unescapedOutput,
   unescapedPrintf,
+  printfArguments,
   textDomain,
   translatorComments,
   forbiddenFunctions,

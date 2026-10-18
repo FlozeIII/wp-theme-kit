@@ -57,7 +57,7 @@ test('internal rule failures also link to an explanation and all catalogue ancho
   assert.match(explanation.stdout, /Rationale:/);
   const text = fs.readFileSync(catalogue, 'utf8');
   const rules = [...text.matchAll(/^\| `([^`]+)` \| (error|warning|info) \|/gm)].map((match) => match[1]);
-  assert.equal(rules.length, 40);
+  assert.equal(rules.length, 41);
   for (const rule of [...rules, 'meta.rule-error']) {
     const anchor = `<a id="${rule.replaceAll('.', '-')}"></a>`;
     assert.equal(text.split(anchor).length - 1, 1, rule);

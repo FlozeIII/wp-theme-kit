@@ -50,6 +50,7 @@ this presentation metadata; pretty and GitHub output remain unchanged.
 |---|---|---|
 | `php.unescaped-output` | warning | `echo`, `print`, and `<?=` output has escaping |
 | `php.unescaped-printf` | warning | `printf()` values are escaped |
+| `php.printf-arguments` | warning | literal `printf()` formats have enough value arguments |
 | `php.text-domain` | warning | gettext calls use the expected literal domain; a different literal domain is an error |
 | `php.translator-comment` | info | placeholder strings have a `translators:` comment |
 | `php.forbidden-function` | error | removed or unsafe functions |
@@ -456,6 +457,53 @@ After:
 ```php
 function demo_theme_setup() { add_theme_support( 'title-tag' ); }
 add_action( 'after_setup_theme', 'demo_theme_setup' );
+```
+
+### `php.printf-arguments`
+
+<a id="php-printf-arguments"></a>
+
+Default: warning. Applies to PHP files in all theme types.
+
+Rationale: Missing `printf()` values cause formatting failures and can interrupt
+page rendering. This rule checks the minimum number of value arguments required
+by an exact single/double-quoted format, including source strings returned by
+`__`, `_x`, `esc_html__`, `esc_attr__`, `esc_xml__`, `esc_html_x`, `esc_attr_x`,
+`translate`, and `translate_with_gettext_context`. It does not load translations.
+
+`%%` consumes no value. Positional indexes such as `%2$s` may repeat and do not
+advance the ordinary sequential cursor. Flags, custom ASCII padding, literal
+width/precision, `l`, and conversions `bcdeEfFgGhHosuxX` are recognized. Star width
+and precision consume arguments too, including `%2$*3$.*4$f` (PHP 8+ syntax).
+The required count is the highest referenced index, not the number of `%` signs.
+PHP allows extra values, so surplus arguments are not reported.
+Position indexes may have leading zeros. Literal width/precision and argument
+indexes outside PHP's accepted integer bounds are skipped.
+
+Bare and fully qualified global function names are case-insensitive. Methods,
+constructors, attributes, and namespace-qualified names are excluded. In files
+with namespace declarations or imports, bare function and wrapper names are
+skipped; explicitly global calls with known formats still work. Dynamic,
+concatenated or interpolated formats, heredoc/nowdoc, double-quoted numeric or
+Unicode escapes, plural/unknown wrappers, named arguments, unpacking, first-class
+callables, binary-prefixed strings and unsupported/malformed conversions are
+conservatively skipped. Literal dollar signs such as "$" or "$5" are accepted.
+Nested value expressions, comments and trailing commas do not affect counting.
+The checker uses PHP `token_get_all` or the JS fallback without evaluating source.
+
+Severity overrides, ignores, baselines, diff and output formats apply as usual.
+The rule has no automatic fix: adding values or changing a format requires intent.
+
+Before:
+
+```php
+printf( '%s: %d', esc_html( $label ) );
+```
+
+After:
+
+```php
+printf( '%s: %d', esc_html( $label ), $count );
 ```
 
 ### `php.unescaped-printf`

@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `php.printf-arguments` warns when literal `printf` formats need more value
+  arguments. Supports singular gettext source strings, positional indexes and
+  reuse, flags/padding, literal and star width/precision, global names and both
+  analyzers. Extra arguments are legal; unresolved formats/lists and non-function
+  calls are skipped. Existing check workflows apply, with no source execution
+  or automatic format fixes. Leading-zero indexes and PHP's numeric format
+  bounds are covered by regression tests. Literal dollar signs and escaped
+  backslashes retain matching findings across analyzers.
 - `php.template-part-missing` recognizes literal positional array argument
   unpacking for `get_template_part`, including short/long arrays, mixed leading
   arguments, multiple unpacks, comments, trailing commas and third data values.
@@ -25,10 +33,10 @@ All notable changes to this project are documented here. The format follows
   existing diff/baseline/fix loops, and HTML-comment suppression directives.
 - JSON findings include `documentationUrl`, an encoded absolute file URL to
   the matching explanation in the installed catalogue. Stable explicit anchors
-  cover all 40 checks and `meta.rule-error`; diff, dry-run, and post-fix reports
+  cover all 41 checks and `meta.rule-error`; diff, dry-run, and post-fix reports
   use the same links without changing baseline identities or non-JSON output.
 - `check --explain <rule-id>` prints a rule's rationale and before/after examples
-  from the shipped catalogue, with entries for all 40 current rules. It works
+  from the shipped catalogue, with entries for all 41 current rules. It works
   offline without a theme or toolchain, supports Markdown and JSON output, and
   rejects invalid IDs, unsupported formats, and conflicting scan options.
 - `check --diff <ref>` limits reports and mechanical fixes to changed files,
@@ -60,7 +68,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Verified
 
-- `npm test`: 156 passing, 1 skipped on Windows (file-symlink privileges).
+- `npm test`: 167 passing, 1 skipped on Windows (file-symlink privileges).
+- printf acceptance: 11 real CLI tests cover shortages/corrections, format
+  variants, gettext wrappers, global-call identity, conservative skips,
+  theme types, JS/PHP parity, a PHP runtime oracle, suppression/baselines,
+  diff/fix rechecks and offline explanations/output formats.
 - Template-array acceptance: 11 real CLI tests cover candidates/fallbacks,
   literal syntax variants, dynamic skips, methods, JS/PHP tokenizer agreement,
   global/namespace calls, heredoc/nowdoc skips, legacy/data arguments,
@@ -80,7 +92,7 @@ All notable changes to this project are documented here. The format follows
   formats, exact rule targets, internal diagnostics, unique anchors, diff/fix
   reports, existing baseline fingerprints, non-JSON output, and a relocated kit
   with Unicode, spaces, `#`, and `%` in its path.
-- `check --explain` acceptance: 6 CLI integration tests cover all 40 catalogue
+- `check --explain` acceptance: 6 CLI integration tests cover all 41 catalogue
   entries, execution outside a theme without tools, broken configuration,
   read-only behavior, text/JSON formats, help, and invalid/conflicting options.
 - `check --diff` acceptance: 14 CLI integration tests cover real Git changes,

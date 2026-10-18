@@ -45,8 +45,12 @@ Each item is small enough for one agent session and has an acceptance command.
   checks literal positional unpacks, candidate fallback, dynamic skips and
   JS/PHP agreement. Local WordPress runtime candidate lists also verified.
   Verified: 11 pass; `npm test` (156 pass, 1 Windows file-symlink privilege skip).
-- [ ] Add a PHP `token_get_all` rule for `printf` placeholder/argument count
+- [x] Add a PHP `token_get_all` rule for `printf` placeholder/argument count
   mismatches.
+  Acceptance: `node --test tests/integration/check-printf.test.mjs` covers literal
+  and translated formats, PHP counting semantics, conservative skips, JS/PHP
+  parity and the existing pipeline; authored runtime fixtures confirm counts.
+  Verified: 11 pass; `npm test` (167 pass, 1 Windows file-symlink privilege skip).
 - [ ] Add a rule for `wp_enqueue_script` in the footer argument that is not
   boolean.
 

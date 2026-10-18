@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 156 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 167 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -57,6 +57,17 @@ bin/wp-theme-kit.mjs
 - `src/check/analyzer.php` produces the same tokens with `token_get_all`.
 - `src/check/analyze.mjs` picks one, batch-runs PHP, and falls back per file.
 - `src/check/rules/{structure,php,assets}.mjs` contain the rules.
+- `src/check/rules/printf.mjs` adds `php.printf-arguments`, a warning in all PHP
+  files. `src/check/printf-format.mjs` computes minimum value counts for literal
+  formats, positional reuse/mixing, `%%`, flags/padding and star width/precision.
+  Singular gettext return wrappers expose source literals; translations are not
+  loaded. Extra values are allowed. Dynamic/unresolved formats and argument
+  lists are skipped, as are methods, constructors and attributes. Namespaced or
+  imported files require explicitly global function/wrapper names. Neither
+  analyzer evaluates source, and no fix is offered. Existing suppression,
+  severity, baseline/diff, formats and fix rechecks remain independent.
+  Acceptance: `tests/integration/check-printf.test.mjs` (11 CLI tests, native
+  comparison skips without PHP; the runtime star oracle requires PHP 8+).
 - `src/check/template-arguments.mjs` expands unkeyed literal positional arrays
   (`...[...]`, `...array(...)`) for `get_template_part` target checks. It accepts
   leading direct arguments, multiple unpacks, comments, trailing commas and
@@ -102,12 +113,12 @@ bin/wp-theme-kit.mjs
   catalogue. JSON report findings add `documentationUrl` after suppression and
   fix planning, so baseline identities/schema and non-JSON output stay intact.
   Explicit HTML anchors use rule IDs with dots replaced by hyphens. They cover
-  all 40 registered checks plus the synthetic `meta.rule-error` diagnostic.
+  all 41 registered checks plus the synthetic `meta.rule-error` diagnostic.
   URLs are installation-specific and require no network calls; use a Markdown
   viewer supporting explicit anchors, or read the entry through `--explain`.
   Acceptance: `tests/integration/check-documentation.test.mjs` (6 CLI tests).
 - `src/check/explain.mjs` reads the rule entry directly from the shipped
-  `skills/wp-theme-dev/references/checks.md` catalogue. All 40 current rules
+  `skills/wp-theme-dev/references/checks.md` catalogue. All 41 current rules
   have rationale and before/after examples under exact level-three ID headings.
   Code fences protect example headings from section splitting. Explanation
   bypasses theme/configuration/tool discovery; scan flags and unsupported

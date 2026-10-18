@@ -224,6 +224,26 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
 
+## printf argument counts
+
+`php.printf-arguments` warns when a literal PHP `printf()` format needs more
+values than the call supplies. For example, `printf( '%s: %d', 'Posts' )` needs a
+second value. Exact single/double-quoted formats and source literals in singular
+WordPress gettext return wrappers are supported in every theme type.
+
+The count follows PHP: `%%` needs no value, repeated positional references reuse
+values, and star width/precision consume arguments (including positional stars
+in PHP 8+). Flags, ASCII padding, literal width/precision and standard conversions
+are supported. Extra values are legal and do not produce warnings.
+
+Dynamic/concatenated/interpolated formats, heredoc/nowdoc, numeric/Unicode escapes
+in double-quoted formats, binary-prefixed strings, plural/unknown wrappers, named arguments and unpacking
+are skipped. Methods, constructors, attributes and namespace-qualified names are
+excluded; files with namespaces/imports require explicitly global function and
+wrapper names. Bare/global names are case-insensitive. Unsupported format syntax
+is skipped, and no PHP source is evaluated. The rule has no automatic fix and
+retains the existing severity, ignore, baseline, diff and fix-recheck pipeline.
+
 ## Literal array template arguments
 
 `php.template-part-missing` recognizes positional arguments unpacked from
@@ -317,7 +337,7 @@ GitHub annotations do not include link metadata.
 ## Rule explanations
 
 Run `wptk check --explain php.unescaped-output` for a rule's rationale and
-before/after examples. All 40 current rules have entries in the shipped
+before/after examples. All 41 current rules have entries in the shipped
 [rule catalogue](skills/wp-theme-dev/references/checks.md#rule-explanations),
 which is also the CLI's explanation source. Rule IDs are exact and case-sensitive.
 
