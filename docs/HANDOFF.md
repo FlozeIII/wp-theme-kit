@@ -8,7 +8,7 @@ It does not assume access to any previous chat, plan file, or local session.
 - Version: `0.1.0`
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 123 passing, 1 skipped on Windows because file-symlink
+- Tests: `npm test` -> 134 passing, 1 skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -57,6 +57,17 @@ bin/wp-theme-kit.mjs
 - `src/check/analyzer.php` produces the same tokens with `token_get_all`.
 - `src/check/analyze.mjs` picks one, batch-runs PHP, and falls back per file.
 - `src/check/rules/{structure,php,assets}.mjs` contain the rules.
+- `src/check/rules/blocks.mjs` adds the file-scoped `block.markup-balance`
+  error rule for HTML under `templates/` and `parts/` in all theme types.
+  Its comment scanner tracks a stack and delimiter lines, accepts self-closing
+  blocks and core aliases, and reports unfinished comments, unclosed blocks,
+  unexpected closes and closing-order errors. It does not parse attribute JSON.
+  At a misnested ancestor close, report then drop that ancestor and its open
+  children; unmatched closes leave the stack intact. HTML-comment suppression
+  affects findings rather than stack state. No block fixes are planned.
+  HTML sources read directives only from HTML comments; C/JS comment syntax in
+  ordinary text cannot suppress findings.
+  Acceptance: `tests/integration/check-blocks.test.mjs` (11 CLI tests).
 - `src/check/index.mjs` discovers files, runs rules, applies severity overrides,
   inline ignores, and baselines, then renders the report.
 - A rule calls `ctx.add({ line, severity, message, hint, file })`.
@@ -65,12 +76,12 @@ bin/wp-theme-kit.mjs
   catalogue. JSON report findings add `documentationUrl` after suppression and
   fix planning, so baseline identities/schema and non-JSON output stay intact.
   Explicit HTML anchors use rule IDs with dots replaced by hyphens. They cover
-  all 38 registered checks plus the synthetic `meta.rule-error` diagnostic.
+  all 39 registered checks plus the synthetic `meta.rule-error` diagnostic.
   URLs are installation-specific and require no network calls; use a Markdown
   viewer supporting explicit anchors, or read the entry through `--explain`.
   Acceptance: `tests/integration/check-documentation.test.mjs` (6 CLI tests).
 - `src/check/explain.mjs` reads the rule entry directly from the shipped
-  `skills/wp-theme-dev/references/checks.md` catalogue. All 38 current rules
+  `skills/wp-theme-dev/references/checks.md` catalogue. All 39 current rules
   have rationale and before/after examples under exact level-three ID headings.
   Code fences protect example headings from section splitting. Explanation
   bypasses theme/configuration/tool discovery; scan flags and unsupported

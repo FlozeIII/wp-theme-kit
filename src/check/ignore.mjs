@@ -11,6 +11,8 @@ const PHPCS_MAP = new Map([
 
 function stripComment(text) {
   return text
+    .replace(/^<!--/, '')
+    .replace(/-->$/, '')
     .replace(/^\/\*+/, '')
     .replace(/\*+\/$/, '')
     .replace(/^\/\//, '')
@@ -79,9 +81,19 @@ export function buildIgnoreMap(tokens, source, language) {
   }
 
   const comments = [];
-  for (const match of source.matchAll(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g)) {
-    const line = source.slice(0, match.index).split('\n').length;
-    comments.push({ text: match[0], line });
+  if (language === 'html') {
+    let line = 1;
+    let offset = 0;
+    for (const match of source.matchAll(/<!--[\s\S]*?(?:-->|$)/g)) {
+      line += source.slice(offset, match.index).split('\n').length - 1;
+      offset = match.index;
+      comments.push({ text: match[0], line });
+    }
+  } else {
+    for (const match of source.matchAll(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g)) {
+      const line = source.slice(0, match.index).split('\n').length;
+      comments.push({ text: match[0], line });
+    }
   }
   for (const comment of comments) {
     for (const [offset, text] of stripComment(comment.text).split('\n').entries()) {

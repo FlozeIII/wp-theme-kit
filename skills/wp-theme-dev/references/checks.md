@@ -72,6 +72,7 @@ this presentation metadata; pretty and GitHub output remain unchanged.
 | `block.template-parts` | warning | referenced template parts and patterns exist |
 | `block.block-json` | error | required fields and `render`/`style` targets |
 | `block.pattern-header` | warning | pattern files have Title and Slug headers |
+| `block.markup-balance` | error | block delimiters in `templates/` and `parts/` HTML are balanced |
 
 ## HTML, CSS, JavaScript
 
@@ -131,6 +132,15 @@ Both arrays are additive; the built-in WordPress allowlist still applies.
 
 ## Inline suppression
 
+HTML sources also accept directives in HTML comments. The directive's actual
+line determines the suppressed line; parsing continues even when a finding is
+hidden.
+
+```html
+<!-- wptk-ignore-next-line block.markup-balance -->
+<!-- wp:group -->
+```
+
 ```php
 echo $pre_escaped; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped by my_theme_card()
 // wptk-ignore-next-line
@@ -153,7 +163,7 @@ Each entry below uses a level-three heading containing its exact rule ID;
 the CLI reads that entry directly from this shipped catalogue.
 Keep its explicit `<a id="rule-id-with-hyphens"></a>` anchor stable so existing
 JSON documentation links keep locating the rule. Internal diagnostics are
-documented separately from the 38 registered checks.
+documented separately from the 39 registered checks.
 The output is Markdown by default; `--json` or `--format json` returns
 `{ "rule": "<id>", "documentation": "<Markdown entry>" }`. This mode needs
 no theme or toolchain, does not load configuration, and rejects scan options
@@ -1037,11 +1047,50 @@ After:
 .hero { background-image: url('../images/hero.png'); }
 ```
 
+### `block.markup-balance`
+
+<a id="block-markup-balance"></a>
+
+Default: error. Applies to HTML files recursively under `templates/` and `parts/`.
+
+Rationale: An unclosed or misnested block delimiter changes how WordPress
+interprets the remaining template. Balance opening and closing names in nesting
+order, or use a self-closing delimiter for a block with no serialized content.
+This rule checks delimiter structure, not HTML validity, block registration,
+or attribute JSON syntax.
+
+Unclosed blocks point to their opening line; unexpected or misnested closing
+delimiters point to the closing line. A block delimiter comment without `-->`
+also reports an error. Bare names match their `core/` forms; custom namespaces
+stay distinct. Self-closing blocks never enter the nesting stack. Ordinary
+comments and escaped markup are ignored.
+
+After a close matches an ancestor instead of the innermost block, the checker
+reports the closing-order error and discards that ancestor and its children.
+An unexpected close leaves the open stack intact. Scope/inline ignores,
+baselines, severity overrides, diff checks and output formats apply normally.
+No mechanical fix is offered for ambiguous block structure.
+
+Before:
+
+```html
+<!-- wp:group -->
+<main>Content</main>
+```
+
+After:
+
+```html
+<!-- wp:group -->
+<main>Content</main>
+<!-- /wp:group -->
+```
+
 ### `meta.rule-error`
 
 <a id="meta-rule-error"></a>
 
-Default: info. This is an internal diagnostic, not one of the 38 registered checks.
+Default: info. This is an internal diagnostic, not one of the 39 registered checks.
 
 Rationale: When a rule throws, the checker reports the exception and continues
 with other rules. This diagnostic means that one rule did not finish; it does

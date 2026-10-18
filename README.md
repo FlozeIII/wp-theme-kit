@@ -224,6 +224,29 @@ Codex sidecars live in `skills/<name>/agents/openai.yaml`.
 - The POT extractor handles literal gettext calls. Dynamic strings are skipped
   and counted; fix the call rather than editing the POT by hand.
 
+## Block markup balance
+
+`block.markup-balance` reports errors for unclosed blocks, unexpected or
+misnested closing delimiters, and unterminated block comments in HTML files
+recursively under `templates/` and `parts/`. It runs for every theme type and
+uses the actual file and delimiter line, including CRLF sources.
+
+Nested, sibling, and self-closing blocks are supported. Bare core names such
+as `wp:group` match `wp:core/group`; custom namespaces remain distinct.
+Ordinary comments and escaped markup do not affect nesting. After a misnested
+close matching an ancestor, the checker drops that ancestor and its open
+children to continue; unmatched closes leave existing opens intact.
+
+Rule overrides, path ignores, baselines, diff scope, and fail-on thresholds
+apply normally. HTML comments can suppress findings, for example
+`<!-- wptk-ignore-next-line block.markup-balance -->` before an opening block.
+Suppression does not skip parsing. `--fix` leaves block markup unchanged and
+reports remaining block errors after applying other mechanical fixes.
+
+This checks delimiter balance; it does not validate HTML, registered block
+types, or attribute JSON syntax. Read the rationale and examples with
+`wptk check --explain block.markup-balance`.
+
 ## JSON finding documentation
 
 Every entry in a check report's `findings` array includes `documentationUrl`,
@@ -247,7 +270,7 @@ GitHub annotations do not include link metadata.
 ## Rule explanations
 
 Run `wptk check --explain php.unescaped-output` for a rule's rationale and
-before/after examples. All 38 current rules have entries in the shipped
+before/after examples. All 39 current rules have entries in the shipped
 [rule catalogue](skills/wp-theme-dev/references/checks.md#rule-explanations),
 which is also the CLI's explanation source. Rule IDs are exact and case-sensitive.
 

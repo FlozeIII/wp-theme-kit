@@ -13,9 +13,10 @@ import { buildIgnoreMap, isIgnored } from './ignore.mjs';
 import { rules as phpRules } from './rules/php.mjs';
 import { rules as structureRules } from './rules/structure.mjs';
 import { rules as assetRules } from './rules/assets.mjs';
+import { rules as blockRules } from './rules/blocks.mjs';
 
 const SEVERITY_RANK = { info: 0, warning: 1, error: 2 };
-const ALL_RULES = [...structureRules, ...phpRules, ...assetRules];
+const ALL_RULES = [...structureRules, ...phpRules, ...assetRules, ...blockRules];
 
 function sourcePathKey(file) {
   return process.platform === 'win32' ? file.toLowerCase() : file;
@@ -218,6 +219,9 @@ export async function runCheck({
     }
     if (language === 'css') {
       for (const rule of assetRules.filter((item) => item.scope === 'css')) runRule(rule, context, sink, config);
+    }
+    if (language === 'html') {
+      for (const rule of blockRules) runRule(rule, context, sink, config);
     }
 
     for (const finding of sink) {

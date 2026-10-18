@@ -22,7 +22,7 @@ test('--explain prints the escaping rule rationale and examples without a theme 
 test('--explain covers every rule in the shipped catalogue with rationale and examples', () => {
   const catalogue = fs.readFileSync(path.join(KIT_ROOT, 'skills/wp-theme-dev/references/checks.md'), 'utf8');
   const entries = [...catalogue.matchAll(/^\| `([^`]+)` \| (error|warning|info) \|/gm)];
-  assert.equal(entries.length, 38);
+  assert.equal(entries.length, 39);
   for (const [, id, severity] of entries) {
     const result = runCli(['check', '--explain', id]);
     assert.equal(result.status, 0, `${id}: ${result.stderr}`);

@@ -32,8 +32,10 @@ Each item is small enough for one agent session and has an acceptance command.
 
 ## v0.2: block and PHP analysis
 
-- [ ] Validate block markup balance in `templates/` and `parts/`.
+- [x] Validate block markup balance in `templates/` and `parts/`.
   Acceptance: a fixture with an unclosed block comment fails, a valid one passes.
+  Verified: `node --test tests/integration/check-blocks.test.mjs` (11 pass);
+  `npm test` (134 pass, 1 Windows file-symlink privilege skip).
 - [ ] Detect block attribute JSON that is syntactically invalid.
 - [ ] Recognize `get_template_part()` targets built from a literal array form.
 - [ ] Add a PHP `token_get_all` rule for `printf` placeholder/argument count
