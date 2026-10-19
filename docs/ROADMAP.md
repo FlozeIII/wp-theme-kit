@@ -215,7 +215,10 @@ Each item is small enough for one agent session and has an acceptance command.
   day; `0.2.1` is the new `latest` and `wp-theme-kit@0.2.1` installs cleanly.
   `dist-tags.latest` is `0.2.1`, tag `v0.2.1` is pushed, and a fresh temporary
   install adds exactly one package with `dependencies: {}`; both the node CLI
-  and the `.bin/wptk` shim print `0.2.1`.
+  and the `.bin/wptk` shim print `0.2.1`. `0.3.0` (the `preview --link` feature
+  and the Simplified Chinese README) is the current `latest`; tag `v0.3.0` is
+  pushed and a temporary `npm i wp-theme-kit@0.3.0` adds exactly one package and
+  prints `0.3.0` (verified 2026-10-19).
 
 - [x] Mount a local design-comparison directory into a WordPress site
   (oil-ui integration; requested after the roadmap closed).

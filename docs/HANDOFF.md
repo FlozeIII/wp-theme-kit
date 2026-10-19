@@ -6,11 +6,10 @@ It does not assume access to any previous chat, plan file, or local session.
 ## Current state
 
 - Version: `0.3.0`
-- Published: `wp-theme-kit@0.2.1` on npm (account `floze3`) and the public
+- Published: `wp-theme-kit@0.3.0` on npm (account `floze3`) and the public
   repository `FlozeIII/wp-theme-kit`; the Claude marketplace entry is
-  `FlozeIII/wp-theme-kit`. Git tag `v0.2.1` is pushed; the GitHub Release
-  remains manual. Release `0.3.0` is prepared locally (tag `v0.3.0`); it is
-  not published yet.
+  `FlozeIII/wp-theme-kit`. Tags `v0.2.1` and `v0.3.0` are pushed; the GitHub
+  Release remains manual.
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
 - Tests: `npm test` -> 350 passing, 1 skipped (351 total) on Windows because file-symlink
