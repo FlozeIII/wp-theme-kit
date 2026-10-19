@@ -11,3 +11,10 @@ test('the CLI version matches package.json', () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
   assert.equal(VERSION, pkg.version);
 });
+
+test('plugin manifests carry the same version', () => {
+  for (const file of ['.claude-plugin/plugin.json', '.codex-plugin/plugin.json']) {
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
+    assert.equal(manifest.version, VERSION, file);
+  }
+});

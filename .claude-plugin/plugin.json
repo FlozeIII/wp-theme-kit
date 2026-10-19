@@ -1,6 +1,6 @@
 {
   "name": "wp-theme-kit",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Offline checks, scaffolding, browser screenshots, packaging, and POT generation for classic, block, and hybrid WordPress themes. Shared skills for Claude Code, Codex, and DeepSeek Harness.",
   "author": {
     "name": "FlozeIII"
