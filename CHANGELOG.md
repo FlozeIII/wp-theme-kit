@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `wptk preview --link <dir>` mounts a local design-comparison directory under
+  the WordPress root (junction/symlink, copy fallback), records it in
+  `wp-content/uploads/wp-theme-kit/links.json`, and adds `--link-status` plus
+  `--link-remove`. Paths are validated `[a-z0-9-]` segments, sources must stay
+  inside the working directory, and the mount can be screenshotted through the
+  real site URL. Removal never deletes a copied tree, and a corrupt manifest is
+  reported instead of silently ignored. This lets an oil-ui comparison page
+  load the site's CSS and JS; wptk has no runtime dependency on oil-ui.
 - A full Simplified Chinese README (`README.zh-CN.md`) kept in structural
   parity with the English one, with language links at the top of both files.
   User-facing command, configuration and behaviour changes must update both.

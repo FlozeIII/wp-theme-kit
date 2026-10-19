@@ -217,6 +217,20 @@ Each item is small enough for one agent session and has an acceptance command.
   install adds exactly one package with `dependencies: {}`; both the node CLI
   and the `.bin/wptk` shim print `0.2.1`.
 
+- [x] Mount a local design-comparison directory into a WordPress site
+  (oil-ui integration; requested after the roadmap closed).
+  Acceptance: `wptk preview --link <dir>` mounts under
+  `<WordPress root>/<link-path>` (default `oil-ui`) with a junction/symlink and
+  a copy fallback; paths are validated `[a-z0-9-]` segments; sources must stay
+  inside the working directory (realpath) and the target must not be theme root
+  or foreign content; the mount is recorded in
+  `wp-content/uploads/wp-theme-kit/links.json`; `--link-status` reports
+  source/target/reachability and `--link-remove` unlinks only what wptk created
+  (copy mounts are unregistered, never deleted); a corrupt manifest errors.
+  oil-ui remains the page generator and is not a runtime dependency.
+  Verified: `npm test` (350 pass, 1 Windows skip, 351 total); `preview --help`;
+  `claude plugin validate . --strict`.
+
 ## Deferred / not planned
 
 - A WordPress admin-side PHP plugin. This is a development-time tool.

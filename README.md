@@ -157,7 +157,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk shot [route]` | Screenshot with a real viewport; `--all`, `--dark`, `--full-page`; `--cookie-file` for authenticated pages. |
 | `wptk compare <expected> <actual>` | Pixel diff with `--tolerance`, `--channel`; `--out` writes a red/gray diff PNG. |
 | `wptk audit [route]` | Console errors, failed assets, overflow, missing selectors, duplicate ids, empty links, unlabeled controls; `--cookie-file` for authenticated pages; `--baseline <file>` and `--update-baseline` accept known console/overflow findings. |
-| `wptk preview [route]` | Open the route in the system browser. |
+| `wptk preview [route]` | Open the route in the system browser; `--link <dir>` mounts a local preview under the site (`--link-path`, `--site`, `--no-open`), `--link-status`, `--link-remove <path>`. |
 | `wptk version [bump patch|minor|major]` | Print or bump `style.css` and `package.json`. |
 | `wptk package [out.zip] [--rev ref]` | Build from a committed revision. |
 | `wptk verify-package <zip>` | Inspect an artifact without WordPress. |
@@ -364,6 +364,43 @@ defaults to `/`, `httpOnly` to `true`, `secure` to `false` and `sameSite` to
 navigation is already authenticated. Values are never printed, and an invalid
 fixture exits 2 before a browser starts. Keep the fixture out of Git and rotate
 the session when you are done.
+
+## Link a design preview into the site
+
+A static comparison generated outside WordPress (for example by
+[oil-ui](https://github.com/oil-oil/oil-ui)) needs the site's own CSS and JS to
+look right. Mount it under the site instead of copying it into the theme:
+
+```bash
+wptk preview --link ../oil-ui/explore --link-path oil-ui --site http://localhost:8080
+wptk preview --link ../oil-ui/explore --link-path oil-ui --no-open
+wptk preview --link-status
+wptk preview --link-remove oil-ui
+wptk shot http://localhost:8080/oil-ui/ --out dist/oil-ui.png
+```
+
+`--link` mounts the directory at `<WordPress root>/<path>` (default `oil-ui`),
+creating a directory junction/symlink and falling back to a copy when the
+platform refuses one. Paths are one or more `[a-z0-9-]` segments (at most 64
+characters, no leading, trailing or doubled slash) and never escape the
+WordPress root; the site must be a WordPress root containing `wp-load.php` and
+`wp-content`. The source directory must live inside the working directory
+(resolved through `realpath`), and the target may not be the theme root or any
+path wptk did not create.
+
+Mounts are recorded in `wp-content/uploads/wp-theme-kit/links.json` and managed
+with `--link-status` and `--link-remove`. Removal unlinks a directory link; a
+copy made on platforms without symlinks is only unregistered, never deleted,
+so wptk does not remove content it did not create. A corrupt manifest is an
+error rather than a silent empty list. `--link` sends one HEAD request to the
+mounted URL (three-second timeout, 2xx/3xx expected) and warns without failing
+when the site does not answer. oil-ui still builds the page; the command has no
+runtime dependency on that repository.
+
+JSON output: `--link` reports `site`, `path`, `url`, `target`, `source`, `kind`,
+`status` and `reachable`; `--link-status` reports `site` plus `links[]` with
+`sourceExists`, `targetExists` and `reachable`; `--link-remove` reports `path`,
+`target`, `removed` and `status`.
 
 ## Mu-plugin helpers
 

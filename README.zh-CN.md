@@ -150,7 +150,7 @@ wptk verify-package dist/my-theme.zip
 | `wptk shot [route]` | 用真实视口截图；`--all`、`--dark`、`--full-page`；`--cookie-file` 截取登录后页面。 |
 | `wptk compare <expected> <actual>` | 像素差异对比，支持 `--tolerance`、`--channel`；`--out` 写红/灰 diff PNG。 |
 | `wptk audit [route]` | 控制台错误、失败资源、溢出、缺失选择器、重复 id、空链接、无标签表单控件；`--cookie-file` 截取登录后页面；`--baseline <file>` 与 `--update-baseline` 接受已知控制台/溢出问题。 |
-| `wptk preview [route]` | 在系统浏览器中打开路由。 |
+| `wptk preview [route]` | 在系统浏览器中打开路由；`--link <dir>` 把本地预览挂到站点下（`--link-path`、`--site`、`--no-open`），另有 `--link-status`、`--link-remove <path>`。 |
 | `wptk version [bump patch|minor|major]` | 打印或更新 `style.css` 与 `package.json` 版本。 |
 | `wptk package [out.zip] [--rev ref]` | 从已提交的 revision 构建。 |
 | `wptk verify-package <zip>` | 不依赖 WordPress 检查产物。 |
@@ -335,6 +335,24 @@ wptk audit /wp-admin/post-new.php --cookie-file .wp-theme-kit-cookies.json
 `true`，`secure` 默认 `false`，`sameSite` 默认 `Lax`。cookie 在每条路由首次请求前写入，
 因此初始导航就已登录。值永远不会被打印；夹具无效时在启动浏览器前以 2 退出。请勿把
 夹具提交进 Git，并在用完后轮换会话。
+
+## 把设计对比页挂进站点
+
+在 WordPress 之外生成的静态对比页（例如 oil-ui 的产物）需要站点自己的 CSS/JS 才能看到真实效果。把目录挂到站点下，而不是复制进主题：
+
+```bash
+wptk preview --link ../oil-ui/explore --link-path oil-ui --site http://localhost:8080
+wptk preview --link ../oil-ui/explore --link-path oil-ui --no-open
+wptk preview --link-status
+wptk preview --link-remove oil-ui
+wptk shot http://localhost:8080/oil-ui/ --out dist/oil-ui.png
+```
+
+`--link` 把目录挂到 `<WordPress 根>/<path>`（默认 `oil-ui`），优先创建目录联接/符号链接，平台不允许时回退为复制。路径是一个或多个 `[a-z0-9-]` 段（总长 ≤64，不允许前导、尾随或连续斜杠），不会逃出 WordPress 根；站点必须是包含 `wp-load.php` 与 `wp-content` 的 WordPress 根目录。源目录必须位于当前工作目录（按 `realpath` 解析）之内，目标不能是主题根，也不能是 wptk 未创建的内容。
+
+挂载记录在 `wp-content/uploads/wp-theme-kit/links.json`，用 `--link-status` 查看、`--link-remove` 移除。移除只删除目录链接；复制模式只删清单条目不删文件，wptk 不会删除不是自己创建的内容。清单损坏会明确报错，而不是静默变成空列表。`--link` 会对挂载 URL 发一次 HEAD 请求（3 秒超时，期望 2xx/3xx），站点无响应时只警告、不失败。oil-ui 仍负责生成页面；本命令不依赖它的仓库。
+
+JSON：`--link` 返回 `site`、`path`、`url`、`target`、`source`、`kind`、`status`、`reachable`；`--link-status` 返回 `site` 与 `links[]`（含 `sourceExists`、`targetExists`、`reachable`）；`--link-remove` 返回 `path`、`target`、`removed`、`status`。
 
 ## Mu-plugin 助手
 

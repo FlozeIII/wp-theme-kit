@@ -12,7 +12,7 @@ It does not assume access to any previous chat, plan file, or local session.
   remains manual.
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 321 passing, 1 skipped (322 total) on Windows because file-symlink
+- Tests: `npm test` -> 350 passing, 1 skipped (351 total) on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.
@@ -59,7 +59,7 @@ bin/wp-theme-kit.mjs
         -> src/package/           git archive, verify, version
         -> src/theme-check/       optional static WordPress artifact inspection
         -> src/scaffold/          templates and code generation
-        -> src/preview/           CDP screenshots, audits and PNG comparison
+        -> src/preview/           CDP screenshots, audits, PNG comparison and design mounts
         -> src/mu-plugin/         helper install, fixture and mail parsing
         -> templates/mu-plugin/   mu-plugin helper templates
         -> src/i18n/              POT extraction and comparison
@@ -320,6 +320,20 @@ bin/wp-theme-kit.mjs
   authenticated screenshot, and config/flag resolution; 1 browser-free
   validation test for bad fixtures). Live wp-admin acceptance still needs a
   running site and credentials.
+- `src/preview/link.mjs` and `preview.mjs` implement `wptk preview --link <dir>`,
+  `--link-status` and `--link-remove`. A source directory is resolved through
+  `realpath` and must stay inside the working directory; it is mounted at
+  `<WordPress root>/<path>` (validated `[a-z0-9-]` segments, default `oil-ui`,
+  max 64 chars, no leading/trailing slash) using a junction/symlink with a copy
+  fallback. The WordPress root must contain `wp-load.php` and `wp-content`.
+  Mounts are recorded as `{path,target,source,site,url,kind,createdAt}` in
+  `wp-content/uploads/wp-theme-kit/links.json` with atomic writes; anything wptk
+  did not create is refused, a copied tree is never deleted (removal only
+  unregisters it), and a corrupt manifest is an error instead of silent loss.
+  One 3-second HEAD probe (2xx/3xx) reports reachability as a warning only.
+  Acceptance: `tests/unit/preview-link.test.mjs` (14) and
+  `tests/integration/preview-link.test.mjs` (15 CLI and browser tests,
+  including a `shot` of the mounted URL).
 - `src/preview/baseline.mjs` implements opt-in `audit --baseline <file>` and
   atomic `--update-baseline`. Profiles match exact URL, actual viewport and
   color scheme; console entries match text/count, overflow exact scrollWidth.
@@ -532,7 +546,7 @@ repository root.
 交接时先提交基线，再让新 Agent 依次读 `AGENTS.md`、`docs/HANDOFF.md`、
 `docs/ROADMAP.md`，跑 `npm test` 和 `claude plugin validate . --strict`。
 架构是 `bin -> cli -> commands -> 领域模块`；检查规则在 `src/check/rules/`，
-打包在 `src/package/`，预览在 `src/preview/`，mu-plugin 在 `src/mu-plugin/`
+打包在 `src/package/`，预览在 `src/preview/`（含 `--link` 本地设计目录挂载），mu-plugin 在 `src/mu-plugin/`
 与 `templates/mu-plugin/`，技能在 `skills/`。
 保持零运行时依赖、只从已提交快照打包、技能 frontmatter 三端兼容、不自动发布。
 多 Agent 并行时一人一个分支/工作树，不要同时改同一个文件。

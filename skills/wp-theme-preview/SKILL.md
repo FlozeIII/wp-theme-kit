@@ -1,6 +1,6 @@
 ---
 name: wp-theme-preview
-description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, screenshot comparison and diff images, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, duplicate ids, empty links, unlabeled form controls, authenticated editor screenshots with a cookie fixture, dark mode, or before declaring a visual change done.
+description: Preview and visually audit a WordPress theme in a real browser. Use for screenshots, screenshot.png generation, screenshot comparison and diff images, mounting a local design-comparison directory under the site, responsive width checks, console errors, failed assets, horizontal overflow, audit baselines, missing selectors, duplicate ids, empty links, unlabeled form controls, authenticated editor screenshots with a cookie fixture, dark mode, or before declaring a visual change done.
 license: MIT
 metadata:
   author: FlozeIII
@@ -30,6 +30,11 @@ wptk audit --update-baseline
 wptk audit --baseline .wp-theme-kit-audit-baseline.json --json
 wptk compare baseline/home.png dist/shots/home.png --tolerance 0.001
 wptk compare baseline/home.png dist/shots/home.png --out dist/home.diff.png --json
+wptk preview --link ../oil-ui/explore --link-path oil-ui --site http://localhost:8080
+wptk preview --link ../oil-ui/explore --link-path oil-ui --no-open
+wptk preview --link-status
+wptk preview --link-remove oil-ui
+wptk shot http://localhost:8080/oil-ui/ --out dist/oil-ui.png
 ```
 
 - The site URL comes from `--url`, `config.preview.baseUrl`,
@@ -42,6 +47,22 @@ wptk compare baseline/home.png dist/shots/home.png --out dist/home.diff.png --js
 - `--cookie-file` (or `preview.cookieFile`) loads a JSON cookie fixture for
   authenticated pages such as `/wp-admin/post-new.php`. Cookies are applied
   before the first request; values are never printed.
+
+## Mount a design preview
+
+`preview --link <dir>` mounts a local static directory (for example an oil-ui
+comparison page) at `<WordPress root>/<link-path>`, so the page loads the site's
+real CSS and JS instead of `file://`. The path defaults to `oil-ui`, uses only
+`[a-z0-9-]` segments (max 64, no leading or trailing slash), and the source must
+stay inside the working directory. The site must be a WordPress root with
+`wp-load.php` and `wp-content`; anything not created by wptk is refused.
+
+Mounts are recorded in `wp-content/uploads/wp-theme-kit/links.json`. Prefer a
+junction/symlink; a copy fallback is only unregistered on `--link-remove`, not
+deleted. A corrupt manifest errors. After linking, screenshot the mounted URL
+with `wptk shot http://localhost:8080/oil-ui/ --out dist/oil-ui.png`. Removing a
+mount never touches the source directory. oil-ui remains the page generator;
+the command does not call it and has no runtime dependency on it.
 
 ## Cookie fixtures
 
@@ -156,5 +177,10 @@ inert on production unless the `wp_theme_kit_harness_enabled` filter opts in.
 诊断，修好后再正常跑。无障碍问题不可加入 baseline，必须修标记。
 `wptk compare` 离线比较两张 PNG，按容差与单通道阈值判定，`--out` 生成红色差异
 图；尺寸不同直接失败。
+`wptk preview --link <dir>` 把本地设计对比目录挂到 WordPress 根目录下的站点路径
+（默认 `oil-ui`）：优先目录联接/符号链接，失败时复制；路径限 `[a-z0-9-]` 段，
+源目录必须在工作目录内，目标不得覆盖 wptk 未创建的内容；挂载记录在
+`wp-content/uploads/wp-theme-kit/links.json`，复制模式删除时只注销不删文件。
+挂载后可用 `wptk shot <站点>/<路径>/` 截图验收。
 `audit --baseline` 显式抑制已知错误；`--update-baseline` 更新全部路由并保留原始
 观测。新增问题与资源、图片、选择器失败仍会报错，截图守护不受影响。
