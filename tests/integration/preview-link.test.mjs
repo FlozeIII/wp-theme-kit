@@ -7,7 +7,9 @@ import { tempDir, write, runCliAsync } from '../helpers.mjs';
 import { findBrowser } from '../../src/env.mjs';
 import { LINKS_STATE_FILE } from '../../src/preview/link.mjs';
 
-const browserTest = { skip: !findBrowser({}), timeout: 60000 };
+// Hosted Windows runners hang headless Edge, so browser acceptance runs on Linux/macOS.
+const windowsCi = process.platform === 'win32' && Boolean(process.env.CI);
+const browserTest = { skip: windowsCi || !findBrowser({}), timeout: 60000 };
 
 function siteRoot(port) {
   const root = tempDir('site-');
