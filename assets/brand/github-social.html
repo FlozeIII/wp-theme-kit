@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>wp-theme-kit — GitHub social card</title>
+<style>
+  :root {
+    --ink: #f3f7fd;
+    --muted: #9aa8bd;
+    --blue: #4c8dff;
+    --cyan: #61d4ff;
+    --violet: #9b8cff;
+    --line: rgba(255, 255, 255, .1);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 1280px;
+    height: 640px;
+    overflow: hidden;
+  }
+  body {
+    position: relative;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(760px 460px at 88% 10%, rgba(76, 141, 255, .3), transparent 62%),
+      radial-gradient(620px 420px at 2% 100%, rgba(155, 140, 255, .24), transparent 60%),
+      #070b12;
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(620px 460px at 46% 46%, #000 20%, transparent 76%);
+    mask-image: radial-gradient(620px 460px at 46% 46%, #000 20%, transparent 76%);
+  }
+  .glow {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    right: -90px;
+    top: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(76, 141, 255, .35), transparent 62%);
+    filter: blur(10px);
+  }
+  .frame {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 56px;
+    height: 100%;
+    padding: 64px 72px;
+  }
+  .copy { flex: 1 1 auto; min-width: 0; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 22px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+  }
+  h1 {
+    margin: 0 0 18px;
+    font-size: 92px;
+    line-height: .98;
+    letter-spacing: -.035em;
+    font-weight: 800;
+  }
+  h1 .accent {
+    background: linear-gradient(100deg, var(--cyan), var(--blue) 55%, var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .tagline {
+    margin: 0 0 14px;
+    font-size: 31px;
+    line-height: 1.25;
+    font-weight: 600;
+    color: #e7edf8;
+    letter-spacing: -.01em;
+  }
+  .tagline em {
+    font-style: normal;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .details {
+    margin: 0 0 30px;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 540px;
+  }
+  .harnesses { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .035);
+    font-size: 14px;
+    font-weight: 600;
+    color: #d7e2f2;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.claude { background: #d97757; box-shadow: 0 0 10px rgba(217, 119, 87, .8); }
+  .dot.codex { background: #f5f7fa; box-shadow: 0 0 10px rgba(245, 247, 250, .6); }
+  .dot.dsh { background: #4d6bfe; box-shadow: 0 0 10px rgba(77, 107, 254, .9); }
+  .url {
+    position: absolute;
+    left: 72px;
+    bottom: 40px;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 14px;
+    color: #62708a;
+    letter-spacing: .02em;
+  }
+  .terminal {
+    position: relative;
+    flex: 0 0 470px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(16, 23, 36, .96), rgba(9, 13, 21, .96));
+    box-shadow:
+      0 40px 90px rgba(0, 0, 0, .55),
+      0 0 0 1px rgba(255, 255, 255, .03) inset,
+      0 0 80px rgba(76, 141, 255, .18);
+    transform: rotate(-1.6deg);
+    overflow: hidden;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    background: rgba(255, 255, 255, .03);
+  }
+  .bar span { width: 11px; height: 11px; border-radius: 50%; background: #2b3444; }
+  .bar span:nth-child(1) { background: #ff5f57; }
+  .bar span:nth-child(2) { background: #febc2e; }
+  .bar span:nth-child(3) { background: #28c840; }
+  .bar strong {
+    margin-left: 8px;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6f7e95;
+    letter-spacing: .04em;
+  }
+  pre {
+    margin: 0;
+    padding: 24px 22px 30px;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 15px;
+    line-height: 1.85;
+    white-space: pre-wrap;
+  }
+  .prompt { color: #61d4ff; }
+  .cmd { color: #f3f7fd; }
+  .ok { color: #34d399; }
+  .dim { color: #6f7e95; }
+  .caret {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    margin-left: 4px;
+    vertical-align: -2px;
+    background: var(--cyan);
+    opacity: .8;
+  }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="frame">
+    <div class="copy">
+      <div class="eyebrow">WordPress theme toolkit</div>
+      <h1>wp-theme-<span class="accent">kit</span></h1>
+      <p class="tagline">One skill pack. <em>Every harness.</em></p>
+      <p class="details">Check, scaffold, screenshot, package and translate a theme — from Claude Code, Codex, DeepSeek Harness or a plain terminal.</p>
+      <div class="harnesses">
+        <span class="pill"><span class="dot claude"></span>Claude Code</span>
+        <span class="pill"><span class="dot codex"></span>Codex</span>
+        <span class="pill"><span class="dot dsh"></span>DeepSeek Harness</span>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="bar"><span></span><span></span><span></span><strong>~/themes/yuki</strong></div>
+      <pre><span class="prompt">$</span> <span class="cmd">wptk check</span>
+<span class="ok">✓</span> 0 errors · 0 warnings
+<span class="ok">✓</span> 42 rules · PHP 8.2 analyzer
+<span class="prompt">$</span> <span class="cmd">wptk shot --audit</span>
+<span class="ok">✓</span> 3 routes · audit clean
+<span class="prompt">$</span> <span class="cmd">wptk package --rev HEAD</span>
+<span class="ok">✓</span> dist/yuki.zip <span class="dim">1.8 MB</span><span class="caret"></span></pre>
+    </div>
+  </div>
+  <div class="url">github.com/FlozeIII/wp-theme-kit</div>
+</body>
+</html>

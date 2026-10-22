@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>wp-theme-kit — promo card</title>
+<style>
+  :root {
+    --ink: #f3f7fd;
+    --muted: #9aa8bd;
+    --blue: #4c8dff;
+    --cyan: #61d4ff;
+    --violet: #9b8cff;
+    --line: rgba(255, 255, 255, .1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 900px; overflow: hidden; }
+  body {
+    position: relative;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(900px 600px at 82% 0%, rgba(76, 141, 255, .32), transparent 62%),
+      radial-gradient(800px 560px at 0% 100%, rgba(155, 140, 255, .2), transparent 62%),
+      #070b12;
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 52px 52px;
+    -webkit-mask-image: radial-gradient(900px 640px at 50% 34%, #000 12%, transparent 78%);
+    mask-image: radial-gradient(900px 640px at 50% 34%, #000 12%, transparent 78%);
+  }
+  .page {
+    position: relative;
+    height: 100%;
+    padding: 72px 90px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+  }
+  .harnesses { display: flex; gap: 10px; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 15px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .035);
+    font-size: 14px;
+    font-weight: 600;
+    color: #d7e2f2;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.claude { background: #d97757; box-shadow: 0 0 10px rgba(217, 119, 87, .8); }
+  .dot.codex { background: #f5f7fa; box-shadow: 0 0 10px rgba(245, 247, 250, .6); }
+  .dot.dsh { background: #4d6bfe; box-shadow: 0 0 10px rgba(77, 107, 254, .9); }
+  .hero { padding-top: 74px; }
+  h1 {
+    margin: 0 0 20px;
+    font-size: 112px;
+    line-height: .96;
+    letter-spacing: -.04em;
+    font-weight: 800;
+  }
+  h1 .accent {
+    background: linear-gradient(100deg, var(--cyan), var(--blue) 55%, var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .tagline {
+    margin: 0 0 16px;
+    font-size: 38px;
+    font-weight: 600;
+    letter-spacing: -.015em;
+    color: #e7edf8;
+  }
+  .tagline em { font-style: normal; color: var(--muted); font-weight: 500; }
+  .details {
+    margin: 0;
+    max-width: 900px;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-top: 62px;
+  }
+  .card {
+    position: relative;
+    padding: 24px 24px 22px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(20, 28, 43, .82), rgba(11, 16, 25, .82));
+    overflow: hidden;
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(97, 212, 255, .55), transparent);
+    opacity: .7;
+  }
+  .icon {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    border-radius: 11px;
+    background: rgba(76, 141, 255, .14);
+    border: 1px solid rgba(97, 212, 255, .28);
+    color: var(--cyan);
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .card h3 {
+    margin: 0 0 7px;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+  .card p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 26px 0 38px;
+    border-top: 1px solid rgba(255, 255, 255, .07);
+  }
+  .cmdline {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 17px;
+    color: #cfd9ea;
+  }
+  .cmdline .prompt { color: var(--cyan); }
+  .cmdline .dim { color: #6f7e95; }
+  .url {
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 15px;
+    color: #62708a;
+    letter-spacing: .02em;
+  }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="page">
+    <div class="top">
+      <div class="eyebrow">WordPress theme toolkit</div>
+      <div class="harnesses">
+        <span class="pill"><span class="dot claude"></span>Claude Code</span>
+        <span class="pill"><span class="dot codex"></span>Codex</span>
+        <span class="pill"><span class="dot dsh"></span>DeepSeek Harness</span>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h1>wp-theme-<span class="accent">kit</span></h1>
+      <p class="tagline">One workflow. <em>Every harness.</em></p>
+      <p class="details">A shared skill pack and a zero-dependency CLI for the whole theme lifecycle — so the assistant changes, but the checks, screenshots and release stay the same.</p>
+    </div>
+
+    <div class="features">
+      <div class="card">
+        <div class="icon">✓</div>
+        <h3>Check</h3>
+        <p>42 structural rules for escaping, i18n, blocks and assets — offline.</p>
+      </div>
+      <div class="card">
+        <div class="icon">◧</div>
+        <h3>Preview</h3>
+        <p>Real-browser screenshots, audits, accessibility and design-preview mounts.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⬇</div>
+        <h3>Package</h3>
+        <p>Reproducible zips from a committed revision, with release preflight.</p>
+      </div>
+      <div class="card">
+        <div class="icon">文</div>
+        <h3>Translate</h3>
+        <p>POT generation and text-domain checks without WP-CLI.</p>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="cmdline">
+        <span class="prompt">$</span> <span>npm i -g wp-theme-kit</span>
+        <span class="dim">·</span>
+        <span class="dim">Node 22+ · no runtime dependencies</span>
+      </div>
+      <div class="url">github.com/FlozeIII/wp-theme-kit</div>
+    </div>
+  </div>
+</body>
+</html>
