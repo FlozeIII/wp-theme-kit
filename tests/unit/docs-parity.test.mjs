@@ -6,7 +6,9 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const read = (name) => fs.readFileSync(path.join(root, name), 'utf8');
+// GitHub's Windows checkout converts committed files to CRLF; normalise so the
+// line-anchored patterns read the same on every runner.
+const read = (name) => fs.readFileSync(path.join(root, name), 'utf8').replace(/\r\n/g, '\n');
 
 function headings(text) {
   return text
