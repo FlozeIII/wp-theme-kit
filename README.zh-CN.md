@@ -746,5 +746,7 @@ claude plugin validate . --strict
 MIT。按 WordPress 生态惯例，kit 生成的主题默认 GPL-2.0-or-later；用
 `wptk init --license` 修改。
 
+发布记录见 [CHANGELOG.md](CHANGELOG.md)。
+
 
 
