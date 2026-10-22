@@ -220,7 +220,10 @@ the latest CI run at https://github.com/FlozeIII/wp-theme-kit/actions.
   and the `.bin/wptk` shim print `0.2.1`. `0.3.0` (the `preview --link` feature
   and the Simplified Chinese README) is the current `latest`; tag `v0.3.0` is
   pushed and a temporary `npm i wp-theme-kit@0.3.0` adds exactly one package and
-  prints `0.3.0` (verified 2026-10-19).
+  prints `0.3.0` (verified 2026-10-19). `0.3.1` (release preflight, docs/CI
+  parity and the README artwork) is the current `latest`; tag `v0.3.1` is
+  pushed and a temporary `npm i wp-theme-kit@0.3.1` adds exactly one package and
+  prints `0.3.1` (verified 2026-10-22).
 
 - [x] Mount a local design-comparison directory into a WordPress site
   (oil-ui integration; requested after the roadmap closed).
