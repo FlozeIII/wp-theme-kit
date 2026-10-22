@@ -1,10 +1,6 @@
 <div align="center">
 
-<h1>wp-theme-kit</h1>
-
-<p><strong>跨 harness 的 WordPress 主题开发工具。</strong><br>
-一份共享技能包 + 一个零依赖 Node CLI，可在 Claude Code、Codex、DeepSeek Harness
-或普通终端里使用。</p>
+<img src="assets/brand/github-social.png" alt="wp-theme-kit —— 一套工作流，所有 harness" width="100%">
 
 <p>
 <a href="https://www.npmjs.com/package/wp-theme-kit"><img src="https://img.shields.io/npm/v/wp-theme-kit?style=flat-square&logo=npm&label=npm" alt="npm version"></a>
@@ -48,6 +44,8 @@ CLI 和一套技能，因此用哪个 harness 都一样，结果可复现。
 它提取自一个已在使用的 classic 主题，那套流程本来就使用零依赖 Node 脚本、
 `git archive` 打包和 CDP 截图。开发时以 yuki 主题做 dogfood，但核心代码里没有
 yuki 专用的选择器、文本域或环境变量。
+
+<p align="center"><img src="assets/brand/promo.png" alt="wp-theme-kit：检查、预览、打包与翻译，任何 harness 都一样" width="100%"></p>
 
 ## 环境要求
 

@@ -1,10 +1,6 @@
 <div align="center">
 
-<h1>wp-theme-kit</h1>
-
-<p><strong>A cross-harness toolkit for WordPress theme development.</strong><br>
-One shared skill pack and one zero-dependency Node CLI — Claude Code, Codex,
-DeepSeek Harness, or a plain terminal.</p>
+<img src="assets/brand/github-social.png" alt="wp-theme-kit — one skill pack, every harness" width="100%">
 
 <p>
 <a href="https://www.npmjs.com/package/wp-theme-kit"><img src="https://img.shields.io/npm/v/wp-theme-kit?style=flat-square&logo=npm&label=npm" alt="npm version"></a>
@@ -79,6 +75,8 @@ It was extracted from a working classic theme that already used zero-dependency
 Node scripts, `git archive` packaging, and CDP screenshots. The yuki theme is
 used as a dogfood target during development, but no yuki-specific selector,
 text domain, or environment variable enters the core.
+
+<p align="center"><img src="assets/brand/promo.png" alt="wp-theme-kit: check, preview, package and translate from any harness" width="100%"></p>
 
 ## Requirements
 
