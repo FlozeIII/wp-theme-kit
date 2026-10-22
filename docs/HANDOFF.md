@@ -5,7 +5,7 @@ It does not assume access to any previous chat, plan file, or local session.
 
 ## Current state
 
-- Version: `0.3.0`
+- Version: `0.3.1`
 - Published: `wp-theme-kit@0.3.0` on npm (account `floze3`) and the public
   repository `FlozeIII/wp-theme-kit`; the Claude marketplace entry is
   `FlozeIII/wp-theme-kit`. Tags `v0.2.1` and `v0.3.0` are pushed; the GitHub
