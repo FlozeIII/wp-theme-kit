@@ -1,9 +1,34 @@
-# wp-theme-kit
+<div align="center">
 
-[English](README.md) | 简体中文
+<h1>wp-theme-kit</h1>
 
-一套跨 harness 的 WordPress 主题开发工具：一份共享技能包 + 一个零依赖 Node
-CLI，可在 Claude Code、Codex、DeepSeek Harness 或普通终端里使用。
+<p><strong>跨 harness 的 WordPress 主题开发工具。</strong><br>
+一份共享技能包 + 一个零依赖 Node CLI，可在 Claude Code、Codex、DeepSeek Harness
+或普通终端里使用。</p>
+
+<p>
+<a href="https://www.npmjs.com/package/wp-theme-kit"><img src="https://img.shields.io/npm/v/wp-theme-kit?style=flat-square&logo=npm&label=npm" alt="npm version"></a>
+<a href="https://github.com/FlozeIII/wp-theme-kit/actions/workflows/ci.yml"><img src="https://github.com/FlozeIII/wp-theme-kit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="LICENSE"><img src="https://img.shields.io/npm/l/wp-theme-kit?style=flat-square&label=license" alt="license"></a>
+<a href="https://nodejs.org"><img src="https://img.shields.io/node/v/wp-theme-kit?style=flat-square&label=node" alt="node"></a>
+</p>
+
+<p><sub>Built and dogfooded with</sub></p>
+
+<p>
+<a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-built_with-D97757?style=flat-square" alt="Claude Code"></a>
+<a href="#codex"><img src="https://img.shields.io/badge/Codex-built_with-000000?style=flat-square" alt="Codex"></a>
+<a href="#deepseek-harness"><img src="https://img.shields.io/badge/DeepSeek_Harness-built_with-4D6BFE?style=flat-square" alt="DeepSeek Harness"></a>
+</p>
+
+<p><a href="README.md">English</a> | 简体中文</p>
+
+</div>
+
+---
+
+
+---
 
 ```bash
 wptk check       # 离线检查结构、PHP、区块、i18n 与资源
@@ -12,6 +37,7 @@ wptk shot        # 真实视口截图与视觉守卫
 wptk package     # 从已提交的 Git 快照生成可复现 zip
 wptk pot         # 生成翻译模板
 ```
+
 
 ## 为什么
 

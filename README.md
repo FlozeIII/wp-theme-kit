@@ -1,10 +1,31 @@
-# wp-theme-kit
+<div align="center">
 
-English | [简体中文](README.zh-CN.md)
+<h1>wp-theme-kit</h1>
 
-A cross-harness toolkit for developing WordPress themes. It ships one shared
-skill pack and one zero-dependency Node CLI, usable from Claude Code, Codex,
-DeepSeek Harness, or a plain terminal.
+<p><strong>A cross-harness toolkit for WordPress theme development.</strong><br>
+One shared skill pack and one zero-dependency Node CLI — Claude Code, Codex,
+DeepSeek Harness, or a plain terminal.</p>
+
+<p>
+<a href="https://www.npmjs.com/package/wp-theme-kit"><img src="https://img.shields.io/npm/v/wp-theme-kit?style=flat-square&logo=npm&label=npm" alt="npm version"></a>
+<a href="https://github.com/FlozeIII/wp-theme-kit/actions/workflows/ci.yml"><img src="https://github.com/FlozeIII/wp-theme-kit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="LICENSE"><img src="https://img.shields.io/npm/l/wp-theme-kit?style=flat-square&label=license" alt="license"></a>
+<a href="https://nodejs.org"><img src="https://img.shields.io/node/v/wp-theme-kit?style=flat-square&label=node" alt="node"></a>
+</p>
+
+<p><sub>Built and dogfooded with</sub></p>
+
+<p>
+<a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-built_with-D97757?style=flat-square" alt="Claude Code"></a>
+<a href="#codex"><img src="https://img.shields.io/badge/Codex-built_with-000000?style=flat-square" alt="Codex"></a>
+<a href="#deepseek-harness"><img src="https://img.shields.io/badge/DeepSeek_Harness-built_with-4D6BFE?style=flat-square" alt="DeepSeek Harness"></a>
+</p>
+
+<p>English | <a href="README.zh-CN.md">简体中文</a></p>
+
+</div>
+
+---
 
 ```bash
 wptk check       # offline structure, PHP, block, i18n, and asset checks
@@ -13,6 +34,38 @@ wptk shot        # real-viewport screenshots and visual guards
 wptk package     # reproducible zip from a committed Git revision
 wptk pot         # translation template generation
 ```
+
+<details>
+<summary><strong>Contents</strong></summary>
+
+- **Getting started** — [Why](#why) · [Requirements](#requirements) ·
+  [Install](#install) · [Quick start](#quick-start) · [Commands](#commands) ·
+  [Configuration](#configuration)
+- **Harnesses** — [How one skill pack serves three harnesses](#how-one-skill-pack-serves-three-harnesses) ·
+  [Safety and limits](#safety-and-limits)
+- **Preview and audit** — [Audit baselines](#audit-baselines) ·
+  [Accessibility assertions](#accessibility-assertions) ·
+  [Screenshot comparison](#screenshot-comparison) ·
+  [Editor screenshots and cookie fixtures](#editor-screenshots-and-cookie-fixtures) ·
+  [Link a design preview into the site](#link-a-design-preview-into-the-site) ·
+  [Mu-plugin helpers](#mu-plugin-helpers)
+- **Rules and reference** — [POT header metadata](#pot-header-metadata) ·
+  [Themes in repository subdirectories](#themes-in-repository-subdirectories) ·
+  [Theme Check on a ZIP](#theme-check-on-a-zip) ·
+  [Release tag preflight](#release-tag-preflight) ·
+  [Release notes drafts](#release-notes-drafts) ·
+  [Script footer argument types](#script-footer-argument-types) ·
+  [printf argument counts](#printf-argument-counts) ·
+  [Literal array template arguments](#literal-array-template-arguments) ·
+  [Block markup balance](#block-markup-balance) ·
+  [Block attribute JSON](#block-attribute-json) ·
+  [JSON finding documentation](#json-finding-documentation) ·
+  [Rule explanations](#rule-explanations) ·
+  [Changed-file checks](#changed-file-checks) · [Mechanical fixes](#mechanical-fixes)
+- **Project** — [Development](#development) · [License](#license)
+
+</details>
+
 
 ## Why
 
