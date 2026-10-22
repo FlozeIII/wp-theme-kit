@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `npm run release:check` preflights a release (version agreement, CHANGELOG
+  section, clean tree, upstream sync, npm registry and, with `--online`, npm
+  authentication); `docs/release.md` is the matching runbook.
+- `npm run test:ci` and `npm run test:browser:ci` mirror the exact commands CI
+  runs, and `.github/workflows/ci.yml` now calls them.
+- `tests/unit/docs-parity.test.mjs` enforces that both READMEs keep the same
+  section structure, that both command tables match `wptk --help`, that the
+  router mentions every skill, and that `CHANGELOG.md` starts with the current
+  version.
+- The npm package now ships `README.zh-CN.md`, so the language link in
+  `README.md` works on the registry page.
+
 ## [0.3.0] - 2026-10-19
 
 ### Added

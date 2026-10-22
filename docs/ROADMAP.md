@@ -2,6 +2,8 @@
 
 Status: v0.1.0 is complete. Work top to bottom unless a task says otherwise.
 Each item is small enough for one agent session and has an acceptance command.
+Pass counts in completed items are point-in-time records; the current state is
+the latest CI run at https://github.com/FlozeIII/wp-theme-kit/actions.
 
 ## v0.2: rule depth and fix loops
 
@@ -231,7 +233,7 @@ Each item is small enough for one agent session and has an acceptance command.
   source/target/reachability and `--link-remove` unlinks only what wptk created
   (copy mounts are unregistered, never deleted); a corrupt manifest errors.
   oil-ui remains the page generator and is not a runtime dependency.
-  Verified: `npm test` (350 pass, 1 Windows skip, 351 total); `preview --help`;
+  Verified: `npm test` and the CI browser matrix are green; `preview --help`;
   `claude plugin validate . --strict`.
 
 ## Deferred / not planned

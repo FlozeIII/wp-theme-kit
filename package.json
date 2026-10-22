@@ -19,6 +19,7 @@
     "commands/",
     "AGENTS.md",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE",
     "CHANGELOG.md",
     ".claude-plugin/",
@@ -30,6 +31,9 @@
   },
   "scripts": {
     "test": "node --test",
+    "test:ci": "node --test --test-timeout=180000 --test-force-exit",
+    "test:browser:ci": "node --test --test-concurrency=1 --test-timeout=180000 --test-force-exit tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs",
+    "release:check": "node scripts/release-check.mjs",
     "test:unit": "node --test \"tests/unit/*.test.mjs\"",
     "test:integration": "node --test \"tests/integration/*.test.mjs\"",
     "check:self": "node bin/wp-theme-kit.mjs check ."

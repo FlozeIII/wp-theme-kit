@@ -12,7 +12,8 @@ It does not assume access to any previous chat, plan file, or local session.
   Release remains manual.
 - Status: usable; all four capability areas and the initial v0.2 rule depth
   and fix loop roadmap group are implemented.
-- Tests: `npm test` -> 350 passing, 1 skipped (351 total) on Windows because file-symlink
+- Tests: `npm test` / `npm run test:ci` are green; the current count is whatever the
+  latest CI run reports. One test is skipped on Windows because file-symlink
   creation requires privileges. The combined fix fixture passes PHP lint.
 - Dogfood against `yuki-theme`:
   - `wptk check`: 0 errors, 0 warnings, 8 info.

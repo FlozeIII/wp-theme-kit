@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: Run tests
-        run: node --test --test-timeout=180000 --test-force-exit
+        run: npm run test:ci
       - name: Validate manifests
         shell: bash
         run: |
@@ -54,7 +54,7 @@ jobs:
       - name: Browser tests
         if: steps.detect.outputs.available == 'true'
         shell: bash
-        run: node --test --test-concurrency=1 --test-timeout=180000 --test-force-exit tests/integration/preview.test.mjs tests/integration/audit-baseline.test.mjs tests/integration/accessibility.test.mjs tests/integration/compare.test.mjs tests/integration/editor-cookie.test.mjs
+        run: npm run test:browser:ci
       - name: No browser found
         if: steps.detect.outputs.available != 'true'
         shell: bash

@@ -21,8 +21,11 @@ the next task. Those files do not assume any previous chat context.
 ## Working on this repository
 
 - Node 22.2 or newer. No runtime npm dependencies; keep it that way.
-- Run `npm test` after every change.
+- Run `npm test` after every change. Before pushing, run `npm run test:ci` — it
+  is the exact command CI executes (timeout and force-exit included).
 - Run `claude plugin validate . --strict` after touching a manifest or skill.
+- Release steps live in `docs/release.md`; start with
+  `npm run release:check -- --online`.
 - Keep `skills/<name>/SKILL.md` frontmatter limited to `name`, `description`,
   `license`, and `metadata`. Codex rejects harness-specific keys.
 - Keep skill resources inside the skill directory. Shared references live under
